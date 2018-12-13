@@ -1,0 +1,28 @@
+* {
+  margin: 10px;
+  padding: 5px;
+}
+
+p {
+  font: 1.2em monospace;
+}
+
+.class {
+  border: 3px solid black;
+  background-color: darkturquoise;
+}
+
+.methods {
+  padding-left: 20px;
+}
+
+.function {
+  border: 1px solid black;
+  background-color: palegoldenrod;
+}
+
+h1, h2, h3, ul, ol, li {
+  font-family: sans-serif;
+  margin: 5px;
+  padding: 0px;
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<title>recta_proyectiva</title><link rel='stylesheet' type='text/css' href='style.css'></head>
+<body>
+<a href='index.html'>Página principal</a><h1>recta_proyectiva</h1>
+<p>
+Este archivo proporciona diferentes funciones sobre razones dobles y homografías de la recta.<br>
+Autor: Pablo Sanz Sanz<br>
+</p>
+<div class='function'>
+<h3>Función: razon_doble_puntos</h3>
+<p>
+Calcula la razón doble ({P0, P1, P2, P3}) de los puntos alineados dados.<br>
+Implementación <br>
+Utiliza que la razón doble es invariante por proyecciones y la fórmula de larazón doble de los determinantes. Se elige una proyección que siga siendo una recta.<br>
+Parámetros <br>
+p0: vector(n>1) - primer punto de la razón doblep1: vector(n>1) - segundo punto de la razón doblep2: vector(n>1) - tercer punto de la razón doblep3: vector(n>1) - cuarto punto de la razón doble<br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: razon_doble</h3>
+<p>
+Calcula la razón doble ({theta0, theta1, theta2, theta3}) de los puntos de la recta dados(con parámetro no homogéneo).<br>
+Implementación <br>
+Utiliza la razón doble definida para puntos tras homogeneizar las coordenadas.<br>
+Parámetros <br>
+theta0: número - primer punto de la razón dobletheta1: número - segundo punto de la razón dobletheta2: número - tercer punto de la razón dobletheta3: número - cuarto punto de la razón doble<br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_cuaterna_armonica_puntos</h3>
+<p>
+Determina si los puntos dados forman una cuaterna armónica, esto es, {P0, P1, P2, P3} = -1.<br>
+Implementación <br>
+Devuelve {P0, P1, P2, P3} == -1 utilizando las funciones anteriores.<br>
+Parámetros <br>
+p0: vector(n>1) - primer punto de la razón doblep1: vector(n>1) - segundo punto de la razón doblep2: vector(n>1) - tercer punto de la razón doblep3: vector(n>1) - cuarto punto de la razón doble<br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_cuaterna_armonica</h3>
+<p>
+Determina si los puntos dados forman una cuaterna armónica, esto es,{theta0, theta1, theta2, theta3} = -1.<br>
+Implementación <br>
+Devuelve {theta0, theta1, theta2, theta3} == -1 utilizando las funciones anteriores.<br>
+Parámetros <br>
+theta0: número - primer punto de la razón dobletheta1: número - segundo punto de la razón dobletheta2: número - tercer punto de la razón dobletheta3: número - cuarto punto de la razón doble<br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: conjugado_armonico</h3>
+<p>
+Devuelve el conjugado armónico de theta2 respecto de theta0 y theta1.<br>
+Implementación <br>
+Resuelve la ecuación {theta0, theta1, theta2, theta} == -1 en theta utilizando las funciones anteriores.<br>
+Parámetros <br>
+theta0: número - primer punto de la razón dobletheta1: número - segundo punto de la razón dobletheta2: número - tercer punto de la razón dobletheta: número - variable que se quiere que sea el conjugado armónico<br>
+</p>
+</div>
+</body>
+</html>
