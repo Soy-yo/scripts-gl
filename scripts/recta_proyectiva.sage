@@ -13,9 +13,9 @@ load("espacios.sage")
 # razón doble de los determinantes. Se elige una proyección que siga siendo una recta.
 #
 # Parámetros \\
-# p0: vector(n>1) - primer punto de la razón doble
-# p1: vector(n>1) - segundo punto de la razón doble
-# p2: vector(n>1) - tercer punto de la razón doble
+# p0: vector(n>1) - primer punto de la razón doble \\
+# p1: vector(n>1) - segundo punto de la razón doble \\
+# p2: vector(n>1) - tercer punto de la razón doble \\
 # p3: vector(n>1) - cuarto punto de la razón doble
 #
 def razon_doble_puntos(p0, p1, p2, p3):
@@ -57,10 +57,10 @@ def razon_doble_puntos(p0, p1, p2, p3):
 # Utiliza la razón doble definida para puntos tras homogeneizar las coordenadas.
 #
 # Parámetros \\
-# theta0: número - primer punto de la razón doble
-# theta1: número - segundo punto de la razón doble
-# theta2: número - tercer punto de la razón doble
-# theta3: número - cuarto punto de la razón doble
+# theta0: complejo - primer punto de la razón doble \\
+# theta1: complejo - segundo punto de la razón doble \\
+# theta2: complejo - tercer punto de la razón doble \\
+# theta3: complejo - cuarto punto de la razón doble
 #
 def razon_doble(theta0, theta1, theta2, theta3):
     p0 = vector([1, 0]) if theta0 == Infinity else vector([theta0, 1])
@@ -76,9 +76,9 @@ def razon_doble(theta0, theta1, theta2, theta3):
 # Devuelve {P0, P1, P2, P3} == -1 utilizando las funciones anteriores.
 #
 # Parámetros \\
-# p0: vector(n>1) - primer punto de la razón doble
-# p1: vector(n>1) - segundo punto de la razón doble
-# p2: vector(n>1) - tercer punto de la razón doble
+# p0: vector(n>1) - primer punto de la razón doble \\
+# p1: vector(n>1) - segundo punto de la razón doble \\
+# p2: vector(n>1) - tercer punto de la razón doble \\
 # p3: vector(n>1) - cuarto punto de la razón doble
 #
 def es_cuaterna_armonica_puntos(p0, p1, p2, p3):
@@ -92,10 +92,10 @@ def es_cuaterna_armonica_puntos(p0, p1, p2, p3):
 # Devuelve {theta0, theta1, theta2, theta3} == -1 utilizando las funciones anteriores.
 #
 # Parámetros \\
-# theta0: número - primer punto de la razón doble
-# theta1: número - segundo punto de la razón doble
-# theta2: número - tercer punto de la razón doble
-# theta3: número - cuarto punto de la razón doble
+# theta0: complejo - primer punto de la razón doble \\
+# theta1: complejo - segundo punto de la razón doble \\
+# theta2: complejo - tercer punto de la razón doble \\
+# theta3: complejo - cuarto punto de la razón doble
 #
 def es_cuaterna_armonica(theta0, theta1, theta2, theta3):
     return razon_doble(theta0, theta1, theta2, theta3) == -1
@@ -107,10 +107,10 @@ def es_cuaterna_armonica(theta0, theta1, theta2, theta3):
 # Resuelve la ecuación {theta0, theta1, theta2, theta} == -1 en theta utilizando las funciones anteriores.
 #
 # Parámetros \\
-# theta0: número - primer punto de la razón doble
-# theta1: número - segundo punto de la razón doble
-# theta2: número - tercer punto de la razón doble
-# theta: número - variable que se quiere que sea el conjugado armónico
+# theta0: complejo - primer punto de la razón doble \\
+# theta1: complejo - segundo punto de la razón doble \\
+# theta2: complejo - tercer punto de la razón doble \\
+# theta: variable - variable que se quiere que sea el conjugado armónico
 #
 def conjugado_armonico(theta0, theta1, theta2, theta):
     return solve([es_cuaterna_armonica(theta0, theta1, theta2, theta)], theta)
