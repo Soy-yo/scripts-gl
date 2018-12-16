@@ -5,123 +5,123 @@
 <body>
 <a href='index.html'>Página principal</a><h1>recta_proyectiva</h1>
 <p>
-Este archivo proporciona diferentes funciones sobre razones dobles y homografías de la recta.<br>
-Autor: Pablo Sanz Sanz<br>
+Este archivo proporciona diferentes funciones sobre razones dobles y homografías de la recta. <br>
+Autor: Pablo Sanz Sanz <br>
 </p>
 <div class='function'>
 <h3>Función: razon_doble_puntos</h3>
 <p>
-Calcula la razón doble ({P0, P1, P2, P3}) de los puntos alineados dados.<br>
+Calcula la razón doble ({P0, P1, P2, P3}) de los puntos alineados dados. <br>
 Implementación <br>
-Utiliza que la razón doble es invariante por proyecciones y la fórmula de larazón doble de los determinantes. Se elige una proyección que siga siendo una recta.<br>
+Utiliza que la razón doble es invariante por proyecciones y la fórmula de la razón doble de los determinantes. Se elige una proyección que siga siendo una recta. <br>
 Parámetros <br>
 p0: vector(n>1) - primer punto de la razón doble <br>
 p1: vector(n>1) - segundo punto de la razón doble <br>
 p2: vector(n>1) - tercer punto de la razón doble <br>
-p3: vector(n>1) - cuarto punto de la razón doble<br>
+p3: vector(n>1) - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: razon_doble</h3>
 <p>
-Calcula la razón doble ({theta0, theta1, theta2, theta3}) de los puntos de la recta dados(con parámetro no homogéneo).<br>
+Calcula la razón doble ({theta0, theta1, theta2, theta3}) de los puntos de la recta dados (con parámetro no homogéneo). <br>
 Implementación <br>
-Utiliza la razón doble definida para puntos tras homogeneizar las coordenadas.<br>
+Utiliza la razón doble definida para puntos tras homogeneizar las coordenadas. <br>
 Parámetros <br>
 theta0: complejo/Infinity - primer punto de la razón doble <br>
 theta1: complejo/Infinity - segundo punto de la razón doble <br>
 theta2: complejo/Infinity - tercer punto de la razón doble <br>
-theta3: complejo/Infinity - cuarto punto de la razón doble<br>
+theta3: complejo/Infinity - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: es_cuaterna_armonica_puntos</h3>
 <p>
-Determina si los puntos dados forman una cuaterna armónica, esto es, {P0, P1, P2, P3} = -1.<br>
+Determina si los puntos dados forman una cuaterna armónica, esto es, {P0, P1, P2, P3} = -1. <br>
 Implementación <br>
-Devuelve {P0, P1, P2, P3} == -1 utilizando las funciones anteriores.<br>
+Devuelve {P0, P1, P2, P3} == -1 utilizando las funciones anteriores. <br>
 Parámetros <br>
 p0: vector(n>1) - primer punto de la razón doble <br>
 p1: vector(n>1) - segundo punto de la razón doble <br>
 p2: vector(n>1) - tercer punto de la razón doble <br>
-p3: vector(n>1) - cuarto punto de la razón doble<br>
+p3: vector(n>1) - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: es_cuaterna_armonica</h3>
 <p>
-Determina si los puntos dados forman una cuaterna armónica, esto es,{theta0, theta1, theta2, theta3} = -1.<br>
+Determina si los puntos dados forman una cuaterna armónica, esto es, {theta0, theta1, theta2, theta3} = -1. <br>
 Implementación <br>
-Devuelve {theta0, theta1, theta2, theta3} == -1 utilizando las funciones anteriores.<br>
+Devuelve {theta0, theta1, theta2, theta3} == -1 utilizando las funciones anteriores. <br>
 Parámetros <br>
 theta0: complejo/Infinity - primer punto de la razón doble <br>
 theta1: complejo/Infinity - segundo punto de la razón doble <br>
 theta2: complejo/Infinity - tercer punto de la razón doble <br>
-theta3: complejo/Infinity - cuarto punto de la razón doble<br>
+theta3: complejo/Infinity - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: conjugado_armonico_puntos</h3>
 <p>
-Devuelve el conjugado armónico de p2 respecto de p0 y p1.<br>
+Devuelve el conjugado armónico de p2 respecto de p0 y p1. <br>
 Implementación <br>
-Como la razón doble es la coordenada del cuarto punto respecto a la referencia {p0, p1; p2}, obtiene la recta queforman p0, p1 y p2 y devuelve el punto correspondiente a la coordenada theta == -1.<br>
+Como la razón doble es la coordenada del cuarto punto respecto a la referencia {p0, p1; p2}, obtiene la recta que forman p0, p1 y p2 y devuelve el punto correspondiente a la coordenada theta == -1. <br>
 Parámetros <br>
 p0: vector(n>1) - primer punto de la razón doble <br>
 p1: vector(n>1) - segundo punto de la razón doble <br>
-p2: vector(n>1) - tercer punto de la razón doble<br>
+p2: vector(n>1) - tercer punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: conjugado_armonico</h3>
 <p>
-Devuelve el conjugado armónico de theta2 respecto de theta0 y theta1.<br>
+Devuelve el conjugado armónico de theta2 respecto de theta0 y theta1. <br>
 Implementación <br>
-Resuelve la ecuación {theta0, theta1, theta2, theta} == -1 en theta utilizando las funciones anteriores.<br>
+Resuelve la ecuación {theta0, theta1, theta2, theta} == -1 en theta utilizando las funciones anteriores. <br>
 Parámetros <br>
 theta0: complejo/Infinity - primer punto de la razón doble <br>
 theta1: complejo/Infinity - segundo punto de la razón doble <br>
-theta2: complejo/Infinity - tercer punto de la razón doble<br>
+theta2: complejo/Infinity - tercer punto de la razón doble <br>
 </p>
 </div>
 <div class='class'>
 <h2>Clase: recta_proyectiva</h2>
 <p>
-Clase que representa una recta proyectiva para cualquier dimension ambiente. Sirve para cálculos de razones dobleso para homografías entre rectas.<br>
+Clase que representa una recta proyectiva para cualquier dimension ambiente. Sirve para cálculos de razones dobles o para homografías entre rectas. <br>
 </p>
 <div class='methods'>
 <div class='function'>
 <h3>Constructor</h3>
 <p>
-Inicializa la recta dada la referencia {p0, p1; p2} que se quiere utilizar.<br>
+Inicializa la recta dada la referencia {p0, p1; p2} que se quiere utilizar. <br>
 Implementación <br>
-Obtiene la matriz asociada a la referencia dada (esto es, multiplicando el vector asociado a p0 y p1 por un coeficientede forma que a*p0 + b*p1 == p2) y construye el punto b*p1 + theta*a*p0.<br>
+Obtiene la matriz asociada a la referencia dada (esto es, multiplicando el vector asociado a p0 y p1 por un coeficiente de forma que a*p0 + b*p1 == p2) y construye el punto b*p1 + theta*a*p0. <br>
 Parámetros <br>
-p0: vector(n) - punto cuya coordenada será theta == Infinityp1: vector(n) - punto cuya coordenada será theta == 0p2: vector(n) - punto cuya coordenada será theta == 1<br>
+p0: vector(n) - punto cuya coordenada será theta == Infinity p1: vector(n) - punto cuya coordenada será theta == 0 p2: vector(n) - punto cuya coordenada será theta == 1 <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: __getitem__</h3>
 <p>
-Devuelve el punto con coordenada theta.<br>
-Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta(_proyectiva)).<br>
+Devuelve el punto con coordenada theta. <br>
+Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta(_proyectiva)). <br>
 Parámetros <br>
-theta: complejo/Infinity - coordenada del punto de la recta que se quiere obtener<br>
+theta: complejo/Infinity - coordenada del punto de la recta que se quiere obtener <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: subespacio</h3>
 <p>
-Devuelve esta recta proyectiva como objeto del tipo subespacio.</p>
+Devuelve esta recta proyectiva como objeto del tipo subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: coordenada</h3>
 <p>
-Devuelve la coordenada no homogénea asociada al punto p dado.<br>
+Devuelve la coordenada no homogénea asociada al punto p dado. <br>
 Implementación <br>
-Resuelve la ecuación recta(theta) == alpha * p para theta.<br>
+Resuelve la ecuación recta(theta) == alpha * p para theta. <br>
 Parámetros <br>
-p: vector(n) - punto de la recta del que se quiere conocer su coordenada<br>
+p: vector(n) - punto de la recta del que se quiere conocer su coordenada <br>
 </p>
 </div>
 </div>

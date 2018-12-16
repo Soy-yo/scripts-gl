@@ -78,7 +78,7 @@ fun parseFile(file: File, parent: String, destinationDir: String): String {
                     if (line.endsWith("\\\\")) {
                         sb.append("${noPrefix.removeSuffix("\\\\")}<br>\n")
                     } else {
-                        sb.append(noPrefix)
+                        sb.append("$noPrefix ")
                     }
                 }
             } else {

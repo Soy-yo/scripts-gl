@@ -5,151 +5,151 @@
 <body>
 <a href='index.html'>Página principal</a><h1>espacios</h1>
 <p>
-Este archivo proporciona diferentes funciones y clases para trabajar con espacios proyectivos de forma sencilla.<br>
-Las implementaciones no son eficientes y seguro que se pueden mejorar, pero, en general, los vectores que se van a usar no vana tener una dimensión muy grande, por lo que no debería notarse demasiado la lentitud.<br>
-Autor: Pablo Sanz Sanz<br>
+Este archivo proporciona diferentes funciones y clases para trabajar con espacios proyectivos de forma sencilla. <br>
+Las implementaciones no son eficientes y seguro que se pueden mejorar, pero, en general, los vectores que se van a usar no van a tener una dimensión muy grande, por lo que no debería notarse demasiado la lentitud. <br>
+Autor: Pablo Sanz Sanz <br>
 </p>
 <div class='function'>
 <h3>Función: cambiar_referencia</h3>
 <p>
-Devuelve la matriz del cambio de referencia entre la inicial y la final.<br>
+Devuelve la matriz del cambio de referencia entre la inicial y la final. <br>
 Implementación <br>
-Calcula las matrices asociadas a cada referencia (ini y fin) y devuelve fin^-1 * ini(pasamos la incial a la canónica y de esta a la final). ¡Recordar multiplicar el vectorpor la derecha!<br>
+Calcula las matrices asociadas a cada referencia (ini y fin) y devuelve fin^-1 * ini (pasamos la incial a la canónica y de esta a la final). ¡Recordar multiplicar el vector por la derecha! <br>
 Parámetros <br>
 inicial: matriz(n, n+1) - matriz representante del sistema de referencia original <br>
-final: matriz(n, n+1) - matriz representante del sistema de referencia de destino<br>
+final: matriz(n, n+1) - matriz representante del sistema de referencia de destino <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: matriz_asociada</h3>
 <p>
-Devuelve la matriz asociada a una referencia dada por una matriz n x n+1.<br>
+Devuelve la matriz asociada a una referencia dada por una matriz n x n+1. <br>
 Implementación <br>
-Monta el sistema a_0*x_0 + ... + a_n*x_n = x_(n+1), donde x_i representa el puntoi-ésimo de la referencia, y devuelve la misma matriz eliminando la última columna ymultiplicada cada columna por a_i.<br>
+Monta el sistema a_0*x_0 + ... + a_n*x_n = x_(n+1), donde x_i representa el punto i-ésimo de la referencia, y devuelve la misma matriz eliminando la última columna y multiplicada cada columna por a_i. <br>
 Parámetros <br>
-ref: matriz(n, n+1) - matriz representante del sistema de referencia<br>
+ref: matriz(n, n+1) - matriz representante del sistema de referencia <br>
 </p>
 </div>
 <div class='class'>
 <h2>Clase: subespacio</h2>
 <p>
-Clase que representa un subespacio arbitrario en un espacio de dimensión arbitraria.Las dimensiones son determinadas por la dimensión de los puntos dados y por la independencia de los mismos.<br>
-Si se quiere crear un subespacio a partir de unas ecuaciones hay que extraer los coeficientes de estas como vectores, crearun subespacio con ellos y acceder a su dual. Es una operación bastante más costosa, pero ahorra tiempo de programación.Ejemplo. Recta 2x-y+1=0, proyectivamente 2x-y+z=0, se representa en el dual como (2 : -1 : 1). Así se instanciaría comosubespacio(vector([2, -1, 1])).dual().<br>
-Se supone que los atributos o funciones que comienzan por _ son privados y no se debería acceder a ellos desde fuera de laclase. En caso de necesitar acceder a alguno de ellos se podrá usar el método accedente correspondiente.<br>
+Clase que representa un subespacio arbitrario en un espacio de dimensión arbitraria. Las dimensiones son determinadas por la dimensión de los puntos dados y por la independencia de los mismos. <br>
+Si se quiere crear un subespacio a partir de unas ecuaciones hay que extraer los coeficientes de estas como vectores, crear un subespacio con ellos y acceder a su dual. Es una operación bastante más costosa, pero ahorra tiempo de programación. Ejemplo. Recta 2x-y+1=0, proyectivamente 2x-y+z=0, se representa en el dual como (2 : -1 : 1). Así se instanciaría como subespacio(vector([2, -1, 1])).dual(). <br>
+Se supone que los atributos o funciones que comienzan por _ son privados y no se debería acceder a ellos desde fuera de la clase. En caso de necesitar acceder a alguno de ellos se podrá usar el método accedente correspondiente. <br>
 </p>
 <div class='methods'>
 <div class='function'>
 <h3>Constructor</h3>
 <p>
-Inicializa los atributos.<br>
+Inicializa los atributos. <br>
 Implementación <br>
-Se calculan la dimensión ambiente y la del subespacio. Esta última mediante el rango (menos 1) de la matirz formada porlos puntos dados, una vez reducida la matriz a su forma de Hermite. De esta matriz, multiplicada por unos parámetroslambda(i) se obtienen las ecuaciones paramétricas. Para las implícitas se completa esta matriz con las coordenadas x(i)y se igualan a 0 los determinantes de las submatrices formadas por las primeras dim+1 filas más una fila extra hastalograr una matriz cuadrada (tomadas por orden).<br>
+Se calculan la dimensión ambiente y la del subespacio. Esta última mediante el rango (menos 1) de la matirz formada por los puntos dados, una vez reducida la matriz a su forma de Hermite. De esta matriz, multiplicada por unos parámetros lambda(i) se obtienen las ecuaciones paramétricas. Para las implícitas se completa esta matriz con las coordenadas x(i) y se igualan a 0 los determinantes de las submatrices formadas por las primeras dim+1 filas más una fila extra hasta lograr una matriz cuadrada (tomadas por orden). <br>
 Parámetros <br>
-*puntos: vector(n+1) - puntos que contiene el subespacio generado<br>
+*puntos: vector(n+1) - puntos que contiene el subespacio generado <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: dimension_ambiente</h3>
 <p>
-Dimensión del espacio ambiente de este subespacio.</p>
+Dimensión del espacio ambiente de este subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: dim</h3>
 <p>
-Dimensión de este subespacio.</p>
+Dimensión de este subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: parametricas</h3>
 <p>
-Ecuaciones paramétricas de este subespacio.</p>
+Ecuaciones paramétricas de este subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: implicitas</h3>
 <p>
-Ecuaciones implícitas de este subespacio.</p>
+Ecuaciones implícitas de este subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: representantes</h3>
 <p>
-Devuelve dim + 1 vectores independientes que pertenecen al subespacio.</p>
+Devuelve dim + 1 vectores independientes que pertenecen al subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: es_vacio</h3>
 <p>
-Determina si este subespacio es vacío.</p>
+Determina si este subespacio es vacío. </p>
 </div>
 <div class='function'>
 <h3>Función: es_total</h3>
 <p>
-Determina si el subespacio coincide con su espacio ambiente.</p>
+Determina si el subespacio coincide con su espacio ambiente. </p>
 </div>
 <div class='function'>
 <h3>Función: dual</h3>
 <p>
-Devuelve el subespacio dual a este subespacio.<br>
+Devuelve el subespacio dual a este subespacio. <br>
 Implementación <br>
-Obtiene los coeficientes de las ecuaciones implícitas y los usa como vectores para el nuevo subespacio.<br>
+Obtiene los coeficientes de las ecuaciones implícitas y los usa como vectores para el nuevo subespacio. <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: suma</h3>
 <p>
-Devuelve V(self, otro).<br>
+Devuelve V(self, otro). <br>
 Implementación <br>
-Crea un subespacio uniendo los representantes de los dados.<br>
+Crea un subespacio uniendo los representantes de los dados. <br>
 Parámetros <br>
-otro: subespacio - subespacio con el que sumar este<br>
+otro: subespacio - subespacio con el que sumar este <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: interseccion</h3>
 <p>
-Devuelve self (intersección) otro<br>
+Devuelve self (intersección) otro <br>
 Implementación <br>
-Crea un subespacio uniendo los representantes de los duales dados (devuelve el dual).<br>
+Crea un subespacio uniendo los representantes de los duales dados (devuelve el dual). <br>
 Parámetros <br>
-otro: subespacio - subespacio con el que intersecar este<br>
+otro: subespacio - subespacio con el que intersecar este <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: ecuaciones_inhomogeneas</h3>
 <p>
-Devuelve las ecuaciones inhomogéneas del subespacio con xn == 1.<br>
+Devuelve las ecuaciones inhomogéneas del subespacio con xn == 1. <br>
 Implementación <br>
-Sustituye xn == 1 en todas las ecuaciones.<br>
+Sustituye xn == 1 en todas las ecuaciones. <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: __contains__</h3>
 <p>
-Operador in. Determina si un vector está contenido en este subespacio o no.<br>
-Uso: v in U (v es un vector y U un subespacio).<br>
+Operador in. Determina si un vector está contenido en este subespacio o no. <br>
+Uso: v in U (v es un vector y U un subespacio). <br>
 Implementación <br>
-Sustituye las coordenadas del vector en cada una de las ecuaciones implícitas y devuelve si todas se complen.<br>
+Sustituye las coordenadas del vector en cada una de las ecuaciones implícitas y devuelve si todas se complen. <br>
 Parámetros <br>
-vector: vector - vector que comprobar si pertenece al subespacio<br>
+vector: vector - vector que comprobar si pertenece al subespacio <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: __eq__</h3>
 <p>
-Operador ==. Determina si dos subespacios son iguales.<br>
-Uso: U == V (U y V son subespacios).<br>
+Operador ==. Determina si dos subespacios son iguales. <br>
+Uso: U == V (U y V son subespacios). <br>
 Implementación <br>
-Comprueba que las dimensiones coincidan y que al sumarlos quede un subespacio con la misma dimensión (se usa la sumaporque la intersección es más lenta).<br>
+Comprueba que las dimensiones coincidan y que al sumarlos quede un subespacio con la misma dimensión (se usa la suma porque la intersección es más lenta). <br>
 Parámetros <br>
-otro: subespacio - subespacio a comprobar la igualdad<br>
+otro: subespacio - subespacio a comprobar la igualdad <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: __ne__</h3>
 <p>
-Operador !=. Determina si dos subespacios son diferentes.<br>
-Uso: U != V (U y V son subespacios).<br>
+Operador !=. Determina si dos subespacios son diferentes. <br>
+Uso: U != V (U y V son subespacios). <br>
 Implementación <br>
-Negar el operador ==.<br>
+Negar el operador ==. <br>
 Parámetros <br>
-otro: subespacio - subespacio a comprobar la desigualdad<br>
+otro: subespacio - subespacio a comprobar la desigualdad <br>
 </p>
 </div>
 </div>
