@@ -21,9 +21,9 @@ fun main() {
     bw.write("<!doctype html>\n")
     bw.write("<html>\n")
     makeHead(bw, TITLE)
-    bw.write("<body>")
-    bw.write("<h1>$TITLE</h1>")
-    bw.write("<ul>")
+    bw.write("<body>\n")
+    bw.write("<h1>$TITLE</h1>\n")
+    bw.write("<ul>\n")
     val dir = File("scripts")
     for (file in dir.listFiles { _, name -> name.endsWith(".sage", true) }) {
         bw.write("<li>")
@@ -31,8 +31,8 @@ fun main() {
         bw.write("<a href='$filename.html'>$filename</a>")
         bw.write("</li>")
     }
-    bw.write("</ul>")
-    bw.write("</body>")
+    bw.write("</ul>\n")
+    bw.write("</body>\n")
     bw.write("</html>\n")
     bw.close()
 }
