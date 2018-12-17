@@ -9,7 +9,7 @@ Este archivo proporciona diferentes funciones sobre razones dobles y homografía
 Autor: Pablo Sanz Sanz <br>
 </p>
 <div class='function'>
-<h3>Función: razon_doble_puntos</h3>
+<h3>Función: razon_doble_puntos(p0, p1, p2, p3)</h3>
 <p>
 Calcula la razón doble ({P0, P1, P2, P3}) de los puntos alineados dados. <br>
 Implementación <br>
@@ -22,7 +22,7 @@ p3: vector(n>1) - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: razon_doble</h3>
+<h3>Función: razon_doble(theta0, theta1, theta2, theta3)</h3>
 <p>
 Calcula la razón doble ({theta0, theta1, theta2, theta3}) de los puntos de la recta dados (con parámetro no homogéneo). <br>
 Implementación <br>
@@ -35,7 +35,7 @@ theta3: complejo/Infinity - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: es_cuaterna_armonica_puntos</h3>
+<h3>Función: es_cuaterna_armonica_puntos(p0, p1, p2, p3)</h3>
 <p>
 Determina si los puntos dados forman una cuaterna armónica, esto es, {P0, P1, P2, P3} = -1. <br>
 Implementación <br>
@@ -48,7 +48,7 @@ p3: vector(n>1) - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: es_cuaterna_armonica</h3>
+<h3>Función: es_cuaterna_armonica(theta0, theta1, theta2, theta3)</h3>
 <p>
 Determina si los puntos dados forman una cuaterna armónica, esto es, {theta0, theta1, theta2, theta3} = -1. <br>
 Implementación <br>
@@ -61,7 +61,7 @@ theta3: complejo/Infinity - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: conjugado_armonico_puntos</h3>
+<h3>Función: conjugado_armonico_puntos(p0, p1, p2)</h3>
 <p>
 Devuelve el conjugado armónico de p2 respecto de p0 y p1. <br>
 Implementación <br>
@@ -73,7 +73,7 @@ p2: vector(n>1) - tercer punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: conjugado_armonico</h3>
+<h3>Función: conjugado_armonico(theta0, theta1, theta2)</h3>
 <p>
 Devuelve el conjugado armónico de theta2 respecto de theta0 y theta1. <br>
 Implementación <br>
@@ -101,7 +101,7 @@ p0: vector(n) - punto cuya coordenada será theta == Infinity p1: vector(n) - pu
 </p>
 </div>
 <div class='function'>
-<h3>Función: __getitem__</h3>
+<h3>Función: __getitem__(theta)</h3>
 <p>
 Devuelve el punto con coordenada theta. <br>
 Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta(_proyectiva)). <br>
@@ -110,12 +110,12 @@ theta: complejo/Infinity - coordenada del punto de la recta que se quiere obtene
 </p>
 </div>
 <div class='function'>
-<h3>Función: subespacio</h3>
+<h3>Función: subespacio()</h3>
 <p>
 Devuelve esta recta proyectiva como objeto del tipo subespacio. </p>
 </div>
 <div class='function'>
-<h3>Función: coordenada</h3>
+<h3>Función: coordenada(p)</h3>
 <p>
 Devuelve la coordenada no homogénea asociada al punto p dado. <br>
 Implementación <br>

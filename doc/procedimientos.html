@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<title>procedimientos</title><link rel='stylesheet' type='text/css' href='style.css'></head>
+<body>
+<a href='index.html'>Página principal</a><h1>procedimientos</h1>
+<p>
+Módulo para el control de la impresión de los procedimientos por pantalla. <br>
+Para usuarios: activar los procedimientos con mostrar_procedimiento(True) si se quieren ver las operaciones que hacen las funciones por dentro (si el desarrollador ha indicado algo). Para dejar de mostrar, mostrar_procedimiento(False). <br>
+Para desarrolladores: usar pasos(texto) cuando la función haga algún tipo de operación que se consifere relevante. <br>
+</p>
+<div class='function'>
+<h3>Función: paso(*objetos)</h3>
+<p>
+Función para desarrolladores. Muestra por pantalla el texto especificado si la variable _mostrar_procedimiento está activada (no hace nada en caso contrario). Se utiliza para mostrar los pasos que realiza una función. <br>
+Por ejemplo, <br>
+paso("Calculamos el determinante de la matriz M:") <br>
+paso("det", M, "=", M.det()) <br>
+Parámetros <br>
+*objetos: cualquiera - objetos a mostrar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: mostrar_procedimiento(b = True)</h3>
+<p>
+Activa o desactiva que se muestren los pasos que ejecutan las funciones. <br>
+Parámetros <br>
+b: booleano - True para activarlos, False para desactivarlos (True si no se especifica nada) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: ocultar_procedimiento()</h3>
+<p>
+Desactiva temporalmente que se muestren los pasos que ejecutan las funciones. Sirve para desarrolladores, si llaman a funciones auxiliares que generarán un procedimiento, pero que no es relevante para el cálculo que se está efectuando. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: reanudar_procedimiento()</h3>
+<p>
+Activa de nuevo que se muestren los pasos que ejecutan las funciones si estaban activados antes de llamar a ocultar_procedimiento(). <br>
+</p>
+</div>
+</body>
+</html>

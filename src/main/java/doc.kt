@@ -115,7 +115,8 @@ fun parseFile(file: File, parent: String, destinationDir: String): String {
                     if (line.startsWith("def")) {
                         val funName = line.removePrefix("def")
                                 .trimStart()
-                                .takeWhile { it != '(' }
+                                .takeWhile { it != ':' }
+                                .replace("self,?\\s?".toRegex(), "")
                         bw.write("<div class='function'>\n")
                         bw.write("<h3>Función: $funName</h3>\n")
                         bw.write(sb.toString())

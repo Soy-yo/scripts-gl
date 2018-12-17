@@ -8,6 +8,7 @@
 #
 
 _mostrar_procedimiento = False
+_temp_procedimiento = False
 
 #\f
 # Función para desarrolladores. Muestra por pantalla el texto especificado si la variable _mostrar_procedimiento está
@@ -31,8 +32,24 @@ def paso(*objetos):
 # Activa o desactiva que se muestren los pasos que ejecutan las funciones.
 #
 # Parámetros \\
-# b: booleano - True para activarlos, False para desactivarlos
+# b: booleano - True para activarlos, False para desactivarlos (True si no se especifica nada)
 #
-def mostrar_procedimiento(b):
+def mostrar_procedimiento(b = True):
     global _mostrar_procedimiento
     _mostrar_procedimiento = b
+      
+#\f
+# Desactiva temporalmente que se muestren los pasos que ejecutan las funciones. Sirve para desarrolladores, si llaman a
+# funciones auxiliares que generarán un procedimiento, pero que no es relevante para el cálculo que se está efectuando.
+#
+def ocultar_procedimiento():
+    global _temp_procedimiento
+    _temp_procedimiento = _mostrar_procedimiento
+    mostrar_procedimiento(False)
+    
+#\f
+# Activa de nuevo que se muestren los pasos que ejecutan las funciones si estaban activados antes de llamar a
+# ocultar_procedimiento().
+#
+def reanudar_procedimiento():
+    mostrar_procedimiento(_temp_procedimiento)

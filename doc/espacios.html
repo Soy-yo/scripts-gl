@@ -10,7 +10,7 @@ Las implementaciones no son eficientes y seguro que se pueden mejorar, pero, en 
 Autor: Pablo Sanz Sanz <br>
 </p>
 <div class='function'>
-<h3>Función: cambiar_referencia</h3>
+<h3>Función: cambiar_referencia(inicial, final)</h3>
 <p>
 Devuelve la matriz del cambio de referencia entre la inicial y la final. <br>
 Implementación <br>
@@ -21,7 +21,7 @@ final: matriz(n, n+1) - matriz representante del sistema de referencia de destin
 </p>
 </div>
 <div class='function'>
-<h3>Función: matriz_asociada</h3>
+<h3>Función: matriz_asociada(ref)</h3>
 <p>
 Devuelve la matriz asociada a una referencia dada por una matriz n x n+1. <br>
 Implementación <br>
@@ -49,42 +49,42 @@ Parámetros <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: dimension_ambiente</h3>
+<h3>Función: dimension_ambiente()</h3>
 <p>
 Dimensión del espacio ambiente de este subespacio. </p>
 </div>
 <div class='function'>
-<h3>Función: dim</h3>
+<h3>Función: dim()</h3>
 <p>
 Dimensión de este subespacio. </p>
 </div>
 <div class='function'>
-<h3>Función: parametricas</h3>
+<h3>Función: parametricas()</h3>
 <p>
 Ecuaciones paramétricas de este subespacio. </p>
 </div>
 <div class='function'>
-<h3>Función: implicitas</h3>
+<h3>Función: implicitas()</h3>
 <p>
 Ecuaciones implícitas de este subespacio. </p>
 </div>
 <div class='function'>
-<h3>Función: representantes</h3>
+<h3>Función: representantes()</h3>
 <p>
 Devuelve dim + 1 vectores independientes que pertenecen al subespacio. </p>
 </div>
 <div class='function'>
-<h3>Función: es_vacio</h3>
+<h3>Función: es_vacio()</h3>
 <p>
 Determina si este subespacio es vacío. </p>
 </div>
 <div class='function'>
-<h3>Función: es_total</h3>
+<h3>Función: es_total()</h3>
 <p>
 Determina si el subespacio coincide con su espacio ambiente. </p>
 </div>
 <div class='function'>
-<h3>Función: dual</h3>
+<h3>Función: dual()</h3>
 <p>
 Devuelve el subespacio dual a este subespacio. <br>
 Implementación <br>
@@ -92,7 +92,7 @@ Obtiene los coeficientes de las ecuaciones implícitas y los usa como vectores p
 </p>
 </div>
 <div class='function'>
-<h3>Función: suma</h3>
+<h3>Función: suma(otro)</h3>
 <p>
 Devuelve V(self, otro). <br>
 Implementación <br>
@@ -102,7 +102,7 @@ otro: subespacio - subespacio con el que sumar este <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: interseccion</h3>
+<h3>Función: interseccion(otro)</h3>
 <p>
 Devuelve self (intersección) otro <br>
 Implementación <br>
@@ -112,7 +112,7 @@ otro: subespacio - subespacio con el que intersecar este <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: ecuaciones_inhomogeneas</h3>
+<h3>Función: ecuaciones_inhomogeneas()</h3>
 <p>
 Devuelve las ecuaciones inhomogéneas del subespacio con xn == 1. <br>
 Implementación <br>
@@ -120,7 +120,7 @@ Sustituye xn == 1 en todas las ecuaciones. <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: __contains__</h3>
+<h3>Función: __contains__(vector)</h3>
 <p>
 Operador in. Determina si un vector está contenido en este subespacio o no. <br>
 Uso: v in U (v es un vector y U un subespacio). <br>
@@ -131,7 +131,7 @@ vector: vector - vector que comprobar si pertenece al subespacio <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: __eq__</h3>
+<h3>Función: __eq__(otro)</h3>
 <p>
 Operador ==. Determina si dos subespacios son iguales. <br>
 Uso: U == V (U y V son subespacios). <br>
@@ -142,7 +142,7 @@ otro: subespacio - subespacio a comprobar la igualdad <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: __ne__</h3>
+<h3>Función: __ne__(otro)</h3>
 <p>
 Operador !=. Determina si dos subespacios son diferentes. <br>
 Uso: U != V (U y V son subespacios). <br>
