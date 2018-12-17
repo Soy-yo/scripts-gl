@@ -58,6 +58,15 @@ Si quieres subir algún script a este banco de scripts, puedes hacerlo sencillam
 
 Si alguien quiere participar, pero no se ve capaz de implementar algo así, siempre me puede pedir ayuda para hacerlo.
 
+# Procedimientos
+Un tema importante de cara a un examen es el procedimiento seguido al resolver un ejercicio, pues de nada sirve poner directamente el resultado. Ante esto, he añadido la opción de mostrar los pasos que van dando las funciones, por ejemplo "Calculamos el determinante de M" (y añadir después el cálculo explícito). Esto ya depende de quién implemente cada función, si los añade o no. Tampoco es necesario especificar absolutamente todo lo que se hace porque luego no se entiende nada de la salida.
+
+El caso, para poder ver los procedimientos hay que activarlo a mano: simplemente ejecutamos la siguiente instrucción: <code>mostrar_procedimiento(True)</code> y a partir de entonces las funciones comenzarán a mostrar la información que haya añadido el programador. Con esto activado hay que tener cuidado de no ejecutar muchas operaciones a la vez porque de nuevo se nos puede llenar la salida de operaciones intermedias y no entender nada. Por ejemplo, <code>subespacio(vector([1, 2, 1, 0]), vector([3, 4, 1, -1])).interseccion(subespacio(vector([1, 5, -2, 3])))</code> llena más de una pantalla de operaciones intermedias, pero podemos partirlo en varias operaciones y así será más claro.
+
+Notemos que si no podemos cargar los archivos .sage debemos copiar y pegar el código del archivo procedimientos.sage en nuestro cuaderno.
+
+Si somos programadores y consideramos que no es del todo obvio cómo se implementa nuestra función podemos incluir en nuestro módulo (si no lo está aún) <code>load("procedimientos.sage")</code> (asumiendo que se encuentran en la misma carpeta) y utilizar la función <code>paso(*objetos)</code>. Su uso es muy sencillo: escribimos esta línea en el punto que queramos dar información, y como objetos pasamos todo lo que queramos mostrar, separados por comas: desde cadenas de texto o números hasta matrices o ecuaciones. Cualquier cosa. El resultado será una línea que se muestra por pantalla (solamente si el usuario activó previamente los procedimientos) con tipografía de Latex. Por ejemplo, <code>paso(A, B, "=", A * B)</code> muestra explícitamente la matriz A, la matriz B, el signo = y el resultado de su producto.
+
 # Formato de la documentación
 En este proyecto se incluye un pequeño programa que se encarga de leer los comentarios de los archivos .sage para transformarlos en archivos .html (páginas web) que se puedan abrir con un navegador y sean más legibles que los propios comentarios en el código. Pero para que esto fucnione correctamente se necesite que los comentarios sigan unos estándares (sólo se refiere a los de documentación de las funciones; comentarios internos aclarativos pueden llevar el formato que sea).
 <ul>
