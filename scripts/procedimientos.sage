@@ -15,14 +15,17 @@ _mostrar_procedimiento = False
 #
 # Por ejemplo, \\
 # paso("Calculamos el determinante de la matriz M:") \\
-# paso("det" + str(M) + " = " + str(M.det()))
+# paso("det", M, "=", M.det())
 #
 # Parámetros \\
-# texto: string - texto a mostrar
+# *objetos: cualquiera - objetos a mostrar
 #
-def paso(texto):
+def paso(*objetos):
     if _mostrar_procedimiento:
-        print texto
+        s = ""
+        for obj in objetos:
+            s = s + str(latex(obj))
+        view(LatexExpr(s))
         
 #\f
 # Activa o desactiva que se muestren los pasos que ejecutan las funciones.
