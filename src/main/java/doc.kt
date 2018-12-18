@@ -27,7 +27,9 @@ fun main() {
     val dir = File("scripts")
     for (file in dir.listFiles { _, name -> name.endsWith(".sage", true) }) {
         bw.write("<li>")
+        print("Parsing $file".padEnd(50))
         val filename = parseFile(file, INDEX, "doc")
+        println("[DONE]")
         bw.write("<a href='$filename.html'>$filename</a>")
         bw.write("</li>")
     }
@@ -96,6 +98,11 @@ fun parseFile(file: File, parent: String, destinationDir: String): String {
                         FUNCTION_DOC_TYPE
                     }
                     CLASS_DOC in line -> {
+                        if (inClass) {
+                            // We were inside a class and it ended
+                            bw.write("</div>\n")
+                            bw.write("</div>\n")
+                        }
                         inClass = true
                         CLASS_DOC_TYPE
                     }

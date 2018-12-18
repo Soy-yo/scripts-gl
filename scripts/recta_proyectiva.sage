@@ -237,4 +237,86 @@ class recta_proyectiva:
     
     def __repr__(self):
         return "<Recta proyectiva " + str(self._valores) + ">"
+        
+#\c
+# Clase que representa una homografía de una recta en sí misma. En general, se crearán usando funciones auxiliares
+# y no con su constructor.
+#
+class homografia_recta:
     
+    #\i
+    # Construye una homografía sobre la recta dada cuya matriz sea la dada. En general, este constructor no se
+    # usará directamente.
+    #
+    # Parámetros \\
+    # matriz: matriz(2, 2) - matriz asociada a la homografía \\
+    # recta: recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1})
+    #
+    def __init__(self, matriz, recta = recta_proyectiva(vector([1, 0]), vector([0, 1]), vector([1, 1]))):
+        assert matriz.nrows() == 2 and matriz.ncols() == 2, "La matriz debe ser 2x2"
+        assert matriz.det() != 0, "Para que sea una homografía el rango de su matriz asociada debe ser máximo"
+        self._matriz = matriz
+        self._recta = recta
+        self._theta1 = var('theta', latex_name = '\theta')
+        self._theta2 = var('theta2', latex_name = '\theta_2')
+        self._expresion_mobius = theta2 == (matriz[0][0] * theta + matriz[0][1]) / (matriz[1][0] * theta + matriz[1][1])
+        # Multiplicamos por el denominador y restamos el numerador
+        self._expresion = (theta2 * self._expresion_mobius.rhs().denominator() - self._expresion_mobius.rhs().numerator()).expand() == 0
+        
+    # Métodos accedentes
+    
+    #\m
+    # Devuelve la matriz asociada a esta homografía.
+    def matriz_asociada(self):
+        return self._matriz
+        
+    #\m
+    # Devuelve la recta sobre la que se aplica esta homografía.
+    def recta(self):
+        return self._recta
+    
+    #\m
+    # Devuelve la homografía expresada como una transformación de M
+    def expresion_mobius(self):
+        return self._expresion_mobius
+    
+    #\m
+    # Devuelve la ecuación en theta y theta' de esta homografía.
+    def ecuacion(self):
+        return self._expresion
+    
+    #\m
+    # Calcula la imagen mediante esta homografía del punto dado.
+    #
+    # Uso: r(x) ó r(v) (donde r es una recta_proyectiva, x un complejo/Infinity y v un vector).
+    #
+    # Implementación \\
+    # Dado un parámetro no homogéneo sustituye en la expresión de Möbius y devuelve el resultado. \\
+    # Dado un vector del espacio, primero calcula su coordenada en la recta y luego vuelve a llamar a este método.
+    #
+    # Parámetros \\
+    # x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen
+    #
+    def __call__(self, x):
+        # Estamos recibiendo un parámetro no homogéneo, simplemente sustituimos
+        if x == Infinity or len(x.list()) == 1:
+            return self.__sustituir(x)
+        # Asumimos que es un vector, si es del mismo espacio calculamos su coordenada en la recta primero
+        assert len(x) == self._recta.subespacio().dimension_ambiente() + 1, \
+                "El punto debe pertenecer al mismo espacio ambiente"
+        assert x in self._recta.subespacio(), "El punto debe pertenecer a la recta"
+        coord = self._recta.coordenada(x)
+        paso("La coordenada de ", x, " en la recta es: ", coord, ". Sustituimos en la expresión y recuperamos el punto")
+        return self._recta[self(coord)]
+            
+    # Métodos auxiliares
+            
+    def __sustituir(self, x):
+        # Para infinito se pierden las componentes sin theta
+        if x == Infinity:
+            return self._matriz[0][0] / self._matriz[1][0]
+        # En cualquier otro caso se sustituye en la expresión de Möbius
+        return self._expresion_mobius.substitute(self._theta1 == x).rhs()
+        
+    def __repr__(self):
+        return "<Homografía " + str(self._expresion) + " de " + str(self._recta) + ">"

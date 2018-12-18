@@ -126,5 +126,54 @@ p: vector(n) - punto de la recta del que se quiere conocer su coordenada <br>
 </div>
 </div>
 </div>
+<div class='class'>
+<h2>Clase: homografia_recta</h2>
+<p>
+Clase que representa una homografía de una recta en sí misma. En general, se crearán usando funciones auxiliares y no con su constructor. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una homografía sobre la recta dada cuya matriz sea la dada. En general, este constructor no se usará directamente. <br>
+Parámetros <br>
+matriz: matriz(2, 2) - matriz asociada a la homografía <br>
+recta: recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1}) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: matriz_asociada()</h3>
+<p>
+Devuelve la matriz asociada a esta homografía. </p>
+</div>
+<div class='function'>
+<h3>Función: recta()</h3>
+<p>
+Devuelve la recta sobre la que se aplica esta homografía. </p>
+</div>
+<div class='function'>
+<h3>Función: expresion_mobius()</h3>
+<p>
+Devuelve la homografía expresada como una transformación de M </p>
+</div>
+<div class='function'>
+<h3>Función: ecuacion()</h3>
+<p>
+Devuelve la ecuación en theta y theta' de esta homografía. </p>
+</div>
+<div class='function'>
+<h3>Función: __call__(x)</h3>
+<p>
+Calcula la imagen mediante esta homografía del punto dado. <br>
+Uso: r(x) ó r(v) (donde r es una recta_proyectiva, x un complejo/Infinity y v un vector). <br>
+Implementación <br>
+Dado un parámetro no homogéneo sustituye en la expresión de Möbius y devuelve el resultado. <br>
+Dado un vector del espacio, primero calcula su coordenada en la recta y luego vuelve a llamar a este método. <br>
+Parámetros <br>
+x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen <br>
+</p>
+</div>
+</div>
+</div>
 </body>
 </html>
