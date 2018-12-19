@@ -6,6 +6,8 @@
 #
 # Para desarrolladores: usar pasos(texto) cuando la función haga algún tipo de operación que se consifere relevante.
 #
+# Autor: Pablo Sanz Sanz
+#
 
 _mostrar_procedimiento = False
 _temp_procedimiento = False
@@ -26,7 +28,7 @@ def paso(*objetos):
         s = ""
         for obj in objetos:
             s = s + str(latex(obj))
-        view(LatexExpr(s))
+        show(LatexExpr(s))
         
 #\f
 # Activa o desactiva que se muestren los pasos que ejecutan las funciones.

@@ -7,8 +7,6 @@
 # Autor: Pablo Sanz Sanz
 #
 
-load("procedimientos.sage")
-
 # Funciones globales
 
 # \f
@@ -28,7 +26,7 @@ def cambiar_referencia(inicial, final):
            "Las referencias deben pertenecer al mismo espacio proyectivo"
     ini = matriz_asociada(inicial)
     fin = matriz_asociada(final)
-    paso("Vamos a pasar primero de la inicial a las coordenadas canónicas y después a la final.")
+    paso("Vamos a pasar primero de la inicial a las coordenadas canonicas y despues a la final.")
     paso("Calculamos B^-1 * A (B y A asociadas a final e inicial, respectivamente):")
     paso(fin^-1, ini, "=", fin^-1 * ini)
     return fin^-1 * ini
@@ -47,13 +45,12 @@ def cambiar_referencia(inicial, final):
 def matriz_asociada(ref):
     assert ref.ncols() == ref.nrows() + 1, "La referencia debe ser de un espacio proyectivo"
     m = ref.matrix_from_columns(range(ref.ncols() - 1))
-    assert m.det() != 0, "El rango de una referencia debe ser máximo"
-    coef = vector([var('alfa' + str(i + 1), latex_name = '\alfa_' + str(i + 1)) for i in range(0, m.nrows())])
+    assert m.det() != 0, "El rango de una referencia debe ser maximo"
+    coef = vector([var('alfa' + str(i + 1), latex_name = r'alfa_' + str(i + 1)) for i in range(0, m.nrows())])
     ec = m * coef
     paso("Forzamos [x_0 + ... + x_n] = x_{n+1}:")
     paso(matrix([ec]).T, "=", matrix([ref.columns()[-1]]).T)
-    sistema = [ec[i] == ref[i][-1] for i in range(0, len(ec))]
-    res = solve(sistema, coef.list())
+    res = solve((ec - ref.columns()[-1]).list(), coef.list())
     return matrix([m.columns()[i] * coef[i].substitute(res[0][i]) for i in range(0, m.ncols())]).T
   
     
@@ -164,7 +161,7 @@ class subespacio:
     # otro: subespacio - subespacio con el que sumar este
     #
     def suma(self, otro):
-        assert self.__mismo_ambiente(otro), "Los subespacio a sumar deben pertenecer al mismo espacio"
+        assert self.__mismo_ambiente(otro), "Los subespacios a sumar deben pertenecer al mismo espacio"
         paso("Para unir creamos un subespacio con los representantes de cada uno: ", [self.representantes(), otro.representantes()])
         return subespacio(self.representantes() + otro.representantes())
     
@@ -178,7 +175,7 @@ class subespacio:
     # otro: subespacio - subespacio con el que intersecar este
     #
     def interseccion(self, otro):
-        assert self.__mismo_ambiente(otro), "Los subespacio a intersecar deben pertenecer al mismo espacio"
+        assert self.__mismo_ambiente(otro), "Los subespacios a intersecar deben pertenecer al mismo espacio"
         if self.es_vacio() or otro.es_vacio():
             return subespacio()
         paso("Para intersecar unimos las ecuaciones de cada subespacio: ", [self.implicitas(), otro.implicitas()])
@@ -205,7 +202,7 @@ class subespacio:
     # vector: vector - vector que comprobar si pertenece al subespacio
     #
     def __contains__(self, vector):
-        assert len(vector) == self._dimension_ambiente + 1, "El vector debe pertenecer al espacio ambiente"
+        assert len(vector) == self._dimension_ambiente + 1, "El punto debe pertenecer al espacio ambiente"
         subs = [self._vars[i] == vector[i] for i in range(len(vector))]
         ecs = [ec.substitute(subs) for ec in self._implicitas]
         return solve(ecs, self._vars.list())
@@ -223,7 +220,7 @@ class subespacio:
     # otro: subespacio - subespacio a comprobar la igualdad
     #
     def __eq__(self, otro):
-        assert self.__mismo_ambiente(otro), "Los subespacio a comprobar la igualdad deben pertenecer al mismo espacio"
+        assert self.__mismo_ambiente(otro), "Los subespacios a comprobar la igualdad deben pertenecer al mismo espacio"
         # La dimensión debe ser la misma y al sumarlos el subespacio no debería cambiar
         return self._dim == otro._dim and self.suma(otro)._dim == self._dim
     
@@ -266,7 +263,7 @@ class subespacio:
         return self.es_vacio() or otro.es_vacio() or self._dimension_ambiente == otro._dimension_ambiente
     
     def __params(self):
-        return vector([var('lambda' + str(i + 1), latex_name = '\lambda_' + str(i + 1)) for i in range(self._dim + 1)])
+        return vector([var('lambda' + str(i + 1), latex_name = r'lambda_' + str(i + 1)) for i in range(self._dim + 1)])
     
     def __vars(self):
         return vector([var('x' + str(i + 1), latex_name = 'x_' + str(i + 1)) for i in range(self._dimension_ambiente + 1)])
@@ -320,11 +317,11 @@ class subespacio:
     
     def __repr__(self):
         if self.es_vacio():
-            return "<Subespacio vacío>"
+            return "<Subespacio vacio>"
         if self.dim() == 0:
             return "<Punto " + str(self.representantes()[0]) + ">"
         if self.es_total():
-            return "<Espacio de dimensión " + str(self._dim) + ">"
-        return "<Subespacio de dimensión " + str(self._dim) + " en un espacio de dimensión " + str(self._dimension_ambiente) \
-                + " con ecuación(es) implícita(s) " + str(self._implicitas) + ">"
+            return "<Espacio de dimension " + str(self._dim) + ">"
+        return "<Subespacio de dimension " + str(self._dim) + " en un espacio de dimension " + str(self._dimension_ambiente) \
+                + " con ecuacion(es) implicita(s) " + str(self._implicitas) + ">"
         

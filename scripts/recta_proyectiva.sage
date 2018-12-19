@@ -4,9 +4,6 @@
 # Autor: Pablo Sanz Sanz
 #
 
-load("espacios.sage")
-load("procedimientos.sage")
-
 # Funciones globales
 
 #\f
@@ -50,7 +47,7 @@ def razon_doble_puntos(p0, p1, p2, p3):
             i = i + 1
             j = i + 1
     if len(p0) > 2:
-        paso("Como la razón doble es invariante por proyecciones podemos usar los siguientes vectores:")
+        paso("Como la razon doble es invariante por proyecciones podemos usar los siguientes vectores:")
         paso(q0, ", ", q1, ", ", q2, ", ", q3)
     m0 = matrix([[q0[0], q2[0]], [q0[1], q2[1]]])
     m1 = matrix([[q1[0], q2[0]], [q1[1], q2[1]]])
@@ -65,7 +62,7 @@ def razon_doble_puntos(p0, p1, p2, p3):
     paso("det", m1, " = ", det1)
     paso("det", m2, " = ", det2)
     paso("det", m3, " = ", det3)
-    paso("Calculamos la razón doble: {P0, P1; P2, P3} = (", det0, "/", det1, ") : (", det2, "/", det3, ")")
+    paso("Calculamos la razon doble: {P0, P1; P2, P3} = (", det0, "/", det1, ") : (", det2, "/", det3, ")")
     if det1 == 0 or det2 == 0:
         return Infinity
     return (det0 / det1) * (det3 / det2)
@@ -137,7 +134,7 @@ def es_cuaterna_armonica(theta0, theta1, theta2, theta3):
 #
 def conjugado_armonico_puntos(p0, p1, p2):
     paso("Montamos la recta con la referencia {P0=", p0, ", P1=", p1, "; P2=", p2, "}")
-    paso("Así, P0: theta = Infinity, P1: theta = 0, P2: theta = 1 y sustituimos en -1")
+    paso("Asi, P0: theta = Infinity, P1: theta = 0, P2: theta = 1 y sustituimos en -1")
     return recta_proyectiva(p0, p1, p2)[-1]
     
 #\f
@@ -191,7 +188,7 @@ class recta_proyectiva:
         paso(a, "*", p0, " + ", b, "*", p1, " = ", a * p0 + b * p1, " = ", p2)
         coef = solve((a * p0 + b * p1 - p2).list(), a, b)
         paso(coef[0])
-        self._theta = var('theta', latex_name = '\theta')
+        self._theta = var('theta', latex_name = r'theta')
         self._infinito = p0
         self._valores = (b * p1 + self._theta * a * p0).substitute(coef[0])
         paso("Sustituimos y combinamos con theta: ", self._valores)
@@ -254,11 +251,11 @@ class homografia_recta:
     #
     def __init__(self, matriz, recta = recta_proyectiva(vector([1, 0]), vector([0, 1]), vector([1, 1]))):
         assert matriz.nrows() == 2 and matriz.ncols() == 2, "La matriz debe ser 2x2"
-        assert matriz.det() != 0, "Para que sea una homografía el rango de su matriz asociada debe ser máximo"
+        assert matriz.det() != 0, "Para que sea una homografia el rango de su matriz asociada debe ser maximo"
         self._matriz = matriz
         self._recta = recta
-        self._theta1 = var('theta', latex_name = '\theta')
-        self._theta2 = var('theta2', latex_name = '\theta_2')
+        self._theta1 = var('theta', latex_name = r'theta')
+        self._theta2 = var('theta2', latex_name = r'theta_2')
         self._expresion_mobius = theta2 == (matriz[0][0] * theta + matriz[0][1]) / (matriz[1][0] * theta + matriz[1][1])
         # Multiplicamos por el denominador y restamos el numerador
         self._expresion = (theta2 * self._expresion_mobius.rhs().denominator() - self._expresion_mobius.rhs().numerator()).expand() == 0
@@ -306,7 +303,7 @@ class homografia_recta:
                 "El punto debe pertenecer al mismo espacio ambiente"
         assert x in self._recta.subespacio(), "El punto debe pertenecer a la recta"
         coord = self._recta.coordenada(x)
-        paso("La coordenada de ", x, " en la recta es: ", coord, ". Sustituimos en la expresión y recuperamos el punto")
+        paso("La coordenada de ", x, " en la recta es: ", coord, ". Sustituimos en la expresion y recuperamos el punto")
         return self._recta[self(coord)]
             
     # Métodos auxiliares
@@ -319,4 +316,4 @@ class homografia_recta:
         return self._expresion_mobius.substitute(self._theta1 == x).rhs()
         
     def __repr__(self):
-        return "<Homografía " + str(self._expresion) + " de " + str(self._recta) + ">"
+        return "<Homografia " + str(self._expresion) + " de " + str(self._recta) + ">"
