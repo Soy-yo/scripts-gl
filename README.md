@@ -10,7 +10,7 @@ Las carpetas importantes son scripts y doc. En scripts se encuentran todos los a
 
 <ol>
   <li>
-    Descargamos el proyecto (o tan sólo las carpetas <b>scripts</b> y <b>doc</b> y recomendable también este <b>readme</b>).
+    Descargamos el proyecto (o tan sólo las carpetas <b>scripts</b> y <b>doc</b> y recomendable también este <b>README</b>).
   </li>
   <li>
     En el examen los llevamos en un pendrive. Abrimos el cuaderno. Si reconoce la carpeta directamente nos podemos ahorrar esto, si no, depende qué versión usemos:
@@ -26,9 +26,11 @@ Las carpetas importantes son scripts y doc. En scripts se encuentran todos los a
     </ul>
   </li>
   <li>
-    Abrimos <b>doc/index.hatml</b> en el navegador para tener toda la documentación necesaria.
+    Abrimos <b>doc/index.html</b> en el navegador para tener toda la documentación necesaria.
   </li>
 </ol>
+
+Se ha añadido una nueva funcionalidad que permite mostrar por pantalla los pasos que va siguiendo una función, de forma que no sólo obtengamos el resultado sin saber cómo se ha calculado eso. Para más información ver la sección <b>Procedimientos</b> más abajo.
 
 # Cómo participar
 Si quieres subir algún script a este banco de scripts, puedes hacerlo sencillamente con un Pull-request a una rama nueva, o enviármelo, con unas ciertas condiciones.
