@@ -43,16 +43,24 @@ def cambiar_referencia(inicial, final):
 # ref: matriz(n, n+1) - matriz representante del sistema de referencia
 #
 def matriz_asociada(ref):
-    assert ref.ncols() == ref.nrows() + 1, "La referencia debe ser de un espacio proyectivo"
+    assert es_referencia(ref), "La matriz debe ser una referencia (nx(n+1) y rango maximo)"
     m = ref.matrix_from_columns(range(ref.ncols() - 1))
-    assert m.det() != 0, "El rango de una referencia debe ser maximo"
     coef = vector([var('alfa' + str(i + 1), latex_name = r'alfa_' + str(i + 1)) for i in range(0, m.nrows())])
     ec = m * coef
     paso("Forzamos [x_0 + ... + x_n] = x_{n+1}:")
     paso(matrix([ec]).T, "=", matrix([ref.columns()[-1]]).T)
     res = solve((ec - ref.columns()[-1]).list(), coef.list())
     return matrix([m.columns()[i] * coef[i].substitute(res[0][i]) for i in range(0, m.ncols())]).T
-  
+
+#\f
+# Determina si la matriz dada puede representar una referencia proyectiva.
+#
+# Implementación \\
+# Comprueba que sea una matriz cuadrada más la columna del punto unidad y que el rango sea máximo.
+#    
+def es_referencia(matriz):
+    return matriz.ncols() == matirz.nrows() + 1 and \
+            matriz.matrix_from_columns(range(matriz.ncols() - 1)).det() != 0
     
 # Clases
 
@@ -64,9 +72,6 @@ def matriz_asociada(ref):
 # un subespacio con ellos y acceder a su dual. Es una operación bastante más costosa, pero ahorra tiempo de programación.
 # Ejemplo. Recta 2x-y+1=0, proyectivamente 2x-y+z=0, se representa en el dual como (2 : -1 : 1). Así se instanciaría como
 # subespacio(vector([2, -1, 1])).dual().
-#
-# Se supone que los atributos o funciones que comienzan por _ son privados y no se debería acceder a ellos desde fuera de la
-# clase. En caso de necesitar acceder a alguno de ellos se podrá usar el método accedente correspondiente.
 #
 class subespacio:
     
@@ -191,19 +196,21 @@ class subespacio:
         return [ec.substitute(self._vars[-1] == 1) for ec in self._implicitas]
     
     # \m
-    # Operador in. Determina si un vector está contenido en este subespacio o no.
+    # Operador in. Determina si un punto está contenido en este subespacio o no.
     #
-    # Uso: v in U (v es un vector y U un subespacio).
+    # Uso: P in U (P es un punto y U un subespacio).
     #
     # Implementación \\
-    # Sustituye las coordenadas del vector en cada una de las ecuaciones implícitas y devuelve si todas se complen.
+    # Sustituye las coordenadas del punto en cada una de las ecuaciones implícitas y devuelve si todas se complen.
     #
     # Parámetros \\
-    # vector: vector - vector que comprobar si pertenece al subespacio
+    # punto: vector(n) - punto que comprobar si pertenece al subespacio
     #
-    def __contains__(self, vector):
-        assert len(vector) == self._dimension_ambiente + 1, "El punto debe pertenecer al espacio ambiente"
-        subs = [self._vars[i] == vector[i] for i in range(len(vector))]
+    def __contains__(self, punto):
+        if self.es_vacio():
+            return False
+        assert len(punto) == self._dimension_ambiente + 1, "El punto debe pertenecer al espacio ambiente"
+        subs = [self._vars[i] == punto[i] for i in range(len(punto))]
         ecs = [ec.substitute(subs) for ec in self._implicitas]
         return solve(ecs, self._vars.list())
     

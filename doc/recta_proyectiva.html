@@ -5,9 +5,29 @@
 <body>
 <a href='index.html'>Página principal</a><h1>recta_proyectiva</h1>
 <p>
-Este archivo proporciona diferentes funciones sobre razones dobles y homografías de la recta. <br>
+Este archivo proporciona diferentes funciones y clases sobre razones dobles y homografías de la recta. <br>
+Suponemos que los puntos expresados con coordenada inhomogénea theta se obtiene mediante x/y. <br>
 Autor: Pablo Sanz Sanz <br>
 </p>
+<div class='function'>
+<h3>Función: es_parametro(x)</h3>
+<p>
+Función auxiliar que determina si el parámetro recibido es un punto (tipo vector) o un parámetro inhomogéneo de una recta proyectiva. <br>
+Parámetros <br>
+x: complejo/Infinity/variable/vector(n>1) - elemento a considerar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: razon_doble(a, b, c, d)</h3>
+<p>
+Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos de una recta proyectiva (ver razon_doble_puntos y razon_doble_theta, respectivamente). <br>
+Parámetros <br>
+a: complejo/Infinity/vector(n>1) - primer punto de la razón doble <br>
+b: complejo/Infinity/vector(n>1) - segundo punto de la razón doble <br>
+c: complejo/Infinity/vector(n>1) - tercer punto de la razón doble <br>
+d: complejo/Infinity/vector(n>1) - cuarto punto de la razón doble <br>
+</p>
+</div>
 <div class='function'>
 <h3>Función: razon_doble_puntos(p0, p1, p2, p3)</h3>
 <p>
@@ -22,7 +42,7 @@ p3: vector(n>1) - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: razon_doble(theta0, theta1, theta2, theta3)</h3>
+<h3>Función: razon_doble_theta(theta0, theta1, theta2, theta3)</h3>
 <p>
 Calcula la razón doble ({theta0, theta1, theta2, theta3}) de los puntos de la recta dados (con parámetro no homogéneo). <br>
 Implementación <br>
@@ -35,11 +55,22 @@ theta3: complejo/Infinity - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
+<h3>Función: es_cuaterna_armonica(a, b, c, d)</h3>
+<p>
+Determina si los puntos dados forman una cuaterna armónica, esto es, {A, B; C, D} = -1. Es válido tanto para puntos como para parámetros inhomogéneos de una recta proyectiva (ver es_cuaterna_armonica_puntos y es_cuaterna_armonica_theta, respectivamente). <br>
+Parámetros <br>
+a: complejo/Infinity/vector(n>1) - primer punto de la razón doble <br>
+b: complejo/Infinity/vector(n>1) - segundo punto de la razón doble <br>
+c: complejo/Infinity/vector(n>1) - tercer punto de la razón doble <br>
+d: complejo/Infinity/vector(n>1) - cuarto punto de la razón doble <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: es_cuaterna_armonica_puntos(p0, p1, p2, p3)</h3>
 <p>
 Determina si los puntos dados forman una cuaterna armónica, esto es, {P0, P1, P2, P3} = -1. <br>
 Implementación <br>
-Devuelve {P0, P1, P2, P3} == -1 utilizando las funciones anteriores. <br>
+Devuelve {P0, P1; P2, P3} == -1 utilizando las funciones anteriores. <br>
 Parámetros <br>
 p0: vector(n>1) - primer punto de la razón doble <br>
 p1: vector(n>1) - segundo punto de la razón doble <br>
@@ -48,16 +79,27 @@ p3: vector(n>1) - cuarto punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: es_cuaterna_armonica(theta0, theta1, theta2, theta3)</h3>
+<h3>Función: es_cuaterna_armonica_theta(theta0, theta1, theta2, theta3)</h3>
 <p>
 Determina si los puntos dados forman una cuaterna armónica, esto es, {theta0, theta1, theta2, theta3} = -1. <br>
 Implementación <br>
-Devuelve {theta0, theta1, theta2, theta3} == -1 utilizando las funciones anteriores. <br>
+Devuelve {theta0, theta1; theta2, theta3} == -1 utilizando las funciones anteriores. <br>
 Parámetros <br>
 theta0: complejo/Infinity - primer punto de la razón doble <br>
 theta1: complejo/Infinity - segundo punto de la razón doble <br>
 theta2: complejo/Infinity - tercer punto de la razón doble <br>
 theta3: complejo/Infinity - cuarto punto de la razón doble <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: conjugado_armonico(a, b, c)</h3>
+<p>
+Devuelve el conjugado armónico de c respecto de a y b. Es válido tanto para puntos como para parámetros inhomogéneos de una recta proyectiva (ver conjugado_armonico_puntos y conjugado_armonico_theta, respectivamente). <br>
+Parámetros <br>
+a: complejo/Infinity/vector(n>1) - primer punto de la razón doble <br>
+b: complejo/Infinity/vector(n>1) - segundo punto de la razón doble <br>
+c: complejo/Infinity/vector(n>1) - tercer punto de la razón doble <br>
+<br>
 </p>
 </div>
 <div class='function'>
@@ -73,7 +115,7 @@ p2: vector(n>1) - tercer punto de la razón doble <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: conjugado_armonico(theta0, theta1, theta2)</h3>
+<h3>Función: conjugado_armonico_theta(theta0, theta1, theta2)</h3>
 <p>
 Devuelve el conjugado armónico de theta2 respecto de theta0 y theta1. <br>
 Implementación <br>
@@ -97,7 +139,9 @@ Inicializa la recta dada la referencia {p0, p1; p2} que se quiere utilizar. <br>
 Implementación <br>
 Obtiene la matriz asociada a la referencia dada (esto es, multiplicando el vector asociado a p0 y p1 por un coeficiente de forma que a*p0 + b*p1 == p2) y construye el punto b*p1 + theta*a*p0. <br>
 Parámetros <br>
-p0: vector(n) - punto cuya coordenada será theta == Infinity p1: vector(n) - punto cuya coordenada será theta == 0 p2: vector(n) - punto cuya coordenada será theta == 1 <br>
+p0: vector(n) - punto cuya coordenada será theta == Infinity <br>
+p1: vector(n) - punto cuya coordenada será theta == 0 <br>
+p2: vector(n) - punto cuya coordenada será theta == 1 <br>
 </p>
 </div>
 <div class='function'>
@@ -108,6 +152,11 @@ Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta(_proyectiva
 Parámetros <br>
 theta: complejo/Infinity - coordenada del punto de la recta que se quiere obtener <br>
 </p>
+</div>
+<div class='function'>
+<h3>Función: referencia()</h3>
+<p>
+Devuelve la referencia de esta recta proyectiva en forma de lista [Infinity, 0, 1]. </p>
 </div>
 <div class='function'>
 <h3>Función: subespacio()</h3>
@@ -122,6 +171,28 @@ Implementación <br>
 Resuelve la ecuación recta(theta) == alpha * p para theta. <br>
 Parámetros <br>
 p: vector(n) - punto de la recta del que se quiere conocer su coordenada <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __eq__(otra)</h3>
+<p>
+Operador ==. Determina si dos rectas proyectivas son iguales. <br>
+Uso: r == s (r y s son rectas proyectivas). <br>
+Implementación <br>
+Comrpueba que el subespacio sea el mismo. <br>
+Parámetros <br>
+otra: recta_proyectiva - recta a comprobar la igualdad <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __contains__(punto)</h3>
+<p>
+Operador in. Determina si un punto está contenido en este subespacio o no. <br>
+Uso: P in r (P es un punto y r una recta proyectiva). <br>
+Implementación <br>
+Comprueba que el punto pertenezca al subespacio asociado. <br>
+Parámetros <br>
+punto: vector(n) - punto que comprobar si pertenece a la recta <br>
 </p>
 </div>
 </div>
@@ -140,6 +211,11 @@ Parámetros <br>
 matriz: matriz(2, 2) - matriz asociada a la homografía <br>
 recta: recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1}) <br>
 </p>
+</div>
+<div class='function'>
+<h3>Función: aplicacion()</h3>
+<p>
+Devuelve esta homografía como una aplicacion_proyectiva. </p>
 </div>
 <div class='function'>
 <h3>Función: matriz_asociada()</h3>
@@ -165,12 +241,91 @@ Devuelve la ecuación en theta y theta' de esta homografía. </p>
 <h3>Función: __call__(x)</h3>
 <p>
 Calcula la imagen mediante esta homografía del punto dado. <br>
-Uso: r(x) ó r(v) (donde r es una recta_proyectiva, x un complejo/Infinity y v un vector). <br>
+Uso: h(x) ó h(p) (donde r es una homografia_recta, x un complejo/Infinity y p un punto). <br>
 Implementación <br>
 Dado un parámetro no homogéneo sustituye en la expresión de Möbius y devuelve el resultado. <br>
-Dado un vector del espacio, primero calcula su coordenada en la recta y luego vuelve a llamar a este método. <br>
+Dado un punto del espacio, primero calcula su coordenada en la recta y luego vuelve a llamar a este método. <br>
 Parámetros <br>
 x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_fijos_theta()</h3>
+<p>
+Devuelve los parámetros de los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad. <br>
+Implementación <br>
+Calcula los autovectores y deshomogeniza. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_fijos()</h3>
+<p>
+Devuelve los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad. <br>
+Implementación <br>
+Calcula los autovectores de la matriz asociada. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_identidad()</h3>
+<p>
+Determina si esta homografía es la identidad. <br>
+Implementación <br>
+Sustituye theta' por theta y resta un lado de la expresión de Möbius al otro para comparar con 0. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_elacion()</h3>
+<p>
+Determina si esta homografía es una elación, esto es si tiene un punto fijo doble. <br>
+Implementación <br>
+Calcula los puntos fijos y compara. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_involucion()</h3>
+<p>
+Determina si esta homografía es una involución, esto es si self^2 == self. <br>
+Implementación <br>
+Comprueba que la traza sea nula. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: modulo()</h3>
+<p>
+Calcula el módulo de esta homografía, esto es -beta/gamma. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: simplificar()</h3>
+<p>
+Devuelve esta misma homografía en una referencia adecuada de forma que su ecuacion quede de la forma más simple posible. <br>
+Implementación <br>
+En función de los puntos fijos devuelve: <br>
+infinitos -> ella misma (identidad) <br>
+1         -> matriz (1, 1; 0, 1) con referencia el punto fijo y dos arbitrarios, multiplicada por lambda = delta/beta <br>
+2         -> matriz (-beta/gamma, 0; 0, 1) con referencia los puntos fijos y uno arbitrario <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __mul__(otra)</h3>
+<p>
+Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). <br>
+Uso: h * k (h y k son homografías de una misma recta). <br>
+Implementación <br>
+Devuelve una nueva homografía cuya matriz sea el producto de las de ambas. <br>
+Parámetros <br>
+otra: homografia_recta - homografía con la que componer <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __pow__(n)</h3>
+<p>
+Operador ^ (ó **). Devuelve el resultado de componer una homografía con sí misma n veces (^-1 devuelve la inversa). <br>
+Uso h^n (ó h**n) (h es una homografía de la recta y n un entero). <br>
+Implementación <br>
+Devuelve una nueva homografía cuya matriz es la de esta elevada a n. <br>
+Parámetros <br>
+n: entero - exponente al que elevar <br>
 </p>
 </div>
 </div>

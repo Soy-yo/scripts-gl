@@ -8,4 +8,5 @@
 
 load("scripts/procedimientos.sage")
 load("scripts/espacios.sage")
+load("scripts/aplicaciones.sage")
 load("scripts/recta_proyectiva.sage")
