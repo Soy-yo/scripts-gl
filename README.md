@@ -8,9 +8,29 @@ Cualquier error que se detecte debería ser comunicado lo antes posible.
 # Cómo usarlos
 Las carpetas importantes son scripts y doc. En scripts se encuentran todos los archivos con scripts disponibles. En doc se encuentra la documentación básica para ser capaz de usar dichos scripts, sin necesidad de mirar ningún tipo de código.
 
-Si usamos la versión nueva del cuaderno de Sage, Jupyter (la del icono naranja), simplemente podremos subir los archivos .sage. Después, en el archivo que creemos para resolver los ejercicios debemos cargarlos antes de hacer nada con la instrucción <code>load("[nombre del archivo]")</code> (por ejemplo, <code>load("scripts/espacios.sage")</code>). Si queremos que se muestre "bonito" podemos activar Latex con la instrucción <code>pretty_print_default(True)</code>.
+<ol>
+  <li>
+    Descargamos el proyecto (o tan sólo las carpetas <b>scripts</b> y <b>doc</b> y recomendable también este <b>README</b>).
+  </li>
+  <li>
+    En el examen los llevamos en un pendrive. Abrimos el cuaderno. Si reconoce la carpeta directamente nos podemos ahorrar esto, si no, depende qué versión usemos:
+  </li>
+  <li>
+    <ul>
+      <li>
+        En Jupyter (icono naranja) cargamos los archivos .sage con "Upload", creamos una nueva carpeta llamada "scripts" y los movemos ahí. Después creamos una nueva hoja en la que trabajar (en el directorio justo anterior a scripts (es decir, que podamos ver la carpeta y el archivo a la vez)) y ejecutamos en la primera línea <code>load('scripts/scripts_gl.sage')</code>. Con esto se cargarán todos los archivos y ya podremos trabajar. <i>Procedimiento recomendado</i>
+      </li>
+      <li>
+        En la versión antigua (icono azul (o blanco?)) creamos directamente una nueva hoja y copiamos, pegamos y ejecutamos el contenido de cada uno de los archivos en las primeras filas. Después, ya se podrán usar sin más.
+      </li>
+    </ul>
+  </li>
+  <li>
+    Abrimos <b>doc/index.html</b> en el navegador para tener toda la documentación necesaria.
+  </li>
+</ol>
 
-En la versión antigua no he logrado de momento subir archivos .sage, así que nos tendremos que conformar con copiar el código, pegarlo en nuestro cuaderno, ejecutarlo y, ya entonces, lo podremos utilizar. Para verlo en Latex marcar la casilla Typeset.
+Se ha añadido una nueva funcionalidad que permite mostrar por pantalla los pasos que va siguiendo una función, de forma que no sólo obtengamos el resultado sin saber cómo se ha calculado eso. Para más información ver la sección <b>Procedimientos</b> más abajo.
 
 # Cómo participar
 Si quieres subir algún script a este banco de scripts, puedes hacerlo sencillamente con un Pull-request a una rama nueva, o enviármelo, con unas ciertas condiciones.
@@ -65,7 +85,9 @@ El caso, para poder ver los procedimientos hay que activarlo a mano: simplemente
 
 Notemos que si no podemos cargar los archivos .sage debemos copiar y pegar el código del archivo procedimientos.sage en nuestro cuaderno.
 
-Si somos programadores y consideramos que no es del todo obvio cómo se implementa nuestra función podemos incluir en nuestro módulo (si no lo está aún) <code>load("procedimientos.sage")</code> (asumiendo que se encuentran en la misma carpeta) y utilizar la función <code>paso(*objetos)</code>. Su uso es muy sencillo: escribimos esta línea en el punto que queramos dar información, y como objetos pasamos todo lo que queramos mostrar, separados por comas: desde cadenas de texto o números hasta matrices o ecuaciones. Cualquier cosa. El resultado será una línea que se muestra por pantalla (solamente si el usuario activó previamente los procedimientos) con tipografía de Latex. Por ejemplo, <code>paso(A, B, "=", A * B)</code> muestra explícitamente la matriz A, la matriz B, el signo = y el resultado de su producto.
+Si somos programadores y consideramos que no es del todo obvio cómo se implementa nuestra función podemos utilizar la función <code>paso(*objetos)</code>. Su uso es muy sencillo: escribimos esta línea en el punto que queramos dar información, y como objetos pasamos todo lo que queramos mostrar, separados por comas: desde cadenas de texto o números hasta matrices o ecuaciones. Cualquier cosa. El resultado será una línea que se muestra por pantalla (solamente si el usuario activó previamente los procedimientos) con tipografía de Latex. Por ejemplo, <code>paso(A, B, "=", A * B)</code> muestra explícitamente la matriz A, la matriz B, el signo = y el resultado de su producto.
+
+Importante no poner tildes ni caracteres raros porque es probable que el cuaderno no sea capaz de leerlo (comprobado con Jupyter 8.3).
 
 # Formato de la documentación
 En este proyecto se incluye un pequeño programa que se encarga de leer los comentarios de los archivos .sage para transformarlos en archivos .html (páginas web) que se puedan abrir con un navegador y sean más legibles que los propios comentarios en el código. Pero para que esto fucnione correctamente se necesite que los comentarios sigan unos estándares (sólo se refiere a los de documentación de las funciones; comentarios internos aclarativos pueden llevar el formato que sea).
