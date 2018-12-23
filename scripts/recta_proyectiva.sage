@@ -363,7 +363,7 @@ class homografia_recta:
     
     #\m
     # Devuelve esta homografía como una aplicacion_proyectiva.
-    def aplicacion():
+    def aplicacion(self):
         return self._aplicacion
     
     #\m
@@ -375,6 +375,11 @@ class homografia_recta:
     # Devuelve la recta sobre la que se aplica esta homografía.
     def recta(self):
         return self._recta
+        
+    #\m
+    # Devuelve la referencia de la recta en la que está expresada esta homografía.
+    def referencia(self):
+        return self._recta.referencia()
     
     #\m
     # Devuelve la homografía expresada como una transformación de M
@@ -411,13 +416,22 @@ class homografia_recta:
         return self._recta[self(coord)]
     
     #\m
+    # Devuelve los autovalores de esta homografía.
+    #
+    # Implementación \\
+    # Ver autovalores() de aplicacion_proyectiva (aplicacion_proyectiva.sage).
+    #
+    def autovalores(self):
+        return self._aplicacion.autovalores()
+    
+    #\m
     # Devuelve los parámetros de los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
     #
     # Implementación \\
     # Calcula los autovectores y deshomogeniza.
     #
     def puntos_fijos_theta(self):
-        paso("Podemos obtenerlos directamente de:", self._expresion.substitute(self._theta1 == self._theta2), \
+        paso("Podemos obtener los puntos fijos directamente de:", self._expresion.substitute(self._theta1 == self._theta2), \
                 ", pero vamos a usar los autovectores porque es más sencillo para el algoritmo")
         if self.es_identidad():
             return []
@@ -459,19 +473,23 @@ class homografia_recta:
     # Comprueba que la traza sea nula.
     #    
     def es_involucion(self):
-        return self._matriz.trace() != 0
+        return self._matriz.trace() == 0
     
     #\m
-    # Calcula el módulo de esta homografía, esto es -beta/gamma.
+    # Calcula el módulo de esta homografía, esto es el cociente de sus autovalores (en cualquier orden).
     #
     def modulo(self):
-        if self._matriz[1][1] == 0:
-            return Infinity
-        return self._matriz[0][0] / self._matriz[1][1]
+        paso("El módulo se calcula mediante el cociente de los autovalores:")
+        autovalores = self.autovalores()
+        paso("Autovalores:", autovalores)
+        # Autovalor doble: la división siempre da 1
+        if len(autovalores) == 1:
+            return 1
+        return autovalores[0] / autovalores[1]
         
     #\m
-    # Devuelve esta misma homografía en una referencia adecuada de forma que su ecuacion quede de la forma más
-    # simple posible.
+    # Devuelve esta misma homografía en una referencia adecuada de forma que su ecuación quede de la forma más
+    # simple posible. Para las involuciones no devuelve la forma general theta*theta' = 1. Para ello usar simplificar_involucion().
     #
     # Implementación \\
     # En función de los puntos fijos devuelve: \\
@@ -506,10 +524,35 @@ class homografia_recta:
         i = 0 if ref[0] != fijos[0] and ref[0] != fijos[1] else \
             1 if ref[1] != fijos[0] and ref[1] != fijos[1] else \
             2
-        paso("Usamos los puntos fijos como primeros puntos de la nueva referencia y mantenemos el otro:")
-        paso("R={", fijos[0], ",", fijos[1], ";", ref[i], "}")
-        return homografia_recta(matrix([[self.modulo(), 0], [0, 1]]), \
-                                recta_proyectiva(fijos[0], fijos[1], ref[i]))
+        ocultar_procedimiento()
+        modulo = self.modulo()
+        # Se debe cumplir que {M, N; P, P'} = modulo (con M, N fijos, P arbitrario)
+        # Si no, hay que escogerlos al revés
+        j = 0 if razon_doble(fijos[0], fijos[1], ref[i], self(ref[i])) == modulo else 1
+        reanudar_procedimiento()
+        paso("Usamos los puntos fijos como primeros puntos (en el orden correcto) de la nueva referencia y mantenemos el otro:")
+        paso("R={", fijos[j], ",", fijos[(j + 1) % 2], ";", ref[i], "}")
+        return homografia_recta(matrix([[modulo, 0], [0, 1]]), recta_proyectiva(fijos[j], fijos[(j + 1) % 2], ref[i]))
+    
+    #\m
+    # Devuelve esta misma involución en una referencia adecuada de forma que su ecuación quede theta*theta' = 1.
+    #
+    # Implementación \\
+    # Asumiendo que esta homografía es una involución, los dos puntos fijos separan armónicamente cualquier par de la involución.
+    # Por tanto, basta con elegir cualquier punto y su imagen como Infinity y 0 y un punto fijo como 1. De esta forma, el otro
+    # punto fijo tendrá coordenada -1 y con ello obtenemos la ecuación deseada.
+    #
+    def simplificar_involucion(self):
+        assert self.es_involucion(), "Para simplificar como involucion la homografia debe ser una involucion"
+        paso("Calculamos los puntos fijos")
+        fijos = self.puntos_fijos()
+        ref = self._recta.referencia()
+        i = 0 if ref[0] != fijos[0] and ref[0] != fijos[1] else \
+            1 if ref[1] != fijos[0] and ref[1] != fijos[1] else \
+            2
+        paso("Usamos un punto arbitrario y su imagen como primeros puntos de la referencia y uno de los fijos como unidad")
+        paso("R={", ref[i], ",", self(ref[i]), ",", fijos[0], "}")
+        return homografia_recta(matrix([[0, 1], [1, 0]]), recta_proyectiva(ref[i], self(ref[i]), fijos[0]))
     
     #\m
     # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))).

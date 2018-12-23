@@ -125,11 +125,10 @@ class aplicacion_proyectiva:
         reanudar_procedimiento()
         var('lambda0', latex_name = r'lambda')
         paso("Resolvemos", self._matriz - lambda0, "*X = 0 para los autovalores:", self.autovalores())
-        paso("Podemos sustituir la variable por el valor que queramos")
         vars = [var('x' + str(i)) for i in range(self._matriz.ncols())]
         x = vector(vars)
         # Resuelve el sistema y se queda sólo con los resultados como vectores
-        return map(lambda sol: vector(map(lambda x: x.rhs(), sol[0])), \
+        return map(lambda sol: vector(map(lambda x: x.rhs(), sol[0])).simplify_full(), \
                 [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
     
     #\m

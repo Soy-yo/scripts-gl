@@ -228,6 +228,11 @@ Devuelve la matriz asociada a esta homografía. </p>
 Devuelve la recta sobre la que se aplica esta homografía. </p>
 </div>
 <div class='function'>
+<h3>Función: referencia()</h3>
+<p>
+Devuelve la referencia de la recta en la que está expresada esta homografía. </p>
+</div>
+<div class='function'>
 <h3>Función: expresion_mobius()</h3>
 <p>
 Devuelve la homografía expresada como una transformación de M </p>
@@ -247,6 +252,14 @@ Dado un parámetro no homogéneo sustituye en la expresión de Möbius y devuelv
 Dado un punto del espacio, primero calcula su coordenada en la recta y luego vuelve a llamar a este método. <br>
 Parámetros <br>
 x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: autovalores()</h3>
+<p>
+Devuelve los autovalores de esta homografía. <br>
+Implementación <br>
+Ver autovalores() de aplicacion_proyectiva (aplicacion_proyectiva.sage). <br>
 </p>
 </div>
 <div class='function'>
@@ -292,18 +305,26 @@ Comprueba que la traza sea nula. <br>
 <div class='function'>
 <h3>Función: modulo()</h3>
 <p>
-Calcula el módulo de esta homografía, esto es -beta/gamma. <br>
+Calcula el módulo de esta homografía, esto es el cociente de sus autovalores (en cualquier orden). <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: simplificar()</h3>
 <p>
-Devuelve esta misma homografía en una referencia adecuada de forma que su ecuacion quede de la forma más simple posible. <br>
+Devuelve esta misma homografía en una referencia adecuada de forma que su ecuación quede de la forma más simple posible. Para las involuciones no devuelve la forma general theta*theta' = 1. Para ello usar simplificar_involucion(). <br>
 Implementación <br>
 En función de los puntos fijos devuelve: <br>
 infinitos -> ella misma (identidad) <br>
 1         -> matriz (1, 1; 0, 1) con referencia el punto fijo y dos arbitrarios, multiplicada por lambda = delta/beta <br>
 2         -> matriz (-beta/gamma, 0; 0, 1) con referencia los puntos fijos y uno arbitrario <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: simplificar_involucion()</h3>
+<p>
+Devuelve esta misma involución en una referencia adecuada de forma que su ecuación quede theta*theta' = 1. <br>
+Implementación <br>
+Asumiendo que esta homografía es una involución, los dos puntos fijos separan armónicamente cualquier par de la involución. Por tanto, basta con elegir cualquier punto y su imagen como Infinity y 0 y un punto fijo como 1. De esta forma, el otro punto fijo tendrá coordenada -1 y con ello obtenemos la ecuación deseada. <br>
 </p>
 </div>
 <div class='function'>
