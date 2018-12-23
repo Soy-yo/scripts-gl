@@ -133,5 +133,42 @@ n: entero - exponente al que elevar <br>
 </div>
 </div>
 </div>
+<div class='class'>
+<h2>Clase: proyeccion</h2>
+<p>
+Clase que representa una proyección dados un subespacio centro y un subespacio imagen. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una proyección dados su centro (Z) e imagen (Y) de un mismo espacio Z. Se debe asegurar que dim Z + dim Y = dim X - 1. <br>
+Parámetros <br>
+centro: subespacio - centro de la proyección imagen: subespacio - espacio de llegada de la apliación <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: centro()</h3>
+<p>
+Devuelve el centro de esta proyección. </p>
+</div>
+<div class='function'>
+<h3>Función: imagen()</h3>
+<p>
+Devuelve el espacio de llegada de esta proyección. </p>
+</div>
+<div class='function'>
+<h3>Función: __call__(x)</h3>
+<p>
+Calcula la imagen mediante esta proyección del punto dado. <br>
+Uso: pi(x) (donde pi es una proyeccion y x un punto). <br>
+Implementación <br>
+Calcula el subespacio V(Z, x) y lo interseca con el subespacio de llegada, asumiendo x no pertenece a Z. <br>
+Parámetros <br>
+x: vector(n) - punto del que se quiere calcular su imagen <br>
+</p>
+</div>
+</div>
+</div>
 </body>
 </html>

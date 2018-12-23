@@ -82,7 +82,7 @@ class aplicacion_proyectiva:
     #
     # Parámetros \\
     # x: vector(n) - punto del que se quiere calcular su imagen
-    #    
+    #
     def __call__(self, x):
         assert len(x) == self._matriz.ncols(), "El punto debe pertenecer al espacio inicial"
         ocultar_procedimiento()
@@ -127,6 +127,7 @@ class aplicacion_proyectiva:
         paso("Resolvemos", self._matriz - lambda0, "*X = 0 para los autovalores:", self.autovalores())
         vars = [var('x' + str(i)) for i in range(self._matriz.ncols())]
         x = vector(vars)
+        paso("Si queda algun parametro, se podra sacar como factor comun y sustituirse por cualquier valor")
         # Resuelve el sistema y se queda sólo con los resultados como vectores
         return map(lambda sol: vector(map(lambda x: x.rhs(), sol[0])).simplify_full(), \
                 [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
@@ -188,4 +189,63 @@ class aplicacion_proyectiva:
                 
     def __repr__(self):
         return "<Aplicacion proyectiva con matriz asociada\n" + str(self._matriz) + ">"
+
+#\c
+# Clase que representa una proyección dados un subespacio centro y un subespacio imagen.
+#
+class proyeccion:
+    
+    #\i
+    # Construye una proyección dados su centro (Z) e imagen (Y) de un mismo espacio Z.
+    # Se debe asegurar que dim Z + dim Y = dim X - 1.
+    #
+    # Parámetros \\
+    # centro: subespacio - centro de la proyección
+    # imagen: subespacio - espacio de llegada de la apliación
+    #
+    def __init__(self, centro, imagen):
+        dim = centro.dimension_ambiente()
+        assert dim == imagen.dimension_ambiente(), "Los subespacios deben pertenecer al mismo espacio ambiente"
+        assert centro.dim() + imagen.dim() == dim - 1,  "Se debe cumplir dim Z + dim Y = dim X - 1"
+        self._centro = centro
+        self._imagen = imagen
+    
+    # Métodos accedentes
+    
+    #\m
+    # Devuelve el centro de esta proyección.
+    def centro(self):
+        return self._centro
+        
+    #\m
+    # Devuelve el espacio de llegada de esta proyección.
+    def imagen(self):
+        return self._imagen
+        
+    # Otros métodos
+    
+    #\m
+    # Calcula la imagen mediante esta proyección del punto dado.
+    #
+    # Uso: pi(x) (donde pi es una proyeccion y x un punto).
+    #
+    # Implementación \\
+    # Calcula el subespacio V(Z, x) y lo interseca con el subespacio de llegada, asumiendo x no pertenece a Z.
+    #
+    # Parámetros \\
+    # x: vector(n) - punto del que se quiere calcular su imagen
+    #
+    def __call__(self, x):
+        ocultar_procedimiento()
+        assert x not in self._centro, "Los puntos del centro no tienen imagen en una proyeccion"
+        punto = subespacio(x)
+        reanudar_procedimiento()
+        paso("Calculamos V(Z, x)")
+        V = self._centro.suma(punto)
+        paso("Ahora intersecamos con el espacio de llegada, lo que nos deberia dar un solo punto")
+        # La intersección debería ser un punto
+        return V.interseccion(self._imagen).representantes()[0]
+        
+    def __repr__(self):
+        return "<Proyeccion de centro " + str(self._centro) + " e imagen " + str(self._imagen) + ">"
         
