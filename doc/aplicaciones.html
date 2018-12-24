@@ -8,10 +8,25 @@
 Archivo que contiene clases relativas a aplicaciones proyectivas con operaciones simples y funciones creadoras de estas. <br>
 Autor: Pablo Sanz Sanz <br>
 </p>
+<div class='function'>
+<h3>Función: crear_aplicacion_proyectiva(iniciales, finales, centro = [])</h3>
+<p>
+Crea un objeto del tipo aplicacion_proyectiva dadas las transformaciones que se quieren asegurar y su centro. <br>
+Importante tener en cuenta que para los parámetros se piden listas de vectores, luego la llamada podría ser algo así: <br>
+crear_aplicacion_proyectiva([A1, B1, C1], [A2, B2, C2], [Z]) con Ai, Bi, Ci, Z puntos de P^2 (3 coordenadas). <br>
+Implementación <br>
+Tomando como referencia los puntos iniciales junto con el centro se tiene que se transforman e_1, ..., e_k en cada uno de los puntos finales, y e_(k+1), ... e_(n+1) en 0 (como aplicación lineal). Por tanto, la matriz de la aplicación serán los puntos finales por columnas (multiplicados por los coeficientes que hacen que [f(e_1 + ... e_(k-1))] = f(e_k)) y cero para el resto de columnas. Después hay que deshacer el cambio de referencia multiplicando por la inversa de la matriz que forma la base elegida por la derecha. <br>
+PROBABLEMENTE NO FUNCIONARÁ CON PUNTOS PARAMÉTRICOS. <br>
+Parámetros <br>
+iniciales: lista(vector(k<=n+1)) - puntos proyectivamente independientes que se quieren transformar <br>
+finales: lista(vector(k<=n+1)) - puntos a los que se quiere llevar los puntos iniciales (en el mismo orden) <br>
+centro: lista(vector(n+2-k)) - puntos proectivamente independientes a los iniciales que pertenecerán al centro de la aplicación proyectiva, esto es, al núcleo de la aplicación lineal asociada (por defecto vacía) <br>
+</p>
+</div>
 <div class='class'>
 <h2>Clase: aplicacion_proyectiva</h2>
 <p>
-Clase que representa una aplciación proyectiva de un subespacio arbitario en otro. <br>
+Clase que representa una aplicación proyectiva de un subespacio arbitario en otro. <br>
 </p>
 <div class='methods'>
 <div class='function'>
@@ -39,7 +54,7 @@ Calcula el subespacio dual al que contiene las filas de la matriz asociada. <br>
 <div class='function'>
 <h3>Función: es_inyectiva()</h3>
 <p>
-Determina si esta apliación es inyectiva. <br>
+Determina si esta aplicación es inyectiva. <br>
 Implementación <br>
 Comprueba que el rango de la matriz asociada coincida con el núemro de columnas. <br>
 </p>
@@ -47,7 +62,7 @@ Comprueba que el rango de la matriz asociada coincida con el núemro de columnas
 <div class='function'>
 <h3>Función: es_sobreyectiva()</h3>
 <p>
-Determina si esta apliación es sobreyectiva. <br>
+Determina si esta aplicación es sobreyectiva. <br>
 Implementación <br>
 Comprueba que el rango de la matriz asociada coincida con el núemro de filas. <br>
 </p>
@@ -55,7 +70,7 @@ Comprueba que el rango de la matriz asociada coincida con el núemro de filas. <
 <div class='function'>
 <h3>Función: es_homografia()</h3>
 <p>
-Determina si esta apliación es una homografía (biyectiva). <br>
+Determina si esta aplicación es una homografía (biyectiva). <br>
 Implementación <br>
 Comprueba que sea inyectiva y la matriz cuadrada. <br>
 </p>
@@ -76,7 +91,7 @@ x: vector(n) - punto del que se quiere calcular su imagen <br>
 <p>
 Calcula los autovalores de esta aplicación, asumiendo que va de un espacio en sí mismo. <br>
 Implementación <br>
-Resuelve det(f - lambda*id) = 0 para lambda (donde f es esta apliación). <br>
+Resuelve det(f - lambda*id) = 0 para lambda (donde f es esta aplicación). <br>
 </p>
 </div>
 <div class='function'>
@@ -94,15 +109,15 @@ Utilzia eigenvectors_right() de Sage. Para obtener los puntos fijos solamente us
 <p>
 Devuelve los puntos fijos de esta aplicacion proyectiva. <br>
 Implementación <br>
-Para cada autovalor lambda resuelve (f - lambda id)X = 0 para X (donde f es esta apliación). <br>
+Para cada autovalor lambda resuelve (f - lambda id)X = 0 para X (donde f es esta aplicación). <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: cambiar_referencias(cambio_inicial = None, cambio_final = None, misma = True)</h3>
 <p>
-Devuelve una nueva apliación con los cambios de referencia especificados. <br>
+Devuelve una nueva aplicación con los cambios de referencia especificados. <br>
 Implementación <br>
-REVISAR. Si las matrices son M, P y Q las de esta aplciación, el cambio de coordenadas incial y final, respectivamente, calcula Q*M*P^-1. Posiblemente esté al revés, esto es lo que hay que revisar. <br>
+REVISAR. Si las matrices son M, P y Q las de esta aplicación, el cambio de coordenadas incial y final, respectivamente, calcula Q*M*P^-1. Posiblemente esté al revés, esto es lo que hay que revisar. <br>
 Parámetros <br>
 cambio_inicial: matriz(m, m) - matriz del cambio de referencia del espacio de salida (por defecto I) <br>
 cambio_final: matriz(n, n) - matriz del cambio de referencia del espacio de llegada (por defecto I o la misma que la anterior) <br>
@@ -117,7 +132,7 @@ Uso: f * g (f y g son aplicaciones compatibles para la composición). <br>
 Implementación <br>
 Devuelve una nueva aplicación cuya matriz sea el producto de las de ambas. <br>
 Parámetros <br>
-otra: aplicacion_proyectiva - aplciación con la que componer <br>
+otra: aplicacion_proyectiva - aplicación con la que componer <br>
 </p>
 </div>
 <div class='function'>
@@ -126,7 +141,7 @@ otra: aplicacion_proyectiva - aplciación con la que componer <br>
 Operador ^ (ó **). Devuelve el resultado de componer una aplicación consigo misma n veces (^-1 devuelve la inversa). <br>
 Uso f^n (ó f**n) (f es una homografía de la recta y n un entero). <br>
 Implementación <br>
-Devuelve una nueva aplciación cuya matriz es la de esta elevada a n. <br>
+Devuelve una nueva aplicación cuya matriz es la de esta elevada a n. <br>
 Parámetros <br>
 n: entero - exponente al que elevar <br>
 </p>
@@ -144,7 +159,7 @@ Clase que representa una proyección dados un subespacio centro y un subespacio 
 <p>
 Construye una proyección dados su centro (Z) e imagen (Y) de un mismo espacio Z. Se debe asegurar que dim Z + dim Y = dim X - 1. <br>
 Parámetros <br>
-centro: subespacio - centro de la proyección imagen: subespacio - espacio de llegada de la apliación <br>
+centro: subespacio - centro de la proyección imagen: subespacio - espacio de llegada de la aplicación <br>
 </p>
 </div>
 <div class='function'>

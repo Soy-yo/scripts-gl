@@ -4,10 +4,58 @@
 # Autor: Pablo Sanz Sanz
 #
 
+# Funciones globales
+
+#\f
+# Crea un objeto del tipo aplicacion_proyectiva dadas las transformaciones que se quieren asegurar y su centro.
+#
+# Importante tener en cuenta que para los parámetros se piden listas de vectores, luego la llamada podría ser algo así: \\
+# crear_aplicacion_proyectiva([A1, B1, C1], [A2, B2, C2], [Z]) con Ai, Bi, Ci, Z puntos de P^2 (3 coordenadas).
+#
+# Implementación \\
+# Tomando como referencia los puntos iniciales junto con el centro se tiene que se transforman e_1, ..., e_k en cada uno de los
+# puntos finales, y e_(k+1), ... e_(n+1) en 0 (como aplicación lineal). Por tanto, la matriz de la aplicación serán los puntos
+# finales por columnas (multiplicados por los coeficientes que hacen que [f(e_1 + ... e_(k-1))] = f(e_k)) y cero para el resto de
+# columnas. Después hay que deshacer el cambio de referencia multiplicando por la inversa de la matriz que forma la base elegida
+# por la derecha.
+#
+# PROBABLEMENTE NO FUNCIONARÁ CON PUNTOS PARAMÉTRICOS.
+#
+# Parámetros \\
+# iniciales: lista(vector(k<=n+1)) - puntos proyectivamente independientes que se quieren transformar \\
+# finales: lista(vector(k<=n+1)) - puntos a los que se quiere llevar los puntos iniciales (en el mismo orden) \\
+# centro: lista(vector(n+2-k)) - puntos proectivamente independientes a los iniciales que pertenecerán al centro
+# de la aplicación proyectiva, esto es, al núcleo de la aplicación lineal asociada (por defecto vacía)
+#
+def crear_aplicacion_proyectiva(iniciales, finales, centro = []):
+    assert len(iniciales) > 0, "Se debe indicar que puntos se quiere transformar"
+    assert len(iniciales) == len(finales), "Para cada punto inicial se debe especificar su imagen"
+    d = len(iniciales[0])
+    assert len(iniciales) + len(centro) == d + 1, "Se deben especificar suficientes puntos entre inciales y centro para formar una referencia"
+    assert all(map(lambda p: len(p) == d, iniciales + finales + centro)), "Todos los puntos deben pertenecer al mismo espacio"
+    paso("Para crear la aplicacion vamos a usar los puntos inciales mas el centro como referencia (con el ultimo inicial como unidad)")
+    paso("Calculamos la matriz del cambio de referencia a la canonica:")
+    # Matriz del cambio de referencia a la canónica
+    p = matriz_asociada(matrix(iniciales[0 : len(iniciales) - 1] + centro + [iniciales[-1]]).T)
+    paso(p)
+    coef = vector([var('alfa' + str(i + 1), latex_name = r'alfa_' + str(i + 1)) for i in range(len(iniciales) - 1)])
+    ec = (matrix(finales[0 : len(finales) - 1]).T * coef).simplify_full()
+    paso("Forzamos [f(e_1 + ... + e_(k-1))] = f(e_k):")
+    paso(matrix([ec]).T, "=", matrix([finales[-1]]).T)
+    res = solve((ec - finales[-1]).simplify_full().list(), coef.list())
+    # Finales * Alfa y rellenamos los demás con 0
+    m = matrix([finales[i] * coef[i].substitute(res[0][i]) for i in range(len(finales) - 1)] \
+                + [vector([0 for j in range(d)]) for i in range(d - len(finales) + 1)]).T
+    paso("En la referencia formada por", iniciales[0 : len(iniciales) - 1] + centro + [iniciales[-1]], ", la matriz de la aplicación es:")
+    paso(m)
+    paso("El cambio de referencia se hace:")
+    paso(m, p, "^-1 = ", m * p^-1)
+    return aplicacion_proyectiva(m * p^-1)
+
 # Clases
 
 #\c
-# Clase que representa una aplciación proyectiva de un subespacio arbitario en otro.
+# Clase que representa una aplicación proyectiva de un subespacio arbitario en otro.
 #
 class aplicacion_proyectiva:
 
@@ -46,7 +94,7 @@ class aplicacion_proyectiva:
         return dual.dual()
     
     #\m
-    # Determina si esta apliación es inyectiva.
+    # Determina si esta aplicación es inyectiva.
     #
     # Implementación \\
     # Comprueba que el rango de la matriz asociada coincida con el núemro de columnas.
@@ -55,7 +103,7 @@ class aplicacion_proyectiva:
         return self._matriz.rank() == self._matriz.ncols()
     
     #\m
-    # Determina si esta apliación es sobreyectiva.
+    # Determina si esta aplicación es sobreyectiva.
     #
     # Implementación \\
     # Comprueba que el rango de la matriz asociada coincida con el núemro de filas.
@@ -64,7 +112,7 @@ class aplicacion_proyectiva:
         return self._matriz.rank() == self._matriz.nrows()
     
     #\m
-    # Determina si esta apliación es una homografía (biyectiva).
+    # Determina si esta aplicación es una homografía (biyectiva).
     #
     # Implementación \\
     # Comprueba que sea inyectiva y la matriz cuadrada.
@@ -87,14 +135,14 @@ class aplicacion_proyectiva:
         assert len(x) == self._matriz.ncols(), "El punto debe pertenecer al espacio inicial"
         ocultar_procedimiento()
         assert x not in self.centro(), "El punto no puede pertenecer al centro de la aplicacion"
-        mostrar_procedimiento()
+        reanudar_procedimiento()
         return self._matriz * x
         
     #\m
     # Calcula los autovalores de esta aplicación, asumiendo que va de un espacio en sí mismo.
     #
     # Implementación \\
-    # Resuelve det(f - lambda*id) = 0 para lambda (donde f es esta apliación).
+    # Resuelve det(f - lambda*id) = 0 para lambda (donde f es esta aplicación).
     #
     def autovalores(self):
         assert self._matriz.ncols() == self._matriz.nrows(), \
@@ -117,7 +165,7 @@ class aplicacion_proyectiva:
     # Devuelve los puntos fijos de esta aplicacion proyectiva.
     #
     # Implementación \\
-    # Para cada autovalor lambda resuelve (f - lambda id)X = 0 para X (donde f es esta apliación).
+    # Para cada autovalor lambda resuelve (f - lambda id)X = 0 para X (donde f es esta aplicación).
     #
     def puntos_fijos(self):
         ocultar_procedimiento()
@@ -133,10 +181,10 @@ class aplicacion_proyectiva:
                 [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
     
     #\m
-    # Devuelve una nueva apliación con los cambios de referencia especificados.
+    # Devuelve una nueva aplicación con los cambios de referencia especificados.
     #
     # Implementación \\
-    # REVISAR. Si las matrices son M, P y Q las de esta aplciación, el cambio de coordenadas incial y final, respectivamente,
+    # REVISAR. Si las matrices son M, P y Q las de esta aplicación, el cambio de coordenadas incial y final, respectivamente,
     # calcula Q*M*P^-1. Posiblemente esté al revés, esto es lo que hay que revisar.
     #
     # Parámetros \\
@@ -165,7 +213,7 @@ class aplicacion_proyectiva:
     # Devuelve una nueva aplicación cuya matriz sea el producto de las de ambas.
     #
     # Parámetros \\
-    # otra: aplicacion_proyectiva - aplciación con la que componer
+    # otra: aplicacion_proyectiva - aplicación con la que componer
     #    
     def __mul__(self, otra):
         assert self._matriz.ncols() == otra._matriz.nrows(), \
@@ -178,7 +226,7 @@ class aplicacion_proyectiva:
     # Uso f^n (ó f**n) (f es una homografía de la recta y n un entero).
     #
     # Implementación \\
-    # Devuelve una nueva aplciación cuya matriz es la de esta elevada a n.
+    # Devuelve una nueva aplicación cuya matriz es la de esta elevada a n.
     #
     # Parámetros \\
     # n: entero - exponente al que elevar
@@ -201,7 +249,7 @@ class proyeccion:
     #
     # Parámetros \\
     # centro: subespacio - centro de la proyección
-    # imagen: subespacio - espacio de llegada de la apliación
+    # imagen: subespacio - espacio de llegada de la aplicación
     #
     def __init__(self, centro, imagen):
         dim = centro.dimension_ambiente()

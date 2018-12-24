@@ -59,7 +59,7 @@ def matriz_asociada(ref):
 # Comprueba que sea una matriz cuadrada más la columna del punto unidad y que el rango sea máximo.
 #    
 def es_referencia(matriz):
-    return matriz.ncols() == matirz.nrows() + 1 and \
+    return matriz.ncols() == matriz.nrows() + 1 and \
             matriz.matrix_from_columns(range(matriz.ncols() - 1)).det() != 0
     
 # Clases
