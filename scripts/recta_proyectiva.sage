@@ -52,9 +52,9 @@ def razon_doble(a, b, c, d):
 #
 def razon_doble_puntos(p0, p1, p2, p3):
     assert len(p0) > 1, "Para coordenadas de la recta usar 'razon_doble'"
-    ocultar_procedimiento()
+    _no_pasos()
     assert subespacio(p0, p1, p2, p3).dim() == 1, "Los puntos deben estar alineados"
-    reanudar_procedimiento()
+    _no_pasos(False)
     fin = len(p0) == 2
     i = 0
     j = 1
@@ -69,9 +69,9 @@ def razon_doble_puntos(p0, p1, p2, p3):
         q2 = vector([p2[i], p2[j]])
         q3 = vector([p3[i], p3[j]])
         # Si nos sigue quedando una recta (y no un punto) ya podemos calcular la razón doble
-        ocultar_procedimiento()
+        _no_pasos()
         fin = q0 != 0 and q1 != 0 and q2 != 0 and q3 != 0 and subespacio(q0, q1, q2, q3).dim() == 1
-        reanudar_procedimiento()
+        _no_pasos(False)
         j = j + 1
         # Creo que ni debería cumplirse esta condición
         if j == len(p0):
@@ -243,9 +243,9 @@ class recta_proyectiva:
     # p2: vector(n) - punto cuya coordenada será theta == 1
     #
     def __init__(self, p0, p1, p2):
-        ocultar_procedimiento()
+        _no_pasos()
         self._subespacio = subespacio(p0, p1, p2)
-        reanudar_procedimiento()
+        _no_pasos(False)
         assert self._subespacio.dim() == 1, "Los puntos deben estar alineados"
         # Forzamos p2: theta == 1
         var('a b')
@@ -524,12 +524,12 @@ class homografia_recta:
         i = 0 if ref[0] != fijos[0] and ref[0] != fijos[1] else \
             1 if ref[1] != fijos[0] and ref[1] != fijos[1] else \
             2
-        ocultar_procedimiento()
+        _no_pasos()
         modulo = self.modulo()
         # Se debe cumplir que {M, N; P, P'} = modulo (con M, N fijos, P arbitrario)
         # Si no, hay que escogerlos al revés
         j = 0 if razon_doble(fijos[0], fijos[1], ref[i], self(ref[i])) == modulo else 1
-        reanudar_procedimiento()
+        _no_pasos(False)
         paso("Usamos los puntos fijos como primeros puntos (en el orden correcto) de la nueva referencia y mantenemos el otro:")
         paso("R={", fijos[j], ",", fijos[(j + 1) % 2], ";", ref[i], "}")
         return homografia_recta(matrix([[modulo, 0], [0, 1]]), recta_proyectiva(fijos[j], fijos[(j + 1) % 2], ref[i]))

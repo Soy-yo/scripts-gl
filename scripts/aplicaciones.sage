@@ -88,9 +88,9 @@ class aplicacion_proyectiva:
     def centro(self):
         paso("El centro es el nucleo de la aplicacion lineal asociada")
         paso("Se obtiene directamente de las filas de la matriz asociada", self._matriz, "por filas, vistas como ecuaciones (dual)")
-        ocultar_procedimiento()
-        dual = subespacio(self._matriz.rows())
-        reanudar_procedimiento()
+        _no_pasos()
+        dual = subespacio(filter(lambda x: x != 0, self._matriz.rows()))
+        _no_pasos(False)
         return dual.dual()
     
     #\m
@@ -133,9 +133,9 @@ class aplicacion_proyectiva:
     #
     def __call__(self, x):
         assert len(x) == self._matriz.ncols(), "El punto debe pertenecer al espacio inicial"
-        ocultar_procedimiento()
+        _no_pasos()
         assert x not in self.centro(), "El punto no puede pertenecer al centro de la aplicacion"
-        reanudar_procedimiento()
+        _no_pasos(False)
         return self._matriz * x
         
     #\m
@@ -168,9 +168,9 @@ class aplicacion_proyectiva:
     # Para cada autovalor lambda resuelve (f - lambda id)X = 0 para X (donde f es esta aplicación).
     #
     def puntos_fijos(self):
-        ocultar_procedimiento()
+        _no_pasos()
         autovalores = self.autovalores()
-        reanudar_procedimiento()
+        _no_pasos(False)
         var('lambda0', latex_name = r'lambda')
         paso("Resolvemos", self._matriz - lambda0, "*X = 0 para los autovalores:", self.autovalores())
         vars = [var('x' + str(i)) for i in range(self._matriz.ncols())]
@@ -284,15 +284,35 @@ class proyeccion:
     # x: vector(n) - punto del que se quiere calcular su imagen
     #
     def __call__(self, x):
-        ocultar_procedimiento()
+        _no_pasos()
         assert x not in self._centro, "Los puntos del centro no tienen imagen en una proyeccion"
         punto = subespacio(x)
-        reanudar_procedimiento()
+        _no_pasos(False)
         paso("Calculamos V(Z, x)")
         V = self._centro.suma(punto)
         paso("Ahora intersecamos con el espacio de llegada, lo que nos deberia dar un solo punto")
         # La intersección debería ser un punto
         return V.interseccion(self._imagen).representantes()[0]
+        
+    #\m
+    # Devuelve esta proyección como un objeto del tipo aplicacion_proyectiva.
+    #
+    # Implementación \\
+    # Utiliza la función creadora de aplicaciones proyectivas crear_aplicacion_proyectiva, dando como puntos transformados
+    # los representantes del subespacio imagen (que se transforman en sí mismos) y como centro los representantes del centro
+    # de esta proyección. Como punto unidad escoge la suma de los representantes del espacio imagen (que también se transforma
+    # en sí mismo).
+    #
+    def aplicacion(self):
+        _no_pasos()
+        repr_imagen = self._imagen.representantes()
+        repr_centro = self._centro.representantes()
+        unidad = reduce(lambda p1, p2: p1 + p2, repr_imagen) + reduce(lambda p1, p2: p1 + p2, repr_centro)
+        pi_unidad = self(unidad)
+        _no_pasos(False)
+        paso("Los puntos: ", repr_imagen, " se transforman en si mismos y ", repr_centro, " son el centro de la aplicacion")
+        paso("El punto unidad:", unidad, " se transforma en ", pi_unidad)
+        return crear_aplicacion_proyectiva(repr_imagen + [unidad], repr_imagen + [pi_unidad], repr_centro)
         
     def __repr__(self):
         return "<Proyeccion de centro " + str(self._centro) + " e imagen " + str(self._imagen) + ">"

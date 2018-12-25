@@ -30,16 +30,15 @@ b: booleano - True para activarlos, False para desactivarlos (True si no se espe
 </p>
 </div>
 <div class='function'>
-<h3>Función: ocultar_procedimiento()</h3>
+<h3>Función: _no_pasos(b = True)</h3>
 <p>
-Desactiva temporalmente que se muestren los pasos que ejecutan las funciones. Sirve para desarrolladores, si llaman a funciones auxiliares que generarán un procedimiento, pero que no es relevante para el cálculo que se está efectuando. <br>
-</p>
-</div>
-<div class='function'>
-<h3>Función: reanudar_procedimiento()</h3>
-<p>
-Activa de nuevo que se muestren los pasos que ejecutan las funciones si estaban activados antes de llamar a ocultar_procedimiento(). <br>
-</p>
+Para desarroladores. Desactiva temporalmente los procedimientos. Se usa cuando vamos a llamar a otras funciones que sabemos que muestran procedimientos, pero no queremos que aparezcan por pantalla porque son cálculos poco relevantes para el cometido de nuestra función (por ejemplo, si queremos comprobar que realmente el punto que nos han pasado pertenece a un subespacio, pero no queremos que se muestre cómo lo hace porque el usuario da por hecho que su entrada es correcta). <br>
+Uso <br>
+_no_pasos() <br>
+funciones que no queremos que muestren sus procedimientos <br>
+_no_pasos(False) # IMPORTANTE NO OLVIDAR DESACTIVARLO AL FINAL O CAUSARÁ PROBLEMAS <br>
+Parámetros <br>
+b: booleano - True para desactivarlos, False para recuperarlos de nuevo (por defecto True) </p>
 </div>
 </body>
 </html>

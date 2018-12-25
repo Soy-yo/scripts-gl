@@ -9,8 +9,7 @@
 # Autor: Pablo Sanz Sanz
 #
 
-_mostrar_procedimiento = False
-_forzar_ocultar = False
+_mostrar_procedimiento = [False]
 
 #\f
 # Función para desarrolladores. Muestra por pantalla el texto especificado si la variable _mostrar_procedimiento está
@@ -24,7 +23,7 @@ _forzar_ocultar = False
 # *objetos: cualquiera - objetos a mostrar
 #
 def paso(*objetos):
-    if _mostrar_procedimiento and not _forzar_ocultar:
+    if _mostrar_procedimiento[-1]:
         s = ""
         for obj in objetos:
             s = s + str(latex(obj))
@@ -38,22 +37,25 @@ def paso(*objetos):
 #
 def mostrar_procedimiento(b = True):
     global _mostrar_procedimiento
-    global _forzar_ocultar
-    _mostrar_procedimiento = b
-    _forzar_ocultar = False
-      
+    _mostrar_procedimiento = [b]
+
 #\f
-# Desactiva temporalmente que se muestren los pasos que ejecutan las funciones. Sirve para desarrolladores, si llaman a
-# funciones auxiliares que generarán un procedimiento, pero que no es relevante para el cálculo que se está efectuando.
+# Para desarroladores. Desactiva temporalmente los procedimientos. Se usa cuando vamos a llamar a otras funciones que
+# sabemos que muestran procedimientos, pero no queremos que aparezcan por pantalla porque son cálculos poco relevantes
+# para el cometido de nuestra función (por ejemplo, si queremos comprobar que realmente el punto que nos han pasado
+# pertenece a un subespacio, pero no queremos que se muestre cómo lo hace porque el usuario da por hecho que su entrada
+# es correcta).
 #
-def ocultar_procedimiento():
-    global _forzar_ocultar
-    _forzar_ocultar = True
-    
-#\f
-# Activa de nuevo que se muestren los pasos que ejecutan las funciones si estaban activados antes de llamar a
-# ocultar_procedimiento().
+# Uso \\
+# _no_pasos() \\
+# funciones que no queremos que muestren sus procedimientos \\
+# _no_pasos(False) # IMPORTANTE NO OLVIDAR DESACTIVARLO AL FINAL O CAUSARÁ PROBLEMAS
 #
-def reanudar_procedimiento():
-    global _forzar_ocultar
-    _forzar_ocultar = False
+# Parámetros \\
+# b: booleano - True para desactivarlos, False para recuperarlos de nuevo (por defecto True)
+def _no_pasos(b = True):
+    global _mostrar_procedimiento
+    if b:
+        _mostrar_procedimiento.append(False)
+    else:
+        _mostrar_procedimiento.pop()
