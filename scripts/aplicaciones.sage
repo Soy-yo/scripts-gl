@@ -69,16 +69,16 @@ class aplicacion_proyectiva:
     #
     def __init__(self, matriz):
         self._matriz = matriz
-    
+
     # Métodos accedentes
-    
+
     #\m
     # Devuelve la matriz asociada a esta aplicación.
     def matriz_asociada(self):
         return self._matriz
-        
+
     # Otros métodos
-    
+
     #\m
     # Devuelve el centro de esta aplicación proyectiva, que es el núcleo de la lineal asociada.
     #
@@ -92,7 +92,7 @@ class aplicacion_proyectiva:
         dual = subespacio(filter(lambda x: x != 0, self._matriz.rows()))
         _no_pasos(False)
         return dual.dual()
-    
+
     #\m
     # Determina si esta aplicación es inyectiva.
     #
@@ -101,7 +101,7 @@ class aplicacion_proyectiva:
     #
     def es_inyectiva(self):
         return self._matriz.rank() == self._matriz.ncols()
-    
+
     #\m
     # Determina si esta aplicación es sobreyectiva.
     #
@@ -110,7 +110,7 @@ class aplicacion_proyectiva:
     #
     def es_sobreyectiva(self):
         return self._matriz.rank() == self._matriz.nrows()
-    
+
     #\m
     # Determina si esta aplicación es una homografía (biyectiva).
     #
@@ -119,7 +119,7 @@ class aplicacion_proyectiva:
     #
     def es_homografia(self):
         return self._matriz.is_square() and self.es_inyectiva()
-        
+
     #\m
     # Calcula la imagen mediante esta aplicación del punto dado.
     #
@@ -137,7 +137,7 @@ class aplicacion_proyectiva:
         assert x not in self.centro(), "El punto no puede pertenecer al centro de la aplicacion"
         _no_pasos(False)
         return self._matriz * x
-        
+
     #\m
     # Calcula los autovalores de esta aplicación, asumiendo que va de un espacio en sí mismo.
     #
@@ -150,7 +150,7 @@ class aplicacion_proyectiva:
         var('lambda0', latex_name = r'lambda')
         paso("det", self._matriz - lambda0, "=0")
         return map(lambda sol: sol.rhs(), solve((self._matriz - lambda0).det(), lambda0))
-    
+
     #\m
     # Devuelve tuplas con los autovectores de la matriz asociada a esta aplicación. \\
     # Para cada tupla, su primer elemento es el autovalor, el segundo la base del subespacio y el tercero la multiplicidad. \\
@@ -160,7 +160,7 @@ class aplicacion_proyectiva:
     #
     def autovectores(self):
         return self._matriz.eigenvectors_right()
-    
+
     #\m
     # Devuelve los puntos fijos de esta aplicacion proyectiva.
     #
@@ -183,7 +183,7 @@ class aplicacion_proyectiva:
         return map(lambda p: p / gcd(p.list()), sol)
         #return map(lambda sol: vector(map(lambda x: x.rhs(), sol[0])).simplify_full(), \
         #        [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
-    
+
     #\m
     # Devuelve una nueva aplicación con los cambios de referencia especificados.
     #
@@ -207,7 +207,7 @@ class aplicacion_proyectiva:
             else:
                 cambio_final = 1
         return aplicacion_proyectiva(cambio_final * self._matriz * cambio_inicial^-1)
-    
+
     #\m
     # Operador *. Devuelve la composición de las aplicaciones ((self o otra)(x) = self(otra(x))).
     #
@@ -218,12 +218,12 @@ class aplicacion_proyectiva:
     #
     # Parámetros \\
     # otra: aplicacion_proyectiva - aplicación con la que componer
-    #    
+    #
     def __mul__(self, otra):
         assert self._matriz.ncols() == otra._matriz.nrows(), \
                 "El espacio de llegada de la primera aplicacion debe ser el de salida de la segunda"
         return aplicacion_proyectiva(self._matriz * otra._matriz)
-        
+
     #\m
     # Operador ^ (ó **). Devuelve el resultado de componer una aplicación consigo misma n veces (^-1 devuelve la inversa).
     #
@@ -238,7 +238,7 @@ class aplicacion_proyectiva:
     def __pow__(self, n):
         assert self._matriz.is_square(), "La aplicacion debe ir de un espacio en si mismo"
         return aplicacion_proyectiva(self._matriz^n)
-                
+
     def __repr__(self):
         return "<Aplicacion proyectiva con matriz asociada\n" + str(self._matriz) + ">"
 
@@ -246,7 +246,7 @@ class aplicacion_proyectiva:
 # Clase que representa una proyección dados un subespacio centro y un subespacio imagen.
 #
 class proyeccion:
-    
+
     #\i
     # Construye una proyección dados su centro (Z) e imagen (Y) de un mismo espacio Z.
     # Se debe asegurar que dim Z + dim Y = dim X - 1.
@@ -261,21 +261,21 @@ class proyeccion:
         assert centro.dim() + imagen.dim() == dim - 1,  "Se debe cumplir dim Z + dim Y = dim X - 1"
         self._centro = centro
         self._imagen = imagen
-    
+
     # Métodos accedentes
-    
+
     #\m
     # Devuelve el centro de esta proyección.
     def centro(self):
         return self._centro
-        
+
     #\m
     # Devuelve el espacio de llegada de esta proyección.
     def imagen(self):
         return self._imagen
-        
+
     # Otros métodos
-    
+
     #\m
     # Calcula la imagen mediante esta proyección del punto dado.
     #
@@ -297,7 +297,7 @@ class proyeccion:
         paso("Ahora intersecamos con el espacio de llegada, lo que nos deberia dar un solo punto")
         # La intersección debería ser un punto
         return V.interseccion(self._imagen).representantes()[0]
-        
+
     #\m
     # Devuelve esta proyección como un objeto del tipo aplicacion_proyectiva.
     #
@@ -317,7 +317,6 @@ class proyeccion:
         paso("Los puntos: ", repr_imagen, " se transforman en si mismos y ", repr_centro, " son el centro de la aplicacion")
         paso("El punto unidad:", unidad, " se transforma en ", pi_unidad)
         return crear_aplicacion_proyectiva(repr_imagen + [unidad], repr_imagen + [pi_unidad], repr_centro)
-        
+
     def __repr__(self):
         return "<Proyeccion de centro " + str(self._centro) + " e imagen " + str(self._imagen) + ">"
-        

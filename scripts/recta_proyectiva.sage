@@ -3,11 +3,15 @@
 #
 # Suponemos que los puntos expresados con coordenada inhomogénea theta se obtiene mediante x/y.
 #
+# Para usar infinitos, por ejemplo el punto infinito de una recta r, se puede usar r[Infinity] ó r[oo].
+# En general, debería valer tanto positivo como negativo y el resultado debería ser el mismo, pero se
+# recomienda poner sin signo para evitar posibles problemas.
+#
 # Autor: Pablo Sanz Sanz
 #
 
 # Funciones globales
-    
+
 #\f
 # Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos
 # de una recta proyectiva (ver razon_doble_puntos y razon_doble_theta, respectivamente).
@@ -29,7 +33,7 @@ def razon_doble(a, b, c, d):
 # Calcula la razón doble ({P0, P1, P2, P3}) de los puntos alineados dados.
 #
 # Implementación \\
-# Utiliza que la razón doble es invariante por proyecciones y la fórmula de la 
+# Utiliza que la razón doble es invariante por proyecciones y la fórmula de la
 # razón doble de los determinantes. Se elige una proyección que siga siendo una recta.
 #
 # Parámetros \\
@@ -85,7 +89,7 @@ def razon_doble_puntos(p0, p1, p2, p3):
     if det1 == 0 or det2 == 0:
         return Infinity
     return (det0 / det1) * (det3 / det2)
-    
+
 #\f
 # Calcula la razón doble ({theta0, theta1, theta2, theta3}) de los puntos de la recta dados
 # (con parámetro no homogéneo).
@@ -125,11 +129,11 @@ def es_cuaterna_armonica(a, b, c, d):
                 "Todos los puntos deben ser del mismo tipo"
         return es_cuaterna_armonica_theta(a, b, c, d)
     return es_cuaterna_armonica_puntos(a, b, c, d)
-    
-    
+
+
 #\f
 # Determina si los puntos dados forman una cuaterna armónica, esto es, {P0, P1, P2, P3} = -1.
-# 
+#
 # Implementación \\
 # Devuelve {P0, P1; P2, P3} == -1 utilizando las funciones anteriores.
 #
@@ -141,11 +145,11 @@ def es_cuaterna_armonica(a, b, c, d):
 #
 def es_cuaterna_armonica_puntos(p0, p1, p2, p3):
     return razon_doble_puntos(p0, p1, p2, p3) == -1
-        
+
 #\f
 # Determina si los puntos dados forman una cuaterna armónica, esto es,
 # {theta0, theta1, theta2, theta3} = -1.
-# 
+#
 # Implementación \\
 # Devuelve {theta0, theta1; theta2, theta3} == -1 utilizando las funciones anteriores.
 #
@@ -175,7 +179,7 @@ def conjugado_armonico(a, b, c):
 
 #\f
 # Devuelve el conjugado armónico de p2 respecto de p0 y p1.
-# 
+#
 # Implementación \\
 # Como la razón doble es la coordenada del cuarto punto respecto a la referencia {p0, p1; p2}, obtiene la recta que
 # forman p0, p1 y p2 y devuelve el punto correspondiente a la coordenada theta == -1.
@@ -189,10 +193,10 @@ def conjugado_armonico_puntos(p0, p1, p2):
     paso("Montamos la recta con la referencia {P0=", p0, ", P1=", p1, "; P2=", p2, "}")
     paso("Asi, P0: theta = Infinity, P1: theta = 0, P2: theta = 1 y sustituimos en -1")
     return recta_proyectiva(p0, p1, p2)[-1]
-    
+
 #\f
 # Devuelve el conjugado armónico de theta2 respecto de theta0 y theta1.
-# 
+#
 # Implementación \\
 # Resuelve la ecuación {theta0, theta1, theta2, theta} == -1 en theta utilizando las funciones anteriores.
 #
@@ -254,7 +258,7 @@ def crear_homografia_recta(a, ap, b, bp, c = None, cp = None, recta = None, invo
     if not involucion:
         paso(theta2, " -> ", theta2p)
     return crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2, theta2p, recta, involucion)
-    
+
 #\f
 # Crea un objeto del tipo homografia_recta dados la recta y tres puntos (con parámetros inhomogéneos) y sus imágenes. \\
 # Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría
@@ -307,7 +311,7 @@ def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None
     res = homografia_recta(m, recta)
     _no_pasos(False)
     return res
-    
+
 # Clases
 
 #\c
@@ -315,7 +319,7 @@ def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None
 # o para homografías entre rectas.
 #
 class recta_proyectiva:
-    
+
     #\i
     # Inicializa la recta dada la referencia {p0, p1; p2} que se quiere utilizar.
     #
@@ -343,9 +347,9 @@ class recta_proyectiva:
         self._infinito = p0
         self._valores = (b * p1 + self._theta * a * p0).substitute(coef[0])
         paso("Sustituimos y combinamos con theta: ", self._valores)
-        
+
     # Métodos accedentes
-    
+
     #\m
     # Devuelve el punto con coordenada theta.
     #
@@ -358,19 +362,19 @@ class recta_proyectiva:
         if es_infinito(theta):
             return self._infinito
         return self._valores.substitute(self._theta == theta)
-    
+
     #\m
     # Devuelve la referencia de esta recta proyectiva en forma de lista [Infinity, 0, 1].
     def referencia(self):
         return [self[Infinity], self[0], self[1]]
-    
+
     #\m
     # Devuelve esta recta proyectiva como objeto del tipo subespacio.
     def subespacio(self):
         return self._subespacio
-    
+
     # Otros métodos
-    
+
     #\m
     # Devuelve la coordenada no homogénea asociada al punto p dado.
     #
@@ -387,7 +391,7 @@ class recta_proyectiva:
         if inf:
             return Infinity
         return solve([self._valores[i] == alpha * p[i] for i in range(len(p))], alpha, self._theta)[0][1].rhs()
-    
+
     # \m
     # Operador ==. Determina si dos rectas proyectivas son iguales.
     #
@@ -401,7 +405,7 @@ class recta_proyectiva:
     #
     def __eq__(self, otra):
         return self._subespacio == otra._subespacio
-        
+
     # \m
     # Operador in. Determina si un punto está contenido en este subespacio o no.
     #
@@ -415,16 +419,16 @@ class recta_proyectiva:
     #
     def __contains__(self, punto):
         return punto in self._subespacio
-    
+
     def __repr__(self):
         return "<Recta proyectiva " + str(self._valores) + ">"
-        
+
 #\c
 # Clase que representa una homografía de una recta en sí misma. En general, se crearán usando funciones auxiliares
 # y no con su constructor.
 #
 class homografia_recta:
-    
+
     #\i
     # Construye una homografía sobre la recta dada cuya matriz sea la dada. En general, este constructor no se
     # usará directamente.
@@ -448,41 +452,41 @@ class homografia_recta:
         self._expresion_mobius = theta2 == (matriz[0][0] * theta + matriz[0][1]) / (matriz[1][0] * theta + matriz[1][1])
         # Multiplicamos por el denominador y restamos el numerador
         self._expresion = (theta2 * self._expresion_mobius.rhs().denominator() - self._expresion_mobius.rhs().numerator()).expand() == 0
-        
+
     # Métodos accedentes
-    
+
     #\m
     # Devuelve esta homografía como una aplicacion_proyectiva.
     def aplicacion(self):
         return self._aplicacion
-    
+
     #\m
     # Devuelve la matriz asociada a esta homografía.
     def matriz_asociada(self):
         return self._matriz
-        
+
     #\m
     # Devuelve la recta sobre la que se aplica esta homografía.
     def recta(self):
         return self._recta
-        
+
     #\m
     # Devuelve la referencia de la recta en la que está expresada esta homografía.
     def referencia(self):
         return self._recta.referencia()
-    
+
     #\m
     # Devuelve la homografía expresada como una transformación de M
     def expresion_mobius(self):
         return self._expresion_mobius
-    
+
     #\m
     # Devuelve la ecuación en theta y theta' de esta homografía.
     def ecuacion(self):
         return self._expresion
-        
+
     # Otros métodos
-    
+
     #\m
     # Calcula la imagen mediante esta homografía del punto dado.
     #
@@ -504,7 +508,7 @@ class homografia_recta:
         coord = self._recta.coordenada(x)
         paso("La coordenada de ", x, " en la recta es: ", coord, ". Sustituimos en la expresion y recuperamos el punto")
         return self._recta[self(coord)]
-    
+
     #\m
     # Devuelve los autovalores de esta homografía.
     #
@@ -513,7 +517,7 @@ class homografia_recta:
     #
     def autovalores(self):
         return self._aplicacion.autovalores()
-    
+
     #\m
     # Devuelve los parámetros de los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
     #
@@ -526,7 +530,7 @@ class homografia_recta:
         if self.es_identidad():
             return []
         return map(lambda x: Infinity if x[1] == 0 else x[0] / x[1], self._aplicacion.puntos_fijos())
-        
+
     #\m
     # Devuelve los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
     #
@@ -537,7 +541,7 @@ class homografia_recta:
         fijos = self.puntos_fijos_theta()
         paso("Sustituimos los puntos fijos ", fijos, "en la recta")
         return map(lambda theta: self._recta[theta], fijos)
-    
+
     #\m
     # Determina si esta homografía es la identidad.
     #
@@ -546,7 +550,7 @@ class homografia_recta:
     #
     def es_identidad(self):
         return bool(self._expresion_mobius.lhs().substitute(self._theta2 == self._theta1) - self._expresion_mobius.rhs() == 0)
-    
+
     #\m
     # Determina si esta homografía es una elación, esto es si tiene un punto fijo doble.
     #
@@ -555,16 +559,16 @@ class homografia_recta:
     #
     def es_elacion(self):
         return len(self.puntos_fijos()) == 1
-    
+
     #\m
     # Determina si esta homografía es una involución, esto es si self^2 == self.
     #
     # Implementación \\
     # Comprueba que la traza sea nula.
-    #    
+    #
     def es_involucion(self):
         return self._matriz.trace() == 0
-    
+
     #\m
     # Calcula el módulo de esta homografía, esto es el cociente de sus autovalores (en cualquier orden).
     #
@@ -576,7 +580,7 @@ class homografia_recta:
         if len(autovalores) == 1:
             return 1
         return autovalores[0] / autovalores[1]
-        
+
     #\m
     # Devuelve esta misma homografía en una referencia adecuada de forma que su ecuación quede de la forma más
     # simple posible. Para las involuciones no devuelve la forma general theta*theta' = 1. Para ello usar simplificar_involucion().
@@ -623,7 +627,7 @@ class homografia_recta:
         paso("Usamos los puntos fijos como primeros puntos (en el orden correcto) de la nueva referencia y mantenemos el otro:")
         paso("R={", fijos[j], ",", fijos[(j + 1) % 2], ";", ref[i], "}")
         return homografia_recta(matrix([[modulo, 0], [0, 1]]), recta_proyectiva(fijos[j], fijos[(j + 1) % 2], ref[i]))
-    
+
     #\m
     # Devuelve esta misma involución en una referencia adecuada de forma que su ecuación quede theta*theta' = 1.
     #
@@ -643,7 +647,7 @@ class homografia_recta:
         paso("Usamos un punto arbitrario y su imagen como primeros puntos de la referencia y uno de los fijos como unidad")
         paso("R={", ref[i], ",", self(ref[i]), ",", fijos[0], "}")
         return homografia_recta(matrix([[0, 1], [1, 0]]), recta_proyectiva(ref[i], self(ref[i]), fijos[0]))
-        
+
     #\m
     # Devuelve el haz de ecuaciones cuadráticas generado por esta involución.
     #
@@ -678,7 +682,7 @@ class homografia_recta:
         p2 = (b - theta) if not es_infinito(b) else 1
         p3 = (bp - theta) if not es_infinito(bp) else 1
         return p0 * p1 + mu * p2 * p3
-    
+
     #\m
     # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))).
     #
@@ -693,7 +697,7 @@ class homografia_recta:
     def __mul__(self, otra):
         assert self._recta == otra._recta, "Las homografias deben ser de la misma recta"
         return homografia_recta(self._matriz * otra._matriz, self._recta)
-        
+
     #\m
     # Operador ^ (ó **). Devuelve el resultado de componer una homografía con sí misma n veces (^-1 devuelve la inversa).
     #
@@ -707,13 +711,13 @@ class homografia_recta:
     #
     def __pow__(self, n):
         return homografia_recta(self._matriz^n, self._recta)
-            
+
     # Métodos auxiliares
-            
+
     def __sustituir(self, x):
         # Devuelve el límite para los casos de infinito o división por 0
         return limit(self._expresion_mobius.rhs(), theta = x)
-        
+
     def __repr__(self):
         return "<Homografia " + str(self._expresion) + " de " + str(self._recta) + ">"
 
@@ -733,7 +737,7 @@ def es_parametro(x):
 # Función auxiliar que determina si el parámetro recibido es infinito o no. Sólo devuelve True para +/-Infinity.
 #
 # Parámetros \\
-# x: complejo/Infinity/variable/vector(n) - elemento a considerar   
+# x: complejo/Infinity/variable/vector(n) - elemento a considerar
 #
 def es_infinito(x):
     return UnsignedInfinityRing(x) is not UnsignedInfinityRing.less_than_infinity()

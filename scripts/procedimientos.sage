@@ -28,7 +28,7 @@ def paso(*objetos):
         for obj in objetos:
             s = s + str(latex(obj))
         show(LatexExpr(s))
-        
+
 #\f
 # Activa o desactiva que se muestren los pasos que ejecutan las funciones.
 #
