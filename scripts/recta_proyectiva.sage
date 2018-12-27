@@ -7,18 +7,6 @@
 #
 
 # Funciones globales
-
-#\f
-# Función auxiliar que determina si el parámetro recibido es un punto (tipo vector) o un parámetro
-# inhomogéneo de una recta proyectiva.
-#
-# Parámetros \\
-# x: complejo/Infinity/variable/vector(n>1) - elemento a considerar
-#
-def es_parametro(x):
-    # Infinity no tiene método .list(), se ve apartte
-    # La lista tendrá un solo elemento a menos que sea una variable (que la trata como un polinomio)
-    return x == Infinity or x == -Infinity or len(x.list()) == 1 or type(x) == sage.symbolic.expression.Expression
     
 #\f
 # Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos
@@ -112,10 +100,10 @@ def razon_doble_puntos(p0, p1, p2, p3):
 # theta3: complejo/Infinity - cuarto punto de la razón doble
 #
 def razon_doble_theta(theta0, theta1, theta2, theta3):
-    p0 = vector([1, 0]) if theta0 == Infinity or theta == -Infinity else vector([theta0, 1])
-    p1 = vector([1, 0]) if theta1 == Infinity or theta == -Infinity else vector([theta1, 1])
-    p2 = vector([1, 0]) if theta2 == Infinity or theta == -Infinity else vector([theta2, 1])
-    p3 = vector([1, 0]) if theta3 == Infinity or theta == -Infinity else vector([theta3, 1])
+    p0 = vector([1, 0]) if es_infinito(theta0) else vector([theta0, 1])
+    p1 = vector([1, 0]) if es_infinito(theta1) else vector([theta1, 1])
+    p2 = vector([1, 0]) if es_infinito(theta2) else vector([theta2, 1])
+    p3 = vector([1, 0]) if es_infinito(theta3) else vector([theta3, 1])
     paso("Homogeneizando las coordenadas quedan los vectores:")
     paso(p0, ", ", p1, ", ", p2, ", ", p3)
     return razon_doble_puntos(p0, p1, p2, p3)
@@ -293,14 +281,14 @@ def crear_homografia_recta(a, ap, b, bp, c = None, cp = None, recta = None, invo
 def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None, theta2p = None, recta = None, involucion = False):
     assert theta2 is not None and theta2p is not None or involucion, "Si no se crea una involucion se deben indicar los terceros puntos"
     var('a b c d')
-    rhs0 = a / c if theta0 == Infinity or theta0 == -Infinity else (a * theta0 + b) / (c * theta0 + d)
-    rhs1 = a / c if theta1 == Infinity or theta1 == -Infinity else (a * theta1 + b) / (c * theta1 + d)
+    rhs0 = a / c if es_infinito(theta0) else (a * theta0 + b) / (c * theta0 + d)
+    rhs1 = a / c if es_infinito(theta1) else (a * theta1 + b) / (c * theta1 + d)
     if not involucion:
-        rhs2 = a / c if theta2 == Infinity or theta2 == -Infinity else (a * theta2 + b) / (c * theta2 + d)
-    ec0 = rhs0.denominator() == 0 if theta0p == Infinity or theta0p == -Infinity else theta0p == rhs0
-    ec1 = rhs1.denominator() == 0 if theta1p == Infinity or theta1p == -Infinity else theta1p == rhs1
+        rhs2 = a / c if es_infinito(theta2) else (a * theta2 + b) / (c * theta2 + d)
+    ec0 = rhs0.denominator() == 0 if es_infinito(theta0p) else theta0p == rhs0
+    ec1 = rhs1.denominator() == 0 if es_infinito(theta1p) else theta1p == rhs1
     if not involucion:
-        ec2 = rhs2.denominator() == 0 if theta2p == Infinity or theta2p == -Infinity else theta2p == rhs2
+        ec2 = rhs2.denominator() == 0 if es_infinito(theta2p) else theta2p == rhs2
     # Una involución tiene traza nula
     sistema = [ec0, ec1, ec2] if not involucion else [ec0, ec1, a == -d]
     sol = solve(sistema, a, b, c, d)[0]
@@ -309,6 +297,7 @@ def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None
     m21 = sol[2].rhs()
     m22 = sol[3].rhs()
     div = gcd([m11, m12, m21, m22])
+    paso("La homografia tendra la forma: theta' = (a theta + b) / (c theta + d)")
     if involucion:
         paso("Para que la homografia sea una involucion debemos asegurar traza = 0, luego a = -d")
     paso("Resolvemos el sistema:", sistema, "para a, b, c, d:")
@@ -366,7 +355,7 @@ class recta_proyectiva:
     # theta: complejo/Infinity - coordenada del punto de la recta que se quiere obtener
     #
     def __getitem__(self, theta):
-        if theta == Infinity or theta == -Infinity:
+        if es_infinito(theta):
             return self._infinito
         return self._valores.substitute(self._theta == theta)
     
@@ -683,12 +672,11 @@ class homografia_recta:
         paso("Los dos pares especificados son:")
         paso((a, ap), ", ", (b, bp))
         var('mu theta')
-        # Cuidado con infinitos: se usa este método porque == hacía cosas raras
-        # Se debería utilizar algo así en otras funciones, pero sí que ha funcionado
-        p0 = (a - theta) if UnsignedInfinityRing(a) is sage.rings.infinity.LessThanInfinity() else 1
-        p1 = (ap - theta) if UnsignedInfinityRing(ap) is sage.rings.infinity.LessThanInfinity() else 1
-        p2 = (b - theta) if UnsignedInfinityRing(b) is sage.rings.infinity.LessThanInfinity() else 1
-        p3 = (bp - theta) if UnsignedInfinityRing(bp) is sage.rings.infinity.LessThanInfinity() else 1
+        # Cuidado con infinitos
+        p0 = (a - theta) if not es_infinito(a) else 1
+        p1 = (ap - theta) if not es_infinito(ap) else 1
+        p2 = (b - theta) if not es_infinito(b) else 1
+        p3 = (bp - theta) if not es_infinito(bp) else 1
         return p0 * p1 + mu * p2 * p3
     
     #\m
@@ -728,3 +716,24 @@ class homografia_recta:
         
     def __repr__(self):
         return "<Homografia " + str(self._expresion) + " de " + str(self._recta) + ">"
+
+#\f
+# Función auxiliar que determina si el parámetro recibido es un punto (tipo vector) o un parámetro
+# inhomogéneo de una recta proyectiva.
+#
+# Parámetros \\
+# x: complejo/Infinity/variable/vector(n>1) - elemento a considerar
+#
+def es_parametro(x):
+    # Infinity no tiene método .list(), se ve aparte
+    # La lista tendrá un solo elemento a menos que sea una variable (que la trata como un polinomio)
+    return es_infinito(x) or len(x.list()) == 1 or type(x) == sage.symbolic.expression.Expression
+
+#\f
+# Función auxiliar que determina si el parámetro recibido es infinito o no. Sólo devuelve True para +/-Infinity.
+#
+# Parámetros \\
+# x: complejo/Infinity/variable/vector(n) - elemento a considerar   
+#
+def es_infinito(x):
+    return UnsignedInfinityRing(x) is not UnsignedInfinityRing.less_than_infinity()

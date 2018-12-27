@@ -10,14 +10,6 @@ Suponemos que los puntos expresados con coordenada inhomogénea theta se obtiene
 Autor: Pablo Sanz Sanz <br>
 </p>
 <div class='function'>
-<h3>Función: es_parametro(x)</h3>
-<p>
-Función auxiliar que determina si el parámetro recibido es un punto (tipo vector) o un parámetro inhomogéneo de una recta proyectiva. <br>
-Parámetros <br>
-x: complejo/Infinity/variable/vector(n>1) - elemento a considerar <br>
-</p>
-</div>
-<div class='function'>
 <h3>Función: razon_doble(a, b, c, d)</h3>
 <p>
 Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos de una recta proyectiva (ver razon_doble_puntos y razon_doble_theta, respectivamente). <br>
@@ -399,6 +391,22 @@ n: entero - exponente al que elevar <br>
 </p>
 </div>
 </div>
+</div>
+<div class='function'>
+<h3>Función: es_parametro(x)</h3>
+<p>
+Función auxiliar que determina si el parámetro recibido es un punto (tipo vector) o un parámetro inhomogéneo de una recta proyectiva. <br>
+Parámetros <br>
+x: complejo/Infinity/variable/vector(n>1) - elemento a considerar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_infinito(x)</h3>
+<p>
+Función auxiliar que determina si el parámetro recibido es infinito o no. Sólo devuelve True para +/-Infinity. <br>
+Parámetros <br>
+x: complejo/Infinity/variable/vector(n) - elemento a considerar <br>
+</p>
 </div>
 </body>
 </html>
