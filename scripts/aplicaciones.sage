@@ -177,8 +177,12 @@ class aplicacion_proyectiva:
         x = vector(vars)
         paso("Si queda algun parametro, se podra sacar como factor comun y sustituirse por cualquier valor")
         # Resuelve el sistema y se queda sólo con los resultados como vectores
-        return map(lambda sol: vector(map(lambda x: x.rhs(), sol[0])).simplify_full(), \
-                [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
+        sol = map(lambda sol: vector(map(lambda x: x.rhs(), sol)).simplify_full(), \
+                [solve(((self._matriz - autovalor) * x).list(), vars)[0] for autovalor in autovalores])
+        # Divide entre el MCD por si acaso
+        return map(lambda p: p / gcd(p.list()), sol)
+        #return map(lambda sol: vector(map(lambda x: x.rhs(), sol[0])).simplify_full(), \
+        #        [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
     
     #\m
     # Devuelve una nueva aplicación con los cambios de referencia especificados.
@@ -195,9 +199,9 @@ class aplicacion_proyectiva:
     # la matriz del espacio de llegada y sea posible
     #
     def cambiar_referencias(self, cambio_inicial = None, cambio_final = None, misma = True):
-        if cambio_inicial == None:
+        if cambio_inicial is None:
             cambio_inicial = 1
-        if cambio_final == None:
+        if cambio_final is None:
             if misma and self._matriz.is_square():
                 cambio_final = cambio_inicial
             else:
@@ -300,8 +304,8 @@ class proyeccion:
     # Implementación \\
     # Utiliza la función creadora de aplicaciones proyectivas crear_aplicacion_proyectiva, dando como puntos transformados
     # los representantes del subespacio imagen (que se transforman en sí mismos) y como centro los representantes del centro
-    # de esta proyección. Como punto unidad escoge la suma de los representantes del espacio imagen (que también se transforma
-    # en sí mismo).
+    # de esta proyección. Como punto unidad escoge la suma de los representantes del espacio imagen y el centro y calculamos
+    # su imagen.
     #
     def aplicacion(self):
         _no_pasos()

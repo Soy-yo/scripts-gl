@@ -126,6 +126,44 @@ theta1: complejo/Infinity - segundo punto de la razón doble <br>
 theta2: complejo/Infinity - tercer punto de la razón doble <br>
 </p>
 </div>
+<div class='function'>
+<h3>Función: crear_homografia_recta(a, ap, b, bp, c = None, cp = None, recta = None, involucion = False)</h3>
+<p>
+Crea un objeto del tipo homografia_recta dados la recta y tres puntos y sus imágenes. Es válido tanto para puntos como parámetros inhomogéneos. <br>
+Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría llamar de la siguiente forma: h = crear_homografia_recta(a, ap, b, bp, recta = r, involucion = True), si se especifica una recta r. <br>
+Diferenciar de crear_aplicacion_proyectiva (aplicaciones.sage) en el orden de los argumentos y en que aquí no se piden listas. <br>
+Implementación <br>
+Si se dan puntos se obtiene primero su coordenada de la recta. Una vez obtenidas las coordenadas se usa crear_homografia_recta_theta. <br>
+Parámetros <br>
+a: complejo/Infinity/vector(n>1) - primer punto a transformar <br>
+ap: complejo/Infinity/vector(n>1) - imagen del primer punto <br>
+b: complejo/Infinity/vector(n>1) - segundo punto a transformar <br>
+bp: complejo/Infinity/vector(n>1) - imagen del segundo punto <br>
+c: complejo/Infinity/vector(n>1) - tercer punto a transformar (no necesario si se va a crear una involución) <br>
+cp: complejo/Infinity/vector(n>1) - imagen del tercer punto (no necesario si se va a crear una involución) <br>
+recta: recta_proyectiva - recta sobre la que actúa la homografía (por defecto la recta que ponga homografia_recta por defecto (sólo válido para parámetros inhomogéneos)) <br>
+involucion: booleano - True si se quiere crear una involución, False si no necesariamente (False por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None, theta2p = None, recta = None, involucion = False)</h3>
+<p>
+Crea un objeto del tipo homografia_recta dados la recta y tres puntos (con parámetros inhomogéneos) y sus imágenes. <br>
+Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría llamar de la siguiente forma: h = crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, recta = r, involucion = True), si se especifica una recta r. <br>
+Diferenciar de crear_aplicacion_proyectiva (aplicaciones.sage) en el orden de los argumentos y en que aquí no se piden listas. <br>
+Implementación <br>
+Se crea una primera homografía con ecuación theta' = (a*theta + b) / (c*theta + d), se sustituyen cada uno de los puntos dados y se resuelve el sistema. <br>
+Parámetros <br>
+theta0: complejo/Infinity - primer punto a transformar <br>
+theta0p: complejo/Infinity - imagen del primer punto <br>
+theta1: complejo/Infinity - segundo punto a transformar <br>
+theta1p: complejo/Infinity - imagen del segundo punto <br>
+theta2: complejo/Infinity - tercer punto a transformar (no necesario si se va a crear una involución) <br>
+theta2p: complejo/Infinity - imagen del tercer punto (no necesario si se va a crear una involución) <br>
+recta: recta_proyectiva - recta sobre la que actúa la homografía (por defecto la recta que ponga homografia_recta por defecto (sólo válido para parámetros inhomogéneos)) <br>
+involucion: booleano - True si se quiere crear una involución, False si no necesariamente (False por defecto) <br>
+</p>
+</div>
 <div class='class'>
 <h2>Clase: recta_proyectiva</h2>
 <p>
@@ -209,7 +247,7 @@ Clase que representa una homografía de una recta en sí misma. En general, se c
 Construye una homografía sobre la recta dada cuya matriz sea la dada. En general, este constructor no se usará directamente. <br>
 Parámetros <br>
 matriz: matriz(2, 2) - matriz asociada a la homografía <br>
-recta: recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1}) <br>
+recta: recta_proyectiva - recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1}) <br>
 </p>
 </div>
 <div class='function'>
@@ -325,6 +363,17 @@ infinitos -> ella misma (identidad) <br>
 Devuelve esta misma involución en una referencia adecuada de forma que su ecuación quede theta*theta' = 1. <br>
 Implementación <br>
 Asumiendo que esta homografía es una involución, los dos puntos fijos separan armónicamente cualquier par de la involución. Por tanto, basta con elegir cualquier punto y su imagen como Infinity y 0 y un punto fijo como 1. De esta forma, el otro punto fijo tendrá coordenada -1 y con ello obtenemos la ecuación deseada. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: haz_ecuaciones_cuadraticas(a, b)</h3>
+<p>
+Devuelve el haz de ecuaciones cuadráticas generado por esta involución. <br>
+Funciona tanto para puntos (vectores) como parámetros inhomogéneos de la recta. <br>
+Implementación <br>
+Asumiendo que esta homografía es una involución, calcula las imágenes de los puntos dados. Después, simplemente será necesario componerlos como dos ecuaciones cuyas soluciones sean cada par (theta_i, h(theta_i)). <br>
+Parámetros <br>
+a: complejo/Infinity/vector(n) - punto del primer par b: complejo/Infinity/vector(n) - punto del segundo par <br>
 </p>
 </div>
 <div class='function'>

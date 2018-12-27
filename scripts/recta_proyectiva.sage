@@ -221,6 +221,103 @@ def conjugado_armonico_theta(theta0, theta1, theta2):
     if len(res) == 0:
         return Infinity
     return res[0].rhs()
+
+#\f
+# Crea un objeto del tipo homografia_recta dados la recta y tres puntos y sus imágenes. Es válido tanto para puntos
+# como parámetros inhomogéneos. \\
+# Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría
+# llamar de la siguiente forma: h = crear_homografia_recta(a, ap, b, bp, recta = r, involucion = True), si se especifica una recta r.
+#
+# Diferenciar de crear_aplicacion_proyectiva (aplicaciones.sage) en el orden de los argumentos y en que aquí no se piden listas.
+#
+# Implementación \\
+# Si se dan puntos se obtiene primero su coordenada de la recta. Una vez obtenidas las coordenadas se usa
+# crear_homografia_recta_theta.
+#
+# Parámetros \\
+# a: complejo/Infinity/vector(n>1) - primer punto a transformar \\
+# ap: complejo/Infinity/vector(n>1) - imagen del primer punto \\
+# b: complejo/Infinity/vector(n>1) - segundo punto a transformar \\
+# bp: complejo/Infinity/vector(n>1) - imagen del segundo punto \\
+# c: complejo/Infinity/vector(n>1) - tercer punto a transformar (no necesario si se va a crear una involución) \\
+# cp: complejo/Infinity/vector(n>1) - imagen del tercer punto (no necesario si se va a crear una involución) \\
+# recta: recta_proyectiva - recta sobre la que actúa la homografía (por defecto la recta que ponga homografia_recta
+# por defecto (sólo válido para parámetros inhomogéneos)) \\
+# involucion: booleano - True si se quiere crear una involución, False si no necesariamente (False por defecto)
+#
+def crear_homografia_recta(a, ap, b, bp, c = None, cp = None, recta = None, involucion = False):
+    assert c is not None and cp is not None or involucion, "Si no se crea una involucion se deben indicar los terceros puntos"
+    if es_parametro(a):
+        assert es_parametro(ap) and es_parametro(b) and es_parametro(bp), "Todos los puntos deben ser del mismo tipo"
+        # Si no es una involución también hay que comprobar el tercer punto
+        if not involucion:
+            assert es_parametro(c) and es_parametro(cp), "Todos los puntos deben ser del mismo tipo"
+        return crear_homografia_recta_theta(a, ap, b, bp, c, cp, recta, involucion)
+    assert recta != None, "Si no se especifica la recta se deben usar parametros inhomogeneos"
+    theta0 = recta.coordenada(a)
+    theta0p = recta.coordenada(ap)
+    theta1 = recta.coordenada(b)
+    theta1p = recta.coordenada(bp)
+    theta2 = recta.coordenada(c) if not involucion else None
+    theta2p = recta.coordenada(cp) if not involucion else None
+    paso("Las coordenadas en la recta de los puntos que se van a transformar son:")
+    paso(theta0, " -> ", theta0p)
+    paso(theta1, " -> ", theta1p)
+    if not involucion:
+        paso(theta2, " -> ", theta2p)
+    return crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2, theta2p, recta, involucion)
+    
+#\f
+# Crea un objeto del tipo homografia_recta dados la recta y tres puntos (con parámetros inhomogéneos) y sus imágenes. \\
+# Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría
+# llamar de la siguiente forma: h = crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, recta = r, involucion = True),
+# si se especifica una recta r.
+#
+# Diferenciar de crear_aplicacion_proyectiva (aplicaciones.sage) en el orden de los argumentos y en que aquí no se piden listas.
+#
+# Implementación \\
+# Se crea una primera homografía con ecuación theta' = (a*theta + b) / (c*theta + d), se sustituyen cada uno de los
+# puntos dados y se resuelve el sistema.
+#
+# Parámetros \\
+# theta0: complejo/Infinity - primer punto a transformar \\
+# theta0p: complejo/Infinity - imagen del primer punto \\
+# theta1: complejo/Infinity - segundo punto a transformar \\
+# theta1p: complejo/Infinity - imagen del segundo punto \\
+# theta2: complejo/Infinity - tercer punto a transformar (no necesario si se va a crear una involución) \\
+# theta2p: complejo/Infinity - imagen del tercer punto (no necesario si se va a crear una involución) \\
+# recta: recta_proyectiva - recta sobre la que actúa la homografía (por defecto la recta que ponga homografia_recta
+# por defecto (sólo válido para parámetros inhomogéneos)) \\
+# involucion: booleano - True si se quiere crear una involución, False si no necesariamente (False por defecto)
+#
+def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None, theta2p = None, recta = None, involucion = False):
+    assert theta2 is not None and theta2p is not None or involucion, "Si no se crea una involucion se deben indicar los terceros puntos"
+    var('a b c d')
+    rhs0 = a / c if theta0 == Infinity or theta0 == -Infinity else (a * theta0 + b) / (c * theta0 + d)
+    rhs1 = a / c if theta1 == Infinity or theta1 == -Infinity else (a * theta1 + b) / (c * theta1 + d)
+    if not involucion:
+        rhs2 = a / c if theta2 == Infinity or theta2 == -Infinity else (a * theta2 + b) / (c * theta2 + d)
+    ec0 = rhs0.denominator() == 0 if theta0p == Infinity or theta0p == -Infinity else theta0p == rhs0
+    ec1 = rhs1.denominator() == 0 if theta1p == Infinity or theta1p == -Infinity else theta1p == rhs1
+    if not involucion:
+        ec2 = rhs2.denominator() == 0 if theta2p == Infinity or theta2p == -Infinity else theta2p == rhs2
+    # Una involución tiene traza nula
+    sistema = [ec0, ec1, ec2] if not involucion else [ec0, ec1, a == -d]
+    sol = solve(sistema, a, b, c, d)[0]
+    m11 = sol[0].rhs()
+    m12 = sol[1].rhs()
+    m21 = sol[2].rhs()
+    m22 = sol[3].rhs()
+    div = gcd([m11, m12, m21, m22])
+    if involucion:
+        paso("Para que la homografia sea una involucion debemos asegurar traza = 0, luego a = -d")
+    paso("Resolvemos el sistema:", sistema, "para a, b, c, d:")
+    paso([a == m11 / div, b == m12 / div, c == m21 / div, d == m22 / div])
+    m = matrix([[m11 / div, m12 / div], [m21 / div, m22 / div]])
+    _no_pasos()
+    res = homografia_recta(m, recta)
+    _no_pasos(False)
+    return res
     
 # Clases
 
@@ -281,7 +378,7 @@ class recta_proyectiva:
     #\m
     # Devuelve esta recta proyectiva como objeto del tipo subespacio.
     def subespacio(self):
-        return self._subespacio;
+        return self._subespacio
     
     # Otros métodos
     
@@ -314,7 +411,7 @@ class recta_proyectiva:
     # otra: recta_proyectiva - recta a comprobar la igualdad
     #
     def __eq__(self, otra):
-        return self.subespacio() == otra.subespacio()
+        return self._subespacio == otra._subespacio
         
     # \m
     # Operador in. Determina si un punto está contenido en este subespacio o no.
@@ -345,11 +442,15 @@ class homografia_recta:
     #
     # Parámetros \\
     # matriz: matriz(2, 2) - matriz asociada a la homografía \\
-    # recta: recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1})
+    # recta: recta_proyectiva - recta sobre la que actúa la homografía (por defecto una recta con referencia {Infinity, 0; 1})
     #
-    def __init__(self, matriz, recta = recta_proyectiva(vector([1, 0]), vector([0, 1]), vector([1, 1]))):
+    def __init__(self, matriz, recta = None):
         assert matriz.nrows() == 2 and matriz.ncols() == 2, "La matriz debe ser 2x2"
         assert matriz.det() != 0, "Para que sea una homografia el rango de su matriz asociada debe ser maximo"
+        if recta is None:
+            _no_pasos()
+            recta = recta_proyectiva(vector([1, 0]), vector([0, 1]), vector([1, 1]))
+            _no_pasos(False)
         self._aplicacion = aplicacion_proyectiva(matriz)
         self._matriz = matriz
         self._recta = recta
@@ -553,6 +654,42 @@ class homografia_recta:
         paso("Usamos un punto arbitrario y su imagen como primeros puntos de la referencia y uno de los fijos como unidad")
         paso("R={", ref[i], ",", self(ref[i]), ",", fijos[0], "}")
         return homografia_recta(matrix([[0, 1], [1, 0]]), recta_proyectiva(ref[i], self(ref[i]), fijos[0]))
+        
+    #\m
+    # Devuelve el haz de ecuaciones cuadráticas generado por esta involución.
+    #
+    # Funciona tanto para puntos (vectores) como parámetros inhomogéneos de la recta.
+    #
+    # Implementación \\
+    # Asumiendo que esta homografía es una involución, calcula las imágenes de los puntos dados. Después, simplemente será
+    # necesario componerlos como dos ecuaciones cuyas soluciones sean cada par (theta_i, h(theta_i)).
+    #
+    # Parámetros \\
+    # a: complejo/Infinity/vector(n) - punto del primer par
+    # b: complejo/Infinity/vector(n) - punto del segundo par
+    #
+    def haz_ecuaciones_cuadraticas(self, a, b):
+        assert self.es_involucion(), "Para generar el haz de ecuaciones cuadraticas, esta homografia debe ser una involucion"
+        assert a != b, "Para generar el haz de ecuaciones cuadraticas se deben especificar puntos distintos"
+        _no_pasos()
+        if not es_parametro(a):
+            a = self._recta.coordenada(a)
+        if not es_parametro(b):
+            a = self._recta.coordenada(b)
+        ap = self(a)
+        bp = self(b)
+        _no_pasos(False)
+        assert ap != b and bp != a, "Para generar el haz de ecuaciones cuadraticas no se puede especificar un par de la involucion"
+        paso("Los dos pares especificados son:")
+        paso((a, ap), ", ", (b, bp))
+        var('mu theta')
+        # Cuidado con infinitos: se usa este método porque == hacía cosas raras
+        # Se debería utilizar algo así en otras funciones, pero sí que ha funcionado
+        p0 = (a - theta) if UnsignedInfinityRing(a) is sage.rings.infinity.LessThanInfinity() else 1
+        p1 = (ap - theta) if UnsignedInfinityRing(ap) is sage.rings.infinity.LessThanInfinity() else 1
+        p2 = (b - theta) if UnsignedInfinityRing(b) is sage.rings.infinity.LessThanInfinity() else 1
+        p3 = (bp - theta) if UnsignedInfinityRing(bp) is sage.rings.infinity.LessThanInfinity() else 1
+        return p0 * p1 + mu * p2 * p3
     
     #\m
     # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))).
@@ -586,14 +723,8 @@ class homografia_recta:
     # Métodos auxiliares
             
     def __sustituir(self, x):
-        # Para infinito se pierden las componentes sin theta
-        if x == Infinity or x == -Infinity:
-            if self._matriz[1][0] == 0:
-                return Infinity
-            else:
-                return self._matriz[0][0] / self._matriz[1][0]
-        # En cualquier otro caso se sustituye en la expresión de Möbius
-        return self._expresion_mobius.substitute(self._theta1 == x).rhs()
+        # Devuelve el límite para los casos de infinito o división por 0
+        return limit(self._expresion_mobius.rhs(), theta = x)
         
     def __repr__(self):
         return "<Homografia " + str(self._expresion) + " de " + str(self._recta) + ">"
