@@ -132,6 +132,19 @@ En este proyecto se incluye un pequeño programa que se encarga de leer los come
 </code>
   
 </li>
+<li>
+  Para el constructor de una clase \i
+  
+<code>
+  
+    # \i
+    # Constructor.
+    #
+    def __init__(self):
+    
+</code>
+  
+</li>
 </ul>
 Si en el archivo .html que se genere queremos que haya algún salto de línea en un lugar concreto tenemos dos posibilidades: dejar una línea entera en blanco (pero con comentario) o escribir \\. Más o menos como en Latex.
 
