@@ -3,10 +3,6 @@
 #
 # Suponemos que los puntos expresados con coordenada inhomogénea theta se obtiene mediante x/y.
 #
-# Para usar infinitos, por ejemplo el punto infinito de una recta r, se puede usar r[Infinity] ó r[oo].
-# En general, debería valer tanto positivo como negativo y el resultado debería ser el mismo, pero se
-# recomienda poner sin signo para evitar posibles problemas.
-#
 # Autor: Pablo Sanz Sanz
 #
 
@@ -312,6 +308,104 @@ def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None
     _no_pasos(False)
     return res
 
+#\f
+# Crea una homografía entre dos rectas que se cortan dados tres puntos de la recta origen y sus imágenes en la recta destino.
+# Es válido tanto para puntos como parámetros inhomogéneos.
+#
+# Implementación \\
+# Con las coordenadas inhomogéneas de cada punto se halla la homografía sobre una falsa recta {Infinity, 0; 1} que los
+# trasnforma de la forma indicada. Simplemente se transforma la coordenada de una recta a la coordenada de la otra como si fuera
+# una sola recta.
+#
+# Parámetros \\
+# a: complejo/Infinity/vector(n>1) - primer punto a transformar \\
+# ap: complejo/Infinity/vector(n>1) - imagen del primer punto \\
+# b: complejo/Infinity/vector(n>1) - segundo punto a transformar \\
+# bp: complejo/Infinity/vector(n>1) - imagen del segundo punto \\
+# c: complejo/Infinity/vector(n>1) - tercer punto a transformar \\
+# cp: complejo/Infinity/vector(n>1) - imagen del tercer punto \\
+# r_origen: recta_proyectiva - recta desde donde parte la homografía \\
+# r_destino: recta_proyectiva - recta de llegada de la homografía
+#
+def crear_homografia_dos_rectas(a, ap, b, bp, c, cp, r_origen, r_destino):
+    if es_parametro(a):
+        assert es_parametro(ap) and es_parametro(b) and es_parametro(bp) and es_parametro(c) and es_parametro(cp), \
+                "Todos los puntos deben ser del mismo tipo"
+        paso("Creamos una homografia sobre una falsa recta que convierta: ", a, " -> ", ap, ",", b, " -> ", bp, ",", c, " -> ", cp)
+        h = crear_homografia_recta_theta(a, ap, b, bp, c, cp)
+        return homografia_dos_rectas(h, r_origen, r_destino)
+    # No es un parámetro, será un punto
+    assert a in r_origen and b in r_origen and c in r_origen, "Los puntos a, b y c deben pertenecer a la recta origen"
+    assert ap in r_destino and bp in r_destino and cp in r_destino, "Los puntos a', b' y c' deben pertenecer a la recta destino"
+    theta0 = r_origen.coordenada(a)
+    theta0p = r_destino.coordenada(ap)
+    theta1 = r_origen.coordenada(b)
+    theta1p = r_destino.coordenada(bp)
+    theta2 = r_origen.coordenada(c)
+    theta2p = r_destino.coordenada(cp)
+    paso("Creamos una homografia sobre una falsa recta que convierta: ", \
+         theta0, " -> ", theta0p, ",", theta1, " -> ", theta1p, ",", theta2, " -> ", theta2p)
+    h = crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2, theta2p)
+    return homografia_dos_rectas(h, r_origen, r_destino)
+
+#\f
+# Crea una homografía entre dos rectas que se cortan dados un punto y su imagen y el eje de la homografía (como subespacio).
+# Es válido tanto para puntos como parámetros inhomogéneos.
+#
+# Implementación \\
+# Obtiene el punto de corte del eje con cada una de las rectas. En caso de ser dos puntos distintos X e Y se tendrá que O' = Y
+# y X' = O. Si son el mismo punto se utilizará un punto arbitrario extra B, que se puede especificar si se quiere, y se calculará
+# su imagen: se traza una recta que pase por B y A' y cortará el eje en P; uniendo A con P se obtiene B' en la recta destino.
+# El par de puntos será ese corte doble del eje con las rectas. Una vez obtenidos los puntos se usa crear_homografia_dos_rectas().
+#
+# NOTA. Por simplicidad no se hacen comprobaciones sobre puntos coincidentes, pero se debe asegurar que ninguno de los puntos
+# que se da como parámetros (tanto a, ap, como extra) coincida con la intersección (o entre ellos). En caso contrario es probable
+# encontrarse con resultados extraños o incluso errores.
+#
+# Parámetros \\
+# a: complejo/Infinity/vector(n>1) - punto a transformar \\
+# ap: complejo/Infinity/vector(n>1) - imagen del punto \\
+# r_origen: recta_proyectiva - recta desde donde parte la homografía \\
+# r_destino: recta_proyectiva - recta de llegada de la homografía \\
+# eje: subespacio - eje de la homografía, que debe cortar a las anteriores rectas (nótese que se pide un subespacio) \\
+# extra: complejo/Infinity/vector(n>1) - punto extra de r_origen que se utilizará en caso de que el corte del eje con las rectas
+# sea un único punto (por defecto la suma del corte y el punto a dado, como puntos)
+#
+def crear_homografia_dos_rectas_eje(a, ap, r_origen, r_destino, eje, extra = None):
+    if es_parametro(a):
+        assert es_parametro(ap), "Todos los puntos deben ser del mismo tipo"
+        a = r_origen[a]
+        ap = r_destino[ap]
+    _no_pasos()
+    x = eje.interseccion(r_origen.subespacio())
+    y = eje.interseccion(r_destino.subespacio())
+    o = r_origen.subespacio().interseccion(r_destino.subespacio())
+    _no_pasos(False)
+    assert o.es_punto(), "La interseccion de las rectas debe ser un unico punto"
+    # Distinto punto de corte
+    if x != y:
+        b = x.representantes()[0]
+        bp = o.representantes()[0]
+        c = bp
+        cp = y.representantes()[0]
+        paso("Los puntos de corte del eje con las rectas son, respectivamente, ", b, ", ", cp)
+        return crear_homografia_dos_rectas(a, ap, b, bp, c, cp, r_origen, r_destino)
+    # Mismo punto de corte
+    else:
+        b = x.representantes()[0]
+        c = a + b if extra is None else extra
+        # Comprobemos que el punto extra no coincide con ninguno de los otros
+        paso("El punto de corte del eje con las rectas ha sido unico:", b)
+        paso("Hallamos la imagen del punto extra escogido:", c, ", uniendolo con A':", ap, " y cortando esta recta con el eje")
+        _no_pasos()
+        r = subespacio(c, ap)
+        z = r.interseccion(eje).representantes()[0]
+        s = subespacio(a, z)
+        cp = s.interseccion(r_destino.subespacio()).representantes()[0]
+        _no_pasos(False)
+        paso("Resumiendo, la recta corta en el eje en: ", z, ", y uniendolo con A corta en la recta destino en: ", cp)
+        return crear_homografia_dos_rectas(a, ap, b, b, c, cp, r_origen, r_destino)
+
 # Clases
 
 #\c
@@ -372,6 +466,11 @@ class recta_proyectiva:
     # Devuelve esta recta proyectiva como objeto del tipo subespacio.
     def subespacio(self):
         return self._subespacio
+
+    #\m
+    # Devuelve la dimensión del espacio en que se encuentra esta recta.
+    def dimension_ambiente(self):
+        return self._subespacio.dimension_ambiente()
 
     # Otros métodos
 
@@ -444,7 +543,6 @@ class homografia_recta:
             _no_pasos()
             recta = recta_proyectiva(vector([1, 0]), vector([0, 1]), vector([1, 1]))
             _no_pasos(False)
-        self._aplicacion = aplicacion_proyectiva(matriz)
         self._matriz = matriz
         self._recta = recta
         self._theta1 = var('theta', latex_name = r'theta')
@@ -458,7 +556,7 @@ class homografia_recta:
     #\m
     # Devuelve esta homografía como una aplicacion_proyectiva.
     def aplicacion(self):
-        return self._aplicacion
+        return aplicacion_proyectiva(self._matriz)
 
     #\m
     # Devuelve la matriz asociada a esta homografía.
@@ -476,7 +574,7 @@ class homografia_recta:
         return self._recta.referencia()
 
     #\m
-    # Devuelve la homografía expresada como una transformación de M
+    # Devuelve la homografía expresada como una transformación de Möbius.
     def expresion_mobius(self):
         return self._expresion_mobius
 
@@ -516,7 +614,7 @@ class homografia_recta:
     # Ver autovalores() de aplicacion_proyectiva (aplicacion_proyectiva.sage).
     #
     def autovalores(self):
-        return self._aplicacion.autovalores()
+        return self.aplicacion().autovalores()
 
     #\m
     # Devuelve los parámetros de los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
@@ -529,7 +627,7 @@ class homografia_recta:
                 ", pero vamos a usar los autovectores porque es más sencillo para el algoritmo")
         if self.es_identidad():
             return []
-        return map(lambda x: Infinity if x[1] == 0 else x[0] / x[1], self._aplicacion.puntos_fijos())
+        return map(lambda x: Infinity if x[1] == 0 else x[0] / x[1], self.aplicacion().puntos_fijos())
 
     #\m
     # Devuelve los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
@@ -720,6 +818,239 @@ class homografia_recta:
 
     def __repr__(self):
         return "<Homografia " + str(self._expresion) + " de " + str(self._recta) + ">"
+
+#\c
+# Clase que representa una homografía entre dos rectas distintas. En general, se creará utilizando funciones auxiliares.
+#
+# Se representa mediante una falsa homografía de una recta en sí misma, que para lo único que servirá será para aprovechar sus métodos.
+#
+class homografia_dos_rectas:
+
+    def __init__(self, homografia, recta1, recta2):
+        assert recta1.dimension_ambiente() == recta2.dimension_ambiente(), "Las rectas deben pertenecer al mismo espacio"
+        _no_pasos()
+        interseccion = recta1.subespacio().interseccion(recta2.subespacio())
+        _no_pasos(False)
+        assert interseccion.es_punto(), "La interseccion de las rectas debe ser un unico punto"
+        self._homografia = homografia
+        self._recta_origen = recta1
+        self._recta_destino = recta2
+        self._interseccion = interseccion.representantes()[0]
+
+    # Métodos accedentes
+
+    #\m
+    # Devuelve esta homografía como una aplicacion_proyectiva. Nótese que así dejará de estar restringida a las rectas origen y destino.
+    def aplicacion(self):
+        return self._homografia.aplicacion()
+
+    #\m
+    # Devuelve la matriz asociada a esta homografía.
+    def matriz_asociada(self):
+        return self._homografia.matriz_asociada()
+
+    #\m
+    # Devuelve el punto de interseccion de las rectas de esta homografía.
+    def interseccion(self):
+        return self._interseccion
+
+    #\m
+    # Devuelve la recta de partida de esta homografía.
+    def recta_origen(self):
+        return self._recta_origen
+
+    #\m
+    # Devuelve la referencia en la que está expresada la recta origen.
+    def referencia_origen(self):
+        return self._recta_origen.referencia()
+
+    #\m
+    # Devuelve la recta de destino de esta homografía.
+    def recta_destino(self):
+        return self._recta_destino
+
+    #\m
+    # Devuelve la referencia en la que está expresada la recta destino.
+    def referencia_destino(self):
+        return self._recta_destino.referencia()
+
+    #\m
+    # Devuelve la homografía expresada como una transformación de Möbius.
+    def expresion_mobius(self):
+        return self._homografia.expresion_mobius()
+
+    #\m
+    # Devuelve la ecuación en theta y theta' de esta homografía.
+    def ecuacion(self):
+        return self._homografia.ecuacion()
+
+
+    # Otros métodos
+
+    #\m
+    # Calcula la imagen mediante esta homografía del punto dado.
+    #
+    # Uso: h(x) ó h(p) (donde r es una homografia_recta, x un complejo/Infinity y p un punto).
+    #
+    # Implementación \\
+    # Calcula el parámetro no homogéneo asociado a la imagen del punto dado mediante la falsa homografía. \\
+    # Si se ha dado un parámetro devolverá el parámetro y si se ha dado un punto devolverá el punto.
+    #
+    # Parámetros \\
+    # x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen
+    #
+    def __call__(self, x):
+        # Estamos recibiendo un parámetro no homogéneo, simplemente calculamos su imagen
+        if es_parametro(x):
+            return self._homografia(x)
+        # Asumimos que es un vector, si es del mismo espacio calculamos su coordenada en la recta primero
+        assert x in self._recta_origen, "El punto debe pertenecer a la recta origen"
+        coord = self._recta_origen.coordenada(x)
+        paso("La coordenada de ", x, " en la recta origen es: ", coord, ". Calculamos su imagen y recuperamos el punto")
+        return self._recta_destino[self(coord)]
+
+    #\m
+    # Calcula el eje de esta homografía utilizando el teorema del eje. Se puede pedir que se devuelva en forma de recta_proyectiva
+    # en vez de como subespacio (por defecto). En tal caso, se pueden indicar los puntos que se quiere utilizar para hallar el eje
+    # y de los cortes generados se obtendrá la referencia de dicha recta. El primer punto es el generado por ab, el ssegundo ac y el tercero bc.
+    # Importante no repetir si se indican los puntos y evitar que uno de ellos sea la intersección (de momento da error).
+    #
+    # Implementación \\
+    # Se escogen los puntos indicados o tres puntos arbitrarios P, Q, R. Se calculan sus imágenes P', Q', R' y se unen las de distinto
+    # nombre. La unión de las intersecciones resultará en el eje.
+    #
+    # Parámetros \\
+    # recta: booleano - determina si se quiere obtener un objeto del tipo recta_proyectiva como resultado en vez de un subespacio (False por defecto) \\
+    # a: complejo/Infinity - primer punto para obtener el eje (por defecto Infinity) \\
+    # b: complejo/Infinity - segundo punto para obtener el eje (por defecto 0) \\
+    # c: complejo/Infinity - tercer punto para obtener el eje (por defecto 1)
+    #
+    def eje(self, recta = False, a = Infinity, b = 0, c = 1):
+        assert a != b and a != c and b != c, "Se deben indicar puntos distintos para obtener el eje"
+        _no_pasos()
+        ap = self(a)
+        bp = self(b)
+        cp = self(c)
+        p1 = self._recta_origen[a]
+        p2 = self._recta_destino[ap]
+        q1 = self._recta_origen[b]
+        q2 = self._recta_destino[bp]
+        r1 = self._recta_origen[c]
+        r2 = self._recta_destino[cp]
+        _no_pasos(False)
+        paso("Calculamos las imagenes de tres puntos arbitrarios:", a, ",", b, ",", c)
+        paso("Para los puntos indicados se tienen las siguientes transformaciones:")
+        paso("P = ", p1, " -> ", p2, " = P'")
+        paso("Q = ", q1, " -> ", q2, " = Q'")
+        paso("R = ", r1, " -> ", r2, " = R'")
+        paso("Unimos los de dsitinto nombre e intersecamos (no se muestran pasos por no llenar la pantalla, pero se pueden calcular facilmente)")
+        _no_pasos()
+        pq = subespacio(p1, q2)
+        pr = subespacio(p1, r2)
+        qp = subespacio(q1, p2)
+        qr = subespacio(q1, r2)
+        rp = subespacio(r1, p2)
+        rq = subespacio(r1, q2)
+        x1 = pq.interseccion(qp).representantes()[0]
+        x2 = pr.interseccion(rp).representantes()[0]
+        x3 = qr.interseccion(rq).representantes()[0]
+        _no_pasos(False)
+        paso("Las intersecciones son:", x1, ", ", x2, ", ", x3)
+        if recta:
+            return recta_proyectiva(x1, x2, x3)
+        return subespacio(x1, x2, x3)
+
+    #\m
+    # Determina si esta homografía es una perspectividad.
+    #
+    # Implementación \\
+    # Comprueba que la intersección de las dos rectas sea un punto fijo, esto es, h(O) = a*O, donde h es esta homografía, O el punto
+    # de intersección y a un parámetro cualquiera.
+    #
+    def es_perspectividad(self):
+        var('param')
+        return len(solve((self(self._interseccion) - param * self._interseccion).list(), param)) == 1
+
+    #\m
+    # Calcula el punto centro de esta perspectividad.
+    #
+    # Implementación \\
+    # Calcula el corte de las rectas que forman dos pares arbitrarios que no coincidan con la intersección.
+    #
+    def centro(self):
+        assert self.es_perspectividad(), "El interes de calcular el centro es para perspectividades"
+        _no_pasos()
+        a = self(Infinity)
+        b = self(0)
+        c = self(1)
+        r1 = subespacio(self._recta_origen[Infinity], self._recta_destino[a])
+        r2 = subespacio(self._recta_origen[0], self._recta_destino[b])
+        r3 = subespacio(self._recta_origen[1], self._recta_destino[c])
+        _no_pasos(False)
+        paso("Tomamos los puntos Infinity, 0 y 1 de la recta origen (tres por si alguno fuera la interseccion)")
+        paso(Infinity, "->", a)
+        paso(0, "->", b)
+        paso(1, "->", c)
+        paso("Que forman las siguientes rectas y se cortaran en el centro")
+        paso(r1)
+        paso(r2)
+        paso(r3)
+        _no_pasos()
+        res = r1.interseccion(r2) if not r1.es_punto() and not r2.es_punto() else \
+                r1.interseccion(r3) if not r1.es_punto() and not r3.es_punto() else \
+                r2.interseccion(r3)
+        _no_pasos(False)
+        return res.representantes()[0]
+
+    #\m
+    # Devuelve la inversa de esta homografía que va de la recta de destino a la recta origen.
+    #
+    # Implementación \\
+    # Devuelve una nueva homografia_dos_rectas cuya falsa homografía sea la inversa de la actual y con las rectas intercambiadas.
+    #
+    def inversa(self):
+        return homografia_dos_rectas(self._homografia^-1, self._recta_destino, self._recta_origen)
+
+    #\m
+    # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). Se debe cumplir que las
+    # tres rectas implicadas se corten en un mismo punto o que sólo hay dos.
+    #
+    # Uso: h * k (h y k son homografías tal que el destino de k es el origen de h en la misma referencia).
+    #
+    # Implementación \\
+    # Devuelve la composición de la falsa homografía de la otra con esta. \\
+    # NOTA. Por simplicidad NO se comprueba que las referencias de las rectas que tienen que ser iguales coincidan (aunque debería).
+    # Se debe asegurar de todas formas que la referencia de ambas rectas sea la misma o si no el resultado no será válido.
+    #
+    # Parámetros \\
+    # otra: homografia_dos_rectas - homografía con la que componer
+    #
+    def __mul__(self, otra):
+        assert self._recta_origen == otra._recta_destino, \
+            "La recta destino de la primera homografia que actua debe ser la misma que el origen de la segunda"
+        # Estamos volviendo a la misma recta
+        if self._recta_destino == otra._recta_origen:
+            return homografia_recta(self._homografia.matriz_asociada() * otra._homografia.matriz_asociada(), self._recta_destino)
+        return homografia_dos_rectas(self._homografia * otra._homografia, otra._recta_origen, self._recta_destino)
+
+    #\m
+    # Operador ^ (ó **). Sólo aplicable para n = -1. Usar inversa() mejor. Devuelve la inversa de esta homografía.
+    #
+    # Uso h^-1 (ó h**-1) (h es una homografía entre dos rectas y n un entero).
+    #
+    # Implementación \\
+    # Ver inversa.
+    #
+    # Parámetros \\
+    # n: -1 - exponente al que elevar
+    #
+    def __pow__(self, n):
+        assert n == -1, "No se puede calcular otra cosa que la inversa, puesto que origen y destino no pueden coincidir"
+        return self.inversa()
+
+    def __repr__(self):
+        return "<Homografia " + str(self._homografia.ecuacion()) + " entre las rectas " + str(self._recta_origen) + " y " + \
+            str(self._recta_destino) + ">"
 
 #\f
 # Función auxiliar que determina si el parámetro recibido es un punto (tipo vector) o un parámetro

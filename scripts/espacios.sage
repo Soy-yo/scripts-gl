@@ -141,6 +141,11 @@ class subespacio:
         return self._dimension_ambiente == -1
 
     # \m
+    # Determina si este subespacio es un único punto.
+    def es_punto(self):
+        return self._dim == 0
+
+    # \m
     # Determina si el subespacio coincide con su espacio ambiente.
     def es_total(self):
         return self._dim == self._dimension_ambiente
@@ -229,7 +234,10 @@ class subespacio:
     def __eq__(self, otro):
         assert self.__mismo_ambiente(otro), "Los subespacios a comprobar la igualdad deben pertenecer al mismo espacio"
         # La dimensión debe ser la misma y al sumarlos el subespacio no debería cambiar
-        return self._dim == otro._dim and self.suma(otro)._dim == self._dim
+        _no_pasos()
+        res = self._dim == otro._dim and self.suma(otro)._dim == self._dim
+        _no_pasos(False)
+        return res
 
     # \m
     # Operador !=. Determina si dos subespacios son diferentes.
