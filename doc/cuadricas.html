@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<title>cuadricas</title><link rel='stylesheet' type='text/css' href='style.css'></head>
+<body>
+<a href='index.html'>Página principal</a><h1>cuadricas</h1>
+<p>
+Este archivo contiene clases para manejar cónicas y cuádricas y algunas otras funciones útiles. De momento no se ha implementado nada sobre cuádricas en general porque la mayoría de ejercicios son de cónicas, pero ciertos métodos serían exactamente iguales, sólo que en dimensión mayor. Se puede mirar el procedimiento y hacer a mano. <br>
+Autor: Pablo Sanz Sanz <br>
+</p>
+<div class='class'>
+<h2>Clase: conica</h2>
+<p>
+Clase que representa una cónica tanto puntual como dual dada su matriz. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una cónica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de posiciones la mitad del coeficiente según las variables). Se puede usar también ecuacion.hessian() pero puede dar problemas si se tiene algún parámetro o si no aparecen las tres variables. <br>
+Parámetros <br>
+matriz: matriz(3, 3) - matriz de la cónica <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: matriz_asociada()</h3>
+<p>
+Devuelve la matriz asociada a esta cónica. </p>
+</div>
+<div class='function'>
+<h3>Función: ecuacion()</h3>
+<p>
+Devuelve la ecuación de esta cónica. </p>
+</div>
+<div class='function'>
+<h3>Función: es_degenerada()</h3>
+<p>
+Determina si esta cónica es degenerada, esto es, si el rango de su matriz asociada no es 3. </p>
+</div>
+<div class='function'>
+<h3>Función: es_dos_rectas()</h3>
+<p>
+Determina si esta cónica es el producto de dos rectas, esto es, si el rango de su matriz asociada es 2. </p>
+</div>
+<div class='function'>
+<h3>Función: es_recta_doble()</h3>
+<p>
+Determina si esta cónica es una recta doble, esto es, si el rango de su matriz asociada es 1. </p>
+</div>
+<div class='function'>
+<h3>Función: cambiar_referencia(matriz_cambio)</h3>
+<p>
+Devuelve una nueva cónica expresada en la nueva referencia (la que sea), dada la matriz del cambio de referencia. <br>
+Implementación <br>
+Si A es la matriz asociada a esta cónica y M la matriz del cambio de referencia entre dos referencias (que esta cónica desconoce), se crea una nueva cónica cuya matriz asociada sea M^t * A * M. <br>
+Parámetros <br>
+matriz_cambio: matriz(3, 3) - matriz que representa el cambio de referencia <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: dual()</h3>
+<p>
+Devuelve la cónica dual (de rectas tangentes) a esta cónica. <br>
+Implementación <br>
+Se crea una nueva cónica cuya matriz asociada sea la adjunta de la de esta. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: polar(p)</h3>
+<p>
+Devuelve la recta polar del punto P respecto de esta cónica. <br>
+Implementación <br>
+Si A es la matriz asociada a esta cónica, la recta polar es la de ecuación x^t * A * p = 0. <br>
+Parámetros <br>
+p: vector(3) - punto del que se quiere calcular su polar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: polo(r)</h3>
+<p>
+Devuelve el polo de la recta r respecto de esta cónica. <br>
+Implementación <br>
+Se calcula la recta polar del punto dual de la recta r* (el vector de sus coeficientes) respecto a la cónica dual C*. Por tanto, el dual de la recta polar calculada será el punto buscado. <br>
+Parámetros <br>
+r: subespacio - recta de la que calcular el polo </p>
+</div>
+<div class='function'>
+<h3>Función: tangentes(p, conica = False)</h3>
+<p>
+NO FUNCIONA DEL TODO: PUEDE LLAMAR A UN MÉTODO QUE AÚN NO ESTÁ IMPLEMENTADO. <br>
+Devuelve la(s) recta(s) tangentes a la cónica que pasan por P. Será una si P pertenece a la cónica y dos si no. Pueden devolverse también como cónica si así se especifica. <br>
+Implementación <br>
+Si el punto pertenece a esta cónica devuelve su recta polar y, si no, devuelve las dos rectas que forman la cónica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cónica. Si se especifica que se quiere oomo cónica, en cualquier caso devuelve lo segundo. <br>
+Parámetros <br>
+p: vector(3) - punto del que obtener las tangentes <br>
+conica: booleano - determina si este método devolverá un cónica o subespacios (False (subespacios) por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: interseccion()</h3>
+<p>
+Devuelve la intersección de las rectas de esta cónica degenerada. Devuelve un subespacio, si sólo se quiere un punto, en caso de ser dos rectas distintas, se puede usar .representantes()[0] para obtenerlo como vector. Si la cónica no es degenerada devuelve un subespacio vacío. <br>
+Implementación <br>
+Calcula el núcleo de la matriz asociada, que será la intersección de las rectas. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: factorizacion()</h3>
+<p>
+NO IMPLEMENTADO AÚN (ver pág 61). <br>
+Devuelve una tupla conteniendo las dos rectas (como subespacios) en que se descompone esta cónica degenerada. Si la cónica es una recta doble ambas rectas serán la misma. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __contains__(punto)</h3>
+<p>
+Operador in. Determina si un punto está contenido en esta cónica o no. <br>
+Uso: P in c (P es un punto y c una cónica). <br>
+Implementación <br>
+Comprueba p^t * A * p = 0 para A la matriz asociada de la cónica. <br>
+Parámetros <br>
+punto: vector(3) - punto que comprobar si pertenece a la cónica <br>
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
