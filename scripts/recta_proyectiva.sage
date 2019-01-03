@@ -424,9 +424,11 @@ class recta_proyectiva:
     # Parámetros \\
     # p0: vector(n) - punto cuya coordenada será theta == Infinity \\
     # p1: vector(n) - punto cuya coordenada será theta == 0 \\
-    # p2: vector(n) - punto cuya coordenada será theta == 1
+    # p2: vector(n) - punto cuya coordenada será theta == 1 (por defecto p0 + p1)
     #
-    def __init__(self, p0, p1, p2):
+    def __init__(self, p0, p1, p2 = None):
+        if p2 is None:
+            p2 = p0 + p1
         _no_pasos()
         self._subespacio = subespacio(p0, p1, p2)
         _no_pasos(False)
@@ -448,6 +450,8 @@ class recta_proyectiva:
     # Devuelve el punto con coordenada theta.
     #
     # Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta(_proyectiva)).
+    #
+    # Si se quiere un punto genérico de la recta, sustituir por una variable (ej: r[x] devuelve un punto dependiente de x).
     #
     # Parámetros \\
     # theta: complejo/Infinity - coordenada del punto de la recta que se quiere obtener
@@ -588,7 +592,7 @@ class homografia_recta:
     #\m
     # Calcula la imagen mediante esta homografía del punto dado.
     #
-    # Uso: h(x) ó h(p) (donde r es una homografia_recta, x un complejo/Infinity y p un punto).
+    # Uso: h(x) ó h(p) (donde h es una homografia_recta, x un complejo/Infinity y p un punto).
     #
     # Implementación \\
     # Dado un parámetro no homogéneo sustituye en la expresión de Möbius y devuelve el resultado. \\

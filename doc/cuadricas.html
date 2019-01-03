@@ -8,10 +8,33 @@
 Este archivo contiene clases para manejar cónicas y cuádricas y algunas otras funciones útiles. De momento no se ha implementado nada sobre cuádricas en general porque la mayoría de ejercicios son de cónicas, pero ciertos métodos serían exactamente iguales, sólo que en dimensión mayor. Se puede mirar el procedimiento y hacer a mano. <br>
 Autor: Pablo Sanz Sanz <br>
 </p>
+<div class='function'>
+<h3>Función: conica_degenerada(r1, r2 = None)</h3>
+<p>
+Devuelve la cónica degenerada que contiene las dos rectas dadas. Realmente, es más útil hacerlo a mano, así que no se dará implementación. Es útil para otras funciones. <br>
+Parámetros <br>
+r1: subespacio - primera recta de la cónica degenerada <br>
+r2: subespacio - segunda recta de la cónica degenerada (r1 por defecto, es decir, recta doble) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: conica_cinco_puntos(a, b, c, d, e)</h3>
+<p>
+Devuelve la cónica que pasa por los 5 puntos dados. <br>
+Implementación <br>
+Crea el haz de cónicas que pasa por las cónicas degeneradas AB * CD y AC * BD. Después se fuerza que pase por E. <br>
+Parámetros <br>
+a: vector(3) - primer punto de la cónica <br>
+b: vector(3) - segundo punto de la cónica <br>
+c: vector(3) - tercer punto de la cónica <br>
+d: vector(3) - cuarto punto de la cónica <br>
+e: vector(3) - quinto punto de la cónica <br>
+</p>
+</div>
 <div class='class'>
 <h2>Clase: conica</h2>
 <p>
-Clase que representa una cónica tanto puntual como dual dada su matriz. <br>
+Clase que representa una cónica tanto puntual como dual dada su matriz. Probablemente al mostrarse su ecuación por pantalla aparezca factorizada, pero eso no sirve como argumento de la factorizaión. <br>
 </p>
 <div class='methods'>
 <div class='function'>
@@ -48,6 +71,16 @@ Determina si esta cónica es el producto de dos rectas, esto es, si el rango de 
 Determina si esta cónica es una recta doble, esto es, si el rango de su matriz asociada es 1. </p>
 </div>
 <div class='function'>
+<h3>Función: es_tangente(r)</h3>
+<p>
+Determina si la recta dada es tangente a esta cónica. <br>
+Implementación <br>
+Comprueba que el punto dual de la recta pertenezca a la cónica dual. <br>
+Parámetros <br>
+r: subespacio - recta a comprobar si es tangente o no <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: cambiar_referencia(matriz_cambio)</h3>
 <p>
 Devuelve una nueva cónica expresada en la nueva referencia (la que sea), dada la matriz del cambio de referencia. <br>
@@ -82,12 +115,12 @@ Devuelve el polo de la recta r respecto de esta cónica. <br>
 Implementación <br>
 Se calcula la recta polar del punto dual de la recta r* (el vector de sus coeficientes) respecto a la cónica dual C*. Por tanto, el dual de la recta polar calculada será el punto buscado. <br>
 Parámetros <br>
-r: subespacio - recta de la que calcular el polo </p>
+r: subespacio - recta de la que calcular el polo <br>
+</p>
 </div>
 <div class='function'>
 <h3>Función: tangentes(p, conica = False)</h3>
 <p>
-NO FUNCIONA DEL TODO: PUEDE LLAMAR A UN MÉTODO QUE AÚN NO ESTÁ IMPLEMENTADO. <br>
 Devuelve la(s) recta(s) tangentes a la cónica que pasan por P. Será una si P pertenece a la cónica y dos si no. Pueden devolverse también como cónica si así se especifica. <br>
 Implementación <br>
 Si el punto pertenece a esta cónica devuelve su recta polar y, si no, devuelve las dos rectas que forman la cónica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cónica. Si se especifica que se quiere oomo cónica, en cualquier caso devuelve lo segundo. <br>
@@ -107,8 +140,22 @@ Calcula el núcleo de la matriz asociada, que será la intersección de las rect
 <div class='function'>
 <h3>Función: factorizacion()</h3>
 <p>
-NO IMPLEMENTADO AÚN (ver pág 61). <br>
-Devuelve una tupla conteniendo las dos rectas (como subespacios) en que se descompone esta cónica degenerada. Si la cónica es una recta doble ambas rectas serán la misma. <br>
+Devuelve una tupla conteniendo las dos rectas (como subespacios) en que se descompone esta cónica degenerada. Si la cónica es una recta doble ambas rectas serán la misma. Importante ver la implementación para entender lo que se explcia en el procedimiento. <br>
+NOTA. Aquí se utiliza el procedimiento que se describe a continuación porque es más sencillo de programar, pero hay otros métodos, como el de resolver la ecuación en alguna de las variables, o hallar el punto de intersección de las rectas y luego cortar la cónica con rectas sencillas, como x=0, y=0 o z=0 para hallar los otros dos puntos y luego unirlos con el primero. <br>
+Implementación <br>
+Utiliza los ejercicios 3 y 4 de la hoja 6 (han podido cambiar de numeración). Llamaremos u y v a los vectores de coeficientes de las rectas. Los ejercicios nos dicen que (uv^t + vu^t)* = (uxv)(uxv)^t; uv^t - vu^t es una matriz antisimétrica con sus componentes fuera de la diagonal son, por orden, (uxv)3, -(uxv)2, (uxv)1 (donde el número denota la componente del vector); y 2uv^t = (uv^t + vu^t) + (uv^t - vu^t). <br>
+Entonces, el primero de esa suma se obtiene de la propia matriz de la cónica. Para el segundo hay que obtener uxv. Eso se hace sabiendo que (uxv)(uxv)^t es la matriz de la cónica dual. Calculando, la diagonal de esta matriz son los cuadrados de las componentes de uxv. Lo único que queda es calcular el signo. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __call__(p)</h3>
+<p>
+Calcula la imagen de un punto mediante la forma bilineal que define esta cónica. Realmente esta no es una operación de cónicas, pero se incluye aquí porque puede ser útil. <br>
+Uso: c(p) (donde c es una cónica y p un punto). <br>
+Implementación <br>
+Calcula p^t * A * p, donde A es la matriz asociada a esta cónica. <br>
+Parámetros <br>
+p: vector(3) - punto del que se quiere calcular su imagen <br>
 </p>
 </div>
 <div class='function'>

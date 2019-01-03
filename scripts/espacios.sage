@@ -136,6 +136,12 @@ class subespacio:
         return self._matriz.columns()
 
     # \m
+    # Si este subespacio es un único punto devuelve este punto como objeto vector (equivalente a self.representantes()[0])
+    def punto(self):
+        assert self.es_punto(), "El subespacio debe ser un unico punto"
+        return self.representantes()[0]
+
+    # \m
     # Determina si este subespacio es vacío.
     def es_vacio(self):
         return self._dimension_ambiente == -1
@@ -189,7 +195,14 @@ class subespacio:
         if self.es_vacio() or otro.es_vacio():
             return subespacio()
         paso("Para intersecar unimos las ecuaciones de cada subespacio: ", [self.implicitas(), otro.implicitas()])
-        return subespacio(self.dual().representantes() + otro.dual().representantes()).dual()
+        _no_pasos()
+        dual1 = self.dual()
+        dual2 = otro.dual()
+        _no_pasos(False)
+        s = subespacio(dual1.representantes() + dual2.representantes())
+        paso("Ahora obtenemos el dual del subespacio calculado (eral el dual del que buscabamos):")
+        res = s.dual()
+        return res
 
     # \m
     # Devuelve las ecuaciones inhomogéneas del subespacio con xn == 1.

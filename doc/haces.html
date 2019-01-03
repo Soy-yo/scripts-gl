@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+<title>haces</title><link rel='stylesheet' type='text/css' href='style.css'></head>
+<body>
+<a href='index.html'>Página principal</a><h1>haces</h1>
+<p>
+Archivo que contiene clases relativas a haces de hiperplanos y cónicas dados dos elementos del haz. Para usar haces de hiperplanos dada su base mejor usar subespacios duales. <br>
+Autor: Pablo Sanz Sanz <br>
+</p>
+<div class='class'>
+<h2>Clase: haz_hiperplanos</h2>
+<p>
+Clase que representa un haz de hiperplanos (puntutales o duales). <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Crea un haz de hiperplanos dados dos hiperplanos representantes del haz. Será h1 + lambda * h2. <br>
+Parámetros <br>
+h1: subespacio - primer hiperplano representante del haz <br>
+h2: subespacio - segundo hiperplano representante del haz </p>
+</div>
+<div class='function'>
+<h3>Función: ecuacion()</h3>
+<p>
+Devuelve la ecuación de este haz de hiperplanos. Nótese que puede quedar un denominador común, que se puede eliminar a mano si hiciera falta. </p>
+</div>
+<div class='function'>
+<h3>Función: dimension_ambiente()</h3>
+<p>
+Devuelve la dimensión del espacio en que se encuentra este haz. </p>
+</div>
+<div class='function'>
+<h3>Función: __getitem__(x)</h3>
+<p>
+Devuelve el hiperplano para la coordenada dada. <br>
+Uso: H[lambda] (lambda es la coordenada del hiperplano y H un haz de hiperplanos). <br>
+Si se quiere un hiperplano genérico del haz, sustituir por una variable (ej: r[x] devuelve un hiperplano dependiente de x). <br>
+Parámetros <br>
+x: complejo/Infinity - coordenada del hiperplano que se quiere obtener <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: base()</h3>
+<p>
+Devuelve el subespacio base del haz, esto es, el subespacio intersección de los dos dados. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: forzar_punto(p)</h3>
+<p>
+Devuelve el hiperplano del haz que pasa por el punto dado. <br>
+Implementación <br>
+Sustituye el punto en el subespacio genérico dependiente de lambda e iguala a 0. <br>
+Parámetros <br>
+p: vector(n) - punto por el que pasa el hiperplano del haz <br>
+</p>
+</div>
+</div>
+</div>
+<div class='class'>
+<h2>Clase: haz_conicas</h2>
+<p>
+Clase que representa un haz de cónicas (puntutales o duales). <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Crea un haz de cónicas dadas dos cónicas representantes del haz. Será c1 + lambda * c2. <br>
+Parámetros <br>
+c1: cónica - primera cónica representante del haz <br>
+c2: cónica - segunda cónica representante del haz </p>
+</div>
+<div class='function'>
+<h3>Función: matriz_asociada()</h3>
+<p>
+Devuelve la matriz asociada a este haz de cónicas. </p>
+</div>
+<div class='function'>
+<h3>Función: ecuacion()</h3>
+<p>
+Devuelve la ecuación de este haz de cónicas. </p>
+</div>
+<div class='function'>
+<h3>Función: __getitem__(x)</h3>
+<p>
+Devuelve la cónica para la coordenada dada. <br>
+Uso: H[lambda] (lambda es la coordenada de la cónica y H un haz de cónicas). <br>
+Si se quiere una cónica genérica del haz, sustituir por una variable (ej: r[x] devuelve una cónica dependiente de x). <br>
+Parámetros <br>
+x: complejo/Infinity - coordenada de la cónica que se quiere obtener <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: base()</h3>
+<p>
+NO IMPLEMENTADO AÚN. <br>
+Devuelve los puntos base del haz, esto es, los puntos por los que pasan todas las cónicas. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: forzar_punto(p)</h3>
+<p>
+Devuelve la cónica del haz que pasa por el punto dado. <br>
+Implementación <br>
+Resuelve la ecuación p^t * H(lambda) * p = 0, donde H es la matriz representante del haz. <br>
+Parámetros <br>
+p: vector(3) - punto por el que pasa la cónica del haz <br>
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
