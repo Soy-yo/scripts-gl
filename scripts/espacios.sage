@@ -200,7 +200,7 @@ class subespacio:
         dual2 = otro.dual()
         _no_pasos(False)
         s = subespacio(dual1.representantes() + dual2.representantes())
-        paso("Ahora obtenemos el dual del subespacio calculado (eral el dual del que buscabamos):")
+        paso("Ahora obtenemos el dual del subespacio calculado (era el dual del que buscabamos):")
         res = s.dual()
         return res
 

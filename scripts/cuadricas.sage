@@ -32,6 +32,8 @@ def conica_degenerada(r1, r2 = None):
 #\f
 # Devuelve la cónica que pasa por los 5 puntos dados.
 #
+# NOTA. No puede haber cuatro de ellos alineados, pero la función no lo comprueba.
+#
 # Implementación \\
 # Crea el haz de cónicas que pasa por las cónicas degeneradas AB * CD y AC * BD. Después se fuerza que pase por E.
 #
@@ -54,8 +56,8 @@ def conica_cinco_puntos(a, b, c, d, e):
     _no_pasos(False)
     haz = haz_conicas(abcd, acbd)
     paso("Creamos las conicas degeneradas AB*CD y AC*BD y generamos el haz:")
-    paso("(", ab.implicitas()[0], ")(", cd.implicitas()[0], ") + lambda * (", ac.implicitas()[0], ")(", bd.implicitas()[0], ")")
-    paso("Por último, forzamos que pase por E =", e)
+    paso("(", ab.implicitas()[0].lhs(), ")(", cd.implicitas()[0].lhs(), ") + lambda * (", ac.implicitas()[0].lhs(), ")(", bd.implicitas()[0].lhs(), ") = 0")
+    paso("Por ultimo, forzamos que pase por E =", e, ", y despejamos lambda")
     _no_pasos()
     res = haz.forzar_punto(e)
     _no_pasos(False)
@@ -64,8 +66,7 @@ def conica_cinco_puntos(a, b, c, d, e):
 # Clases
 
 #\c
-# Clase que representa una cónica tanto puntual como dual dada su matriz. Probablemente al mostrarse su ecuación por pantalla aparezca factorizada,
-# pero eso no sirve como argumento de la factorizaión.
+# Clase que representa una cónica tanto puntual como dual dada su matriz.
 #
 class conica:
 
@@ -94,8 +95,13 @@ class conica:
 
     #\m
     # Devuelve la ecuación de esta cónica.
-    def ecuacion(self):
-        return self._ecuacion == 0
+    #
+    # Parámetros \\
+    # factor: booleano - indica si se quiere la ecuación factorizada (en caso de degeneradas quizá pueda separarla en dos rectas) o no (False por defecto)
+    #
+    def ecuacion(self, factor = False):
+        # Intenta factorizar de nuevo por si acaso
+        return self._ecuacion.factor() == 0 if factor else self._ecuacion.expand() == 0
 
     #\m
     # Determina si esta cónica es degenerada, esto es, si el rango de su matriz asociada no es 3.
@@ -208,33 +214,19 @@ class conica:
         return res
 
     #\m
-    # Devuelve la(s) recta(s) tangentes a la cónica que pasan por P. Será una si P pertenece a la cónica
-    # y dos si no. Pueden devolverse también como cónica si así se especifica.
+    # Devuelve la cónica degenerada tangente a esta cónica que pasa por P.
     #
     # Implementación \\
-    # Si el punto pertenece a esta cónica devuelve su recta polar y, si no, devuelve las dos rectas que forman
-    # la cónica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cónica.
-    # Si se especifica que se quiere oomo cónica, en cualquier caso devuelve lo segundo.
+    # Devuelve la cónica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cónica.
     #
     # Parámetros \\
-    # p: vector(3) - punto del que obtener las tangentes \\
-    # conica: booleano - determina si este método devolverá un cónica o subespacios (False (subespacios) por defecto)
+    # p: vector(3) - punto del que obtener las tangentes
     #
-    def tangentes(self, p, conica = False):
-        if conica:
-            paso("La conica degenerada tangente a esta que pasa por el punto es la de matriz")
-            paso(self._matriz, matrix([p]).T, matrix([p]), self._matriz, " - (", matrix([p]), self._matriz, \
-                    matrix([p]).T, ")", self._matriz)
-            return conica(self._matriz * p * p * self._matriz - (p * self._matriz * p)[0][0] * self._matriz)
-        if p in self:
-            paso("Como el punto pertenece a la conica, la recta tangente coincide con la polar")
-            return self.polar(p)
-        paso("Las rectas tangentes a esta conica que pasan por el punto son las de la conica de matriz")
-        paso(self._matriz, matrix([p]).T, matrix([p]), self._matriz, " - (", matrix([p]), self._matriz, matrix([p]).T, \
-                ")", self._matriz)
-        c = conica(self._matriz * p * p * self._matriz - (p * self._matriz * p)[0][0] * self._matriz)
-        paso("La matriz de la conica es:", c.matriz_asociada(), "; descomponemos en dos rectas")
-        return c.factorizacion()
+    def tangentes(self, p):
+        x = matrix([p]).T
+        paso("La conica degenerada tangente a esta que pasa por el punto es la de matriz")
+        paso(self._matriz, x, x.T, self._matriz, " - (", x.T, self._matriz, x, ")", self._matriz)
+        return conica(self._matriz * x * x.T * self._matriz - (x.T * self._matriz * x)[0][0] * self._matriz)
 
     #\m
     # Devuelve la intersección de las rectas de esta cónica degenerada. Devuelve un subespacio, si sólo
@@ -251,12 +243,97 @@ class conica:
         return aplicacion_proyectiva(self._matriz).centro()
 
     #\m
+    # Devuelve el tercer punto que forma un triángulo autopolar junto con los otros dos dados, asumiendo que cada uno
+    # está en la polar del otro.
+    #
+    # Si se tiene sólo un punto se debe calcular antes su polar y de ahí elegir un punto arbitrario para que sea
+    # el segundo.
+    #
+    # Implementación \\
+    # Interseca las rectas polares de los puntos dados.
+    #
+    # Parámetros \\
+    # p: vector(3) - un punto del triángulo \\
+    # q: vector(3) - otro punto del triángulo
+    #
+    def triangulo_autopolar(self, p, q):
+        paso("Polar del primer punto")
+        s = self.polar(p)
+        assert q in s, "Cada punto debe pertenecer a la polar del otro"
+        paso("Polar del segundo punto")
+        t = self.polar(q)
+        paso("Intersecamos")
+        assert p in t, "Cada punto debe pertenecer a la polar del otro"
+        return s.interseccion(t).punto()
+
+    #\m
+    # Determina si P, Q, R forman un triángulo autopolar.
+    #
+    # Implementación \\
+    # Comprueba que Q y R pertenezcan a la polar de P.
+    #
+    # Parámetros \\
+    # p: vector(3) - primer punto del triángulo autopolar \\
+    # q: vector(3) - segundo punto del triángulo autopolar \\
+    # r: vector(3) - tercer punto del triángulo autopolar
+    #
+    def es_triangulo_autopolar(self, p, q, r):
+        _no_pasos()
+        polar = self.polar(p)
+        _no_pasos(False)
+        return q in polar and r in polar
+
+    #\m
+    # Devuelve el punto unidad E para la referencia {P, Q, R; E} que hace que esta cónica tenga ecuación x^2 + y^2 + z^2 = 0
+    # en complejos, quizá algunos negativos en reales. Nótese que no cambia la cónica, sino que se debe obtener primero la
+    # matriz del cambio de referencia (ver cambiar_referencia() en espacios.sage) y luego cambiar la referencia de esta
+    # cónica.
+    #
+    # NOTA. Los puntos P, Q, R deben formar un triángulo autopolar.
+    #
+    # Implementación \\
+    # Con un punto E arbitrario la ecuación de esta cónica es ax^2 + by^2 + cz^2 = 0, donde a, b y c se calculan mediante
+    # B(P, P), B(Q, Q), B(R, R), respectivamente (donde B es la forma bilineal asociada a esta cónica). Entonces sólo necesitamos
+    # eliminar estos a, b y c. Esto se hace eligiendo los representantes de P, Q y R de forma que E = [beta1 * P + beta2 * Q + beta3 * R],
+    # donde a*beta1^2 = 1, b*beta2^2 = 1 y c*beta3^2 = 1 (si a, b o c son 0 se elige betai = 1). \\
+    # Para el caso real se igualan a -1 si no se puede resolver la ecuación.
+    #
+    # Parámetros \\
+    # p: vector(3) - primer punto del triángulo autopolar \\
+    # q: vector(3) - segundo punto del triángulo autopolar \\
+    # r: vector(3) - tercer punto del triángulo autopolar \\
+    # real: booleano - determina si la cónica debe ser necesariamente real o no (False por defecto)
+    #
+    def referencia_autopolar(self, p, q, r, real = False):
+        assert self.es_triangulo_autopolar(p, q, r), "Las referencias autopolares se forman con triangulos autopolares"
+        a = self(p)
+        b = self(q)
+        c = self(r)
+        paso("a = B(p,p) = ", a, "; b = B(q,q) = ", b, "; c = B(r,r) = ", c)
+        paso("Calculamos betai para que a*beta1 = a*beta1^2 = 1, b*beta2^2 = 1 y c*beta3^2 = 1 (o betai = 1 si su respectivo es 0)")
+        if not real:
+            beta1 = sqrt(1/a).simplify_full() if a != 0 else 1
+            beta2 = sqrt(1/b).simplify_full() if b != 0 else 1
+            beta3 = sqrt(1/c).simplify_full() if c != 0 else 1
+            paso("beta1 = ", beta1, "; beta2 = ", beta2, "; beta3 = ", beta3)
+            return beta1 * p + beta2 * q + beta3 * r
+        paso("Si alguna ecuacion no se puede resolver en reales se iguala a -1")
+        beta1 = sqrt(1/abs(a)).simplify_full() if a != 0 else 1
+        beta2 = sqrt(1/abs(b)).simplify_full() if b != 0 else 1
+        beta3 = sqrt(1/abs(c)).simplify_full() if c != 0 else 1
+        paso("beta1 = ", beta1, "; beta2 = ", beta2, "; beta3 = ", beta3)
+        return beta1 * p + beta2 * q + beta3 * r
+
+    # ELIMINADO DE MOMENTO PORQUE PARECE NO FUNCIONAR BIEN
+    '''
+    #
     # Devuelve una tupla conteniendo las dos rectas (como subespacios) en que se descompone esta cónica degenerada.
-    # Si la cónica es una recta doble ambas rectas serán la misma. Importante ver la implementación para entender lo que se explcia en el procedimiento.
+    # Si la cónica es una recta doble ambas rectas serán la misma.
     #
     # NOTA. Aquí se utiliza el procedimiento que se describe a continuación porque es más sencillo de programar, pero hay otros métodos, como el de resolver
     # la ecuación en alguna de las variables, o hallar el punto de intersección de las rectas y luego cortar la cónica con rectas sencillas, como x=0, y=0 o z=0
-    # para hallar los otros dos puntos y luego unirlos con el primero.
+    # para hallar los otros dos puntos y luego unirlos con el primero. Además, simplemente accediendo a la ecuación de la cónica con factor = True (ver ecuacion())
+    # se puede ver la cónica factorizada, pero sin ningún tipo de procedimiento especial. Esto está por si fuera necesario.
     #
     # Implementación \\
     # Utiliza los ejercicios 3 y 4 de la hoja 6 (han podido cambiar de numeración). Llamaremos u y v a los vectores de coeficientes de las rectas.
@@ -298,6 +375,7 @@ class conica:
         res = (subespacio(u).dual(), subespacio(v).dual())
         _no_pasos(False)
         return res
+    '''
 
     #\m
     # Calcula la imagen de un punto mediante la forma bilineal que define esta cónica. Realmente esta no es una operación de
@@ -335,18 +413,17 @@ class conica:
         uxv1 = sqrt(m[0][0]).simplify_full()
         uxv2 = sqrt(m[1][1]).simplify_full()
         uxv3 = sqrt(m[2][2]).simplify_full()
-        # Entonces 
-        if uxv1 != 0:
-            # Alguno tiene signo distinto (?)
-            if m[0][1] >= 0 and m[0][2] < 0:
-                uxv3 = -uxv3
-            elif m[0][1] < 0 and m[0][2] >= 0:
-                uxv2 = -uxv2
-            elif m[0][1] < 0 and m[0][2] < 0:
-                uxv1 = -uxv1
-        elif m[1][2] < 0:
-            uxv3 = -uxv3
-        return (uxv1, uxv2, uxv3)
+        paso(m)
+        paso(uxv1)
+        paso(uxv2)
+        paso(uxv3)
+        m01 = (uxv1 * uxv2).simplify_full()
+        m02 = (uxv1 * uxv3).simplify_full()
+        m12 = (uxv2 * uxv3).simplify_full()
+        s1 = 1 if m01 == m[0][1] else -1
+        s2 = 1 if m02 == m[0][2] else -1
+        s3 = 1 if m12 == m[1][2] else -1
+        return (s1 * s2 * uxv1, s1 * s3 * uxv2, s2 * s3 * uxv3)
 
     def __repr__(self):
         return "<Conica de ecuacion " + str(self.ecuacion()) + ">"

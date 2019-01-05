@@ -21,6 +21,7 @@ r2: subespacio - segunda recta de la cónica degenerada (r1 por defecto, es deci
 <h3>Función: conica_cinco_puntos(a, b, c, d, e)</h3>
 <p>
 Devuelve la cónica que pasa por los 5 puntos dados. <br>
+NOTA. No puede haber cuatro de ellos alineados, pero la función no lo comprueba. <br>
 Implementación <br>
 Crea el haz de cónicas que pasa por las cónicas degeneradas AB * CD y AC * BD. Después se fuerza que pase por E. <br>
 Parámetros <br>
@@ -34,7 +35,7 @@ e: vector(3) - quinto punto de la cónica <br>
 <div class='class'>
 <h2>Clase: conica</h2>
 <p>
-Clase que representa una cónica tanto puntual como dual dada su matriz. Probablemente al mostrarse su ecuación por pantalla aparezca factorizada, pero eso no sirve como argumento de la factorizaión. <br>
+Clase que representa una cónica tanto puntual como dual dada su matriz. <br>
 </p>
 <div class='methods'>
 <div class='function'>
@@ -51,9 +52,12 @@ matriz: matriz(3, 3) - matriz de la cónica <br>
 Devuelve la matriz asociada a esta cónica. </p>
 </div>
 <div class='function'>
-<h3>Función: ecuacion()</h3>
+<h3>Función: ecuacion(factor = False)</h3>
 <p>
-Devuelve la ecuación de esta cónica. </p>
+Devuelve la ecuación de esta cónica. <br>
+Parámetros <br>
+factor: booleano - indica si se quiere la ecuación factorizada (en caso de degeneradas quizá pueda separarla en dos rectas) o no (False por defecto) <br>
+</p>
 </div>
 <div class='function'>
 <h3>Función: es_degenerada()</h3>
@@ -119,14 +123,13 @@ r: subespacio - recta de la que calcular el polo <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: tangentes(p, conica = False)</h3>
+<h3>Función: tangentes(p)</h3>
 <p>
-Devuelve la(s) recta(s) tangentes a la cónica que pasan por P. Será una si P pertenece a la cónica y dos si no. Pueden devolverse también como cónica si así se especifica. <br>
+Devuelve la cónica degenerada tangente a esta cónica que pasa por P. <br>
 Implementación <br>
-Si el punto pertenece a esta cónica devuelve su recta polar y, si no, devuelve las dos rectas que forman la cónica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cónica. Si se especifica que se quiere oomo cónica, en cualquier caso devuelve lo segundo. <br>
+Devuelve la cónica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cónica. <br>
 Parámetros <br>
 p: vector(3) - punto del que obtener las tangentes <br>
-conica: booleano - determina si este método devolverá un cónica o subespacios (False (subespacios) por defecto) <br>
 </p>
 </div>
 <div class='function'>
@@ -138,13 +141,42 @@ Calcula el núcleo de la matriz asociada, que será la intersección de las rect
 </p>
 </div>
 <div class='function'>
-<h3>Función: factorizacion()</h3>
+<h3>Función: triangulo_autopolar(p, q)</h3>
 <p>
-Devuelve una tupla conteniendo las dos rectas (como subespacios) en que se descompone esta cónica degenerada. Si la cónica es una recta doble ambas rectas serán la misma. Importante ver la implementación para entender lo que se explcia en el procedimiento. <br>
-NOTA. Aquí se utiliza el procedimiento que se describe a continuación porque es más sencillo de programar, pero hay otros métodos, como el de resolver la ecuación en alguna de las variables, o hallar el punto de intersección de las rectas y luego cortar la cónica con rectas sencillas, como x=0, y=0 o z=0 para hallar los otros dos puntos y luego unirlos con el primero. <br>
+Devuelve el tercer punto que forma un triángulo autopolar junto con los otros dos dados, asumiendo que cada uno está en la polar del otro. <br>
+Si se tiene sólo un punto se debe calcular antes su polar y de ahí elegir un punto arbitrario para que sea el segundo. <br>
 Implementación <br>
-Utiliza los ejercicios 3 y 4 de la hoja 6 (han podido cambiar de numeración). Llamaremos u y v a los vectores de coeficientes de las rectas. Los ejercicios nos dicen que (uv^t + vu^t)* = (uxv)(uxv)^t; uv^t - vu^t es una matriz antisimétrica con sus componentes fuera de la diagonal son, por orden, (uxv)3, -(uxv)2, (uxv)1 (donde el número denota la componente del vector); y 2uv^t = (uv^t + vu^t) + (uv^t - vu^t). <br>
-Entonces, el primero de esa suma se obtiene de la propia matriz de la cónica. Para el segundo hay que obtener uxv. Eso se hace sabiendo que (uxv)(uxv)^t es la matriz de la cónica dual. Calculando, la diagonal de esta matriz son los cuadrados de las componentes de uxv. Lo único que queda es calcular el signo. <br>
+Interseca las rectas polares de los puntos dados. <br>
+Parámetros <br>
+p: vector(3) - un punto del triángulo <br>
+q: vector(3) - otro punto del triángulo <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_triangulo_autopolar(p, q, r)</h3>
+<p>
+Determina si P, Q, R forman un triángulo autopolar. <br>
+Implementación <br>
+Comprueba que Q y R pertenezcan a la polar de P. <br>
+Parámetros <br>
+p: vector(3) - primer punto del triángulo autopolar <br>
+q: vector(3) - segundo punto del triángulo autopolar <br>
+r: vector(3) - tercer punto del triángulo autopolar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: referencia_autopolar(p, q, r, real = False)</h3>
+<p>
+Devuelve el punto unidad E para la referencia {P, Q, R; E} que hace que esta cónica tenga ecuación x^2 + y^2 + z^2 = 0 en complejos, quizá algunos negativos en reales. Nótese que no cambia la cónica, sino que se debe obtener primero la matriz del cambio de referencia (ver cambiar_referencia() en espacios.sage) y luego cambiar la referencia de esta cónica. <br>
+NOTA. Los puntos P, Q, R deben formar un triángulo autopolar. <br>
+Implementación <br>
+Con un punto E arbitrario la ecuación de esta cónica es ax^2 + by^2 + cz^2 = 0, donde a, b y c se calculan mediante B(P, P), B(Q, Q), B(R, R), respectivamente (donde B es la forma bilineal asociada a esta cónica). Entonces sólo necesitamos eliminar estos a, b y c. Esto se hace eligiendo los representantes de P, Q y R de forma que E = [beta1 * P + beta2 * Q + beta3 * R], donde a*beta1^2 = 1, b*beta2^2 = 1 y c*beta3^2 = 1 (si a, b o c son 0 se elige betai = 1). <br>
+Para el caso real se igualan a -1 si no se puede resolver la ecuación. <br>
+Parámetros <br>
+p: vector(3) - primer punto del triángulo autopolar <br>
+q: vector(3) - segundo punto del triángulo autopolar <br>
+r: vector(3) - tercer punto del triángulo autopolar <br>
+real: booleano - determina si la cónica debe ser necesariamente real o no (False por defecto) <br>
 </p>
 </div>
 <div class='function'>
