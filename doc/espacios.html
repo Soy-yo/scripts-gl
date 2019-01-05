@@ -21,6 +21,15 @@ final: matriz(n, n+1) - matriz representante del sistema de referencia de destin
 </p>
 </div>
 <div class='function'>
+<h3>Función: referencia_canonica(n)</h3>
+<p>
+Devuelve una matriz representando una referencia canónica con punto unidad la suma de todos ellos. <br>
+Pensado para uasrse al cambiar de referencia. <br>
+Parámetros <br>
+n: entero - dimensión del espacio (la matriz será de (n+1)x(n+2)) <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: matriz_asociada(ref)</h3>
 <p>
 Devuelve la matriz asociada a una referencia dada por una matriz n x n+1. <br>
@@ -71,9 +80,19 @@ Dimensión de este subespacio. </p>
 Ecuaciones paramétricas de este subespacio. </p>
 </div>
 <div class='function'>
+<h3>Función: parametros()</h3>
+<p>
+Devuelve un vector conteniendo los parámetros de la expresión paramétrica de este subespacio. </p>
+</div>
+<div class='function'>
 <h3>Función: implicitas()</h3>
 <p>
 Ecuaciones implícitas de este subespacio. </p>
+</div>
+<div class='function'>
+<h3>Función: variables()</h3>
+<p>
+Devuelve las variables de las ecuaciones implícitas de este subespacio. </p>
 </div>
 <div class='function'>
 <h3>Función: representantes()</h3>

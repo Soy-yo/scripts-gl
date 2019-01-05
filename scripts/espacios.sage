@@ -9,7 +9,7 @@
 
 # Funciones globales
 
-# \f
+#\f
 # Devuelve la matriz del cambio de referencia entre la inicial y la final.
 #
 # Implementación \\
@@ -31,7 +31,18 @@ def cambiar_referencia(inicial, final):
     paso(fin^-1, ini, "=", fin^-1 * ini)
     return fin^-1 * ini
 
-# \f
+#\f
+# Devuelve una matriz representando una referencia canónica con punto unidad la suma de todos ellos.
+#
+# Pensado para uasrse al cambiar de referencia.
+#
+# Parámetros \\
+# n: entero - dimensión del espacio (la matriz será de (n+1)x(n+2))
+#
+def referencia_canonica(n):
+    return identity_matrix(n + 1).insert_row(n + 1, vector([1 for i in range(n + 1)])).T
+
+#\f
 # Devuelve la matriz asociada a una referencia dada por una matriz n x n+1.
 #
 # Implementación \\
@@ -64,7 +75,7 @@ def es_referencia(matriz):
 
 # Clases
 
-# \c
+#\c
 # Clase que representa un subespacio arbitrario en un espacio de dimensión arbitraria.
 # Las dimensiones son determinadas por la dimensión de los puntos dados y por la independencia de los mismos.
 #
@@ -75,7 +86,7 @@ def es_referencia(matriz):
 #
 class subespacio:
 
-    # \i
+    #\i
     # Inicializa los atributos.
     #
     # Implementación \\
@@ -110,55 +121,65 @@ class subespacio:
 
     # Métodos accedentes
 
-    # \m
+    #\m
     # Dimensión del espacio ambiente de este subespacio.
     def dimension_ambiente(self):
         return self._dimension_ambiente
 
-    # \m
+    #\m
     # Dimensión de este subespacio.
     def dim(self):
         return self._dim
 
-    # \m
+    #\m
     # Ecuaciones paramétricas de este subespacio.
     def parametricas(self):
         return self._parametricas
 
-    # \m
+    #\m
+    # Devuelve un vector conteniendo los parámetros de la expresión paramétrica de este subespacio.
+    def parametros(self):
+        return self._params
+
+    #\m
     # Ecuaciones implícitas de este subespacio.
     def implicitas(self):
         return self._implicitas
 
-    # \m
+    #\m
+    # Devuelve las variables de las ecuaciones implícitas de este subespacio.
+    def variables(self):
+        return self._vars;
+
+    #\m
     # Devuelve dim + 1 vectores independientes que pertenecen al subespacio.
     def representantes(self):
         return self._matriz.columns()
 
-    # \m
+    #\m
     # Si este subespacio es un único punto devuelve este punto como objeto vector (equivalente a self.representantes()[0])
     def punto(self):
         assert self.es_punto(), "El subespacio debe ser un unico punto"
         return self.representantes()[0]
 
-    # \m
+    #\m
     # Determina si este subespacio es vacío.
     def es_vacio(self):
         return self._dimension_ambiente == -1
 
-    # \m
+    #\m
     # Determina si este subespacio es un único punto.
     def es_punto(self):
         return self._dim == 0
 
-    # \m
+    #\m
     # Determina si el subespacio coincide con su espacio ambiente.
     def es_total(self):
         return self._dim == self._dimension_ambiente
 
     # Otros métodos
 
-    # \m
+    #\m
     # Devuelve el subespacio dual a este subespacio.
     #
     # Implementación \\
@@ -167,7 +188,7 @@ class subespacio:
     def dual(self):
         return subespacio([self.__vector_dual(ec) for ec in self._implicitas])
 
-    # \m
+    #\m
     # Devuelve V(self, otro).
     #
     # Implementación \\
@@ -181,7 +202,7 @@ class subespacio:
         paso("Para unir creamos un subespacio con los representantes de cada uno: ", [self.representantes(), otro.representantes()])
         return subespacio(self.representantes() + otro.representantes())
 
-    # \m
+    #\m
     # Devuelve self (intersección) otro
     #
     # Implementación \\
@@ -204,7 +225,7 @@ class subespacio:
         res = s.dual()
         return res
 
-    # \m
+    #\m
     # Devuelve las ecuaciones inhomogéneas del subespacio con xn == 1.
     #
     # Implementación \\
@@ -213,7 +234,7 @@ class subespacio:
     def ecuaciones_inhomogeneas(self):
         return [ec.substitute(self._vars[-1] == 1) for ec in self._implicitas]
 
-    # \m
+    #\m
     # Operador in. Determina si un punto está contenido en este subespacio o no.
     #
     # Uso: P in U (P es un punto y U un subespacio).
@@ -232,7 +253,7 @@ class subespacio:
         ecs = [ec.substitute(subs) for ec in self._implicitas]
         return solve(ecs, self._vars.list())
 
-    # \m
+    #\m
     # Operador ==. Determina si dos subespacios son iguales.
     #
     # Uso: U == V (U y V son subespacios).
@@ -252,7 +273,7 @@ class subespacio:
         _no_pasos(False)
         return res
 
-    # \m
+    #\m
     # Operador !=. Determina si dos subespacios son diferentes.
     #
     # Uso: U != V (U y V son subespacios).
@@ -306,7 +327,7 @@ class subespacio:
         ec = []
         for i in range(self._dim + 1, self._dimension_ambiente + 1):
             m = matrix(arr[0 : self._dim + 1] + [arr[i]])
-            ec.append(m.det() == 0)
+            ec.append(m.det().factor().simplify_full() == 0)
             paso("det", m, "= 0 => ", ec[-1])
         return ec
 
@@ -332,6 +353,10 @@ class subespacio:
         return array
 
     def __vector_dual(self, ecuacion):
+        # Nueva implementación: es más clara y creo que da menos lugar a errores
+        v = [ecuacion.lhs().substitute(map(lambda x: x == 0, filter(lambda xj: bool(xj != xi), self._vars)), xi == 1) for xi in self._vars]
+        return vector(v)
+        '''
         temp = []
         # Variable inventada para ecuaciones del tipo a*x_i == 0 que, tras sustituir devuelve un operands() vacío
         var('x_artificial')
@@ -342,6 +367,7 @@ class subespacio:
             else:
                 temp.append(0)
         return vector(temp)
+        '''
 
     def __repr__(self):
         if self.es_vacio():
