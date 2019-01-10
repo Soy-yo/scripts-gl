@@ -32,6 +32,23 @@ d: vector(3) - cuarto punto de la cónica <br>
 e: vector(3) - quinto punto de la cónica <br>
 </p>
 </div>
+<div class='function'>
+<h3>Función: razon_doble_conica(base, p0, p1, p2, p3)</h3>
+<p>
+Calcula la razón doble de 4 puntos sobre una cónica, dado un punto base también perteneciente a la misma. <br>
+Como una cónica queda definida por 5 puntos no es necesario especificar explícitamente la cónica. <br>
+Nótese que la razón doble debería ser la misma sea cual sea el punto base, siempre que se encuentre en la misma cónica y no sea uno de los otros. <br>
+Ver también métodos similares en la clase parametrizacion_conica. <br>
+Implementación <br>
+Calcula la razón doble de las rectas que unen la base con cada uno de los puntos (ver razon_doble (recta_proyectiva.sage)). Los puntos deben ser todos distintos, aunque no se comprueba. <br>
+Parámetros <br>
+base: vector(3) - punto base del haz de rectas con el que se va a calcular la razón doble (debe pertenecer a la cónica) <br>
+p0: vector(3) - primer punto de la razón doble (debe pertenecer a la cónica) <br>
+p1: vector(3) - segundo punto de la razón doble (debe pertenecer a la cónica) <br>
+p2: vector(3) - tercer punto de la razón doble (debe pertenecer a la cónica) <br>
+p3: vector(3) - cuarto punto de la razón doble (debe pertenecer a la cónica) <br>
+</p>
+</div>
 <div class='class'>
 <h2>Clase: conica</h2>
 <p>
@@ -75,6 +92,19 @@ Determina si esta cónica es el producto de dos rectas, esto es, si el rango de 
 Determina si esta cónica es una recta doble, esto es, si el rango de su matriz asociada es 1. </p>
 </div>
 <div class='function'>
+<h3>Función: puntos(x0 = None, y0 = None, z0 = None)</h3>
+<p>
+Devuelve una tupla conteniendo los dos puntos de la cónica dadas dos de sus coordenadas. No se deben dar ni más ni menos. Devolverá dos veces el mismo punto si sólo hay un punto que cumpla esas condiciones. <br>
+Uso: (P, Q) = c.puntos(x0 = x, y0 = y) (donde c es una cónica, x, y son números); similarmente: P = c.puntos(x0 = x, z0 = z), P = c.puntos(y0 = y, z0 = z) <br>
+Implementación <br>
+Resuelve la ecuación de la cónica sustituyendo los valores dados para la variable no dada. <br>
+Parámetros <br>
+x0: complejo - coordenada x del punto que se quiere obtener (si no se especifica será la que se calcule) <br>
+y0: complejo - coordenada y del punto que se quiere obtener (si no se especifica será la que se calcule) <br>
+z0: complejo - coordenada z del punto que se quiere obtener (si no se especifica será la que se calcule) <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: es_tangente(r)</h3>
 <p>
 Determina si la recta dada es tangente a esta cónica. <br>
@@ -88,10 +118,11 @@ r: subespacio - recta a comprobar si es tangente o no <br>
 <h3>Función: cambiar_referencia(matriz_cambio)</h3>
 <p>
 Devuelve una nueva cónica expresada en la nueva referencia (la que sea), dada la matriz del cambio de referencia. <br>
+La matriz del cambio de referencia debería proceder de cambiar_referencia (espacios.sage). <br>
 Implementación <br>
-Si A es la matriz asociada a esta cónica y M la matriz del cambio de referencia entre dos referencias (que esta cónica desconoce), se crea una nueva cónica cuya matriz asociada sea M^t * A * M. <br>
+Si A es la matriz asociada a esta cónica y M la matriz del cambio de referencia entre dos referencias (que esta cónica desconoce), se crea una nueva cónica cuya matriz asociada sea M^-t * A * M^-1. <br>
 Parámetros <br>
-matriz_cambio: matriz(3, 3) - matriz que representa el cambio de referencia <br>
+matriz_cambio: matriz(3, 3) - matriz que representa el cambio de referencia: x' = Ax <br>
 </p>
 </div>
 <div class='function'>
@@ -202,6 +233,83 @@ punto: vector(3) - punto que comprobar si pertenece a la cónica <br>
 </p>
 </div>
 </div>
+</div>
+<div class='class'>
+<h2>Clase: parametrizacion_conica</h2>
+<p>
+Clase que representa una parametrización de una cónica no degenerada de la forma (p1(theta), p2(theta), p3(theta)), siendo pi polinomios de grado 2. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una parametrización de una cónica dadas la matriz M que determina las coordenadas de cada punto, que se obtienen como M * (1, theta, theta^2). M será la matriz que hace que la cónica se exprese como y^2=xz. <br>
+También se puede indicar una matriz de cambio de referencia extra para casos del tipo (por ejemplo) parametrizar una cónica como (1, theta, theta^2). <br>
+Parámetros <br>
+matriz: matriz(3, 3) - matriz que representa los puntos genéricos de la parametrización como se explica arriba <br>
+matriz_cambio: matriz(3, 3) - matriz del cambio de referencia para convertir la referencia en que se encuentra la parametrización a la canónica (identidad por defecto, esto es, ya se expresa en la canónica) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __getitem__(theta)</h3>
+<p>
+Devuelve el punto con coordenada theta. <br>
+Uso: c[theta_0] (theta_0 es la coordenada del punto y c es parametrizacion_conica). <br>
+Si se quiere un punto genérico de la cónica, sustituir por una variable (ej: c[x] devuelve un punto dependiente de x). <br>
+Parámetros <br>
+theta: complejo/Infinity - coordenada del punto de la cónica que se quiere obtener <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: referencia()</h3>
+<p>
+Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica (es decir, las columnas de la matriz del cambio). </p>
+</div>
+<div class='function'>
+<h3>Función: coordenada(p)</h3>
+<p>
+Devuelve la coordenada no homogénea asociada al punto P dado. <br>
+Implementación <br>
+Resuelve la ecuación (p1(theta), p2(theta), p3(theta)) == P. Se asume que el punto está en la cónica. <br>
+Parámetros <br>
+p: vector(3) - punto de la cónica del que se quiere conocer su coordenada <br>
+</p>
+</div>
+</div>
+</div>
+<div class='function'>
+<h3>Función: razon_doble(a, b, c, d)</h3>
+<p>
+Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos de la cónica. <br>
+Implementación <br>
+Una vez obtenida la coordenada de cada punto se utiliza razon_doble_theta (ver recta_proyectiva.sage). <br>
+Parámetros <br>
+a: complejo/Infinity/vector(3) - primer punto de la razón doble <br>
+b: complejo/Infinity/vector(3) - segundo punto de la razón doble <br>
+c: complejo/Infinity/vector(3) - tercer punto de la razón doble <br>
+d: complejo/Infinity/vector(3) - cuarto punto de la razón doble <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_cuaterna_armonica(a, b, c, d)</h3>
+<p>
+Determina si los puntos dados forman una cuaterna armónica, esto es, {A, B; C, D} = -1. Es válido tanto para puntos como para parámetros inhomogéneos de una cónica. <br>
+Parámetros <br>
+a: complejo/Infinity/vector(3) - primer punto de la razón doble <br>
+b: complejo/Infinity/vector(3) - segundo punto de la razón doble <br>
+c: complejo/Infinity/vector(3) - tercer punto de la razón doble <br>
+d: complejo/Infinity/vector(3) - cuarto punto de la razón doble <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: conjugado_armonico(a, b, c)</h3>
+<p>
+Devuelve el conjugado armónico de c respecto de a y b. Es válido tanto para puntos como para parámetros inhomogéneos de una cónica. <br>
+Parámetros <br>
+a: complejo/Infinity/vector(3) - primer punto de la razón doble <br>
+b: complejo/Infinity/vector(3) - segundo punto de la razón doble <br>
+c: complejo/Infinity/vector(3) - tercer punto de la razón doble <br>
+</p>
 </div>
 </body>
 </html>

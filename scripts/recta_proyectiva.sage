@@ -165,7 +165,7 @@ def es_cuaterna_armonica_theta(theta0, theta1, theta2, theta3):
 # Parámetros \\
 # a: complejo/Infinity/vector(n>1) - primer punto de la razón doble \\
 # b: complejo/Infinity/vector(n>1) - segundo punto de la razón doble \\
-# c: complejo/Infinity/vector(n>1) - tercer punto de la razón doble \\
+# c: complejo/Infinity/vector(n>1) - tercer punto de la razón doble
 #
 def conjugado_armonico(a, b, c):
     if es_parametro(a):
@@ -202,7 +202,7 @@ def conjugado_armonico_puntos(p0, p1, p2):
 # theta2: complejo/Infinity - tercer punto de la razón doble
 #
 def conjugado_armonico_theta(theta0, theta1, theta2):
-    theta = var('theta', latex_name = r'theta')
+    theta = var('theta', latex_name = '\\theta')
     paso("Resolvemos {", theta0, ", ", theta1, ", ", theta2, ", ", theta, "} = -1")
     res = solve([es_cuaterna_armonica_theta(theta0, theta1, theta2, theta)], theta)
     # No ha habido solución
@@ -449,7 +449,7 @@ class recta_proyectiva:
     #\m
     # Devuelve el punto con coordenada theta.
     #
-    # Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta(_proyectiva)).
+    # Uso: r[theta_0] (theta_0 es la coordenada del punto y r es una recta_proyectiva).
     #
     # Si se quiere un punto genérico de la recta, sustituir por una variable (ej: r[x] devuelve un punto dependiente de x).
     #

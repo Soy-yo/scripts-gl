@@ -63,6 +63,37 @@ def conica_cinco_puntos(a, b, c, d, e):
     _no_pasos(False)
     return res
 
+#\m
+# Calcula la razón doble de 4 puntos sobre una cónica, dado un punto base también perteneciente a la misma. \\
+# Como una cónica queda definida por 5 puntos no es necesario especificar explícitamente la cónica. \\
+# Nótese que la razón doble debería ser la misma sea cual sea el punto base, siempre que se encuentre en la misma cónica
+# y no sea uno de los otros.
+#
+# Ver también métodos similares en la clase parametrizacion_conica.
+#
+# Implementación \\
+# Calcula la razón doble de las rectas que unen la base con cada uno de los puntos (ver razon_doble (recta_proyectiva.sage)).
+# Los puntos deben ser todos distintos, aunque no se comprueba.
+#
+# Parámetros \\
+# base: vector(3) - punto base del haz de rectas con el que se va a calcular la razón doble (debe pertenecer a la cónica) \\
+# p0: vector(3) - primer punto de la razón doble (debe pertenecer a la cónica) \\
+# p1: vector(3) - segundo punto de la razón doble (debe pertenecer a la cónica) \\
+# p2: vector(3) - tercer punto de la razón doble (debe pertenecer a la cónica) \\
+# p3: vector(3) - cuarto punto de la razón doble (debe pertenecer a la cónica)
+#
+def razon_doble_conica(base, p0, p1, p2, p3):
+    _no_pasos()
+    r0 = subespacio(base, p0).dual().punto()
+    r1 = subespacio(base, p1).dual().punto()
+    r2 = subespacio(base, p2).dual().punto()
+    r3 = subespacio(base, p3).dual().punto()
+    _no_pasos(False)
+    paso("Calculamos las rectas que unen cada uno de los puntos con la base (no se muestra el procedimiento)")
+    paso("Los coeficientes de cada una son: ", r0, ", ", r1, ", ", r2, ", ", r3)
+    paso("Calculamos su razon doble")
+    return razon_doble_puntos(r0, r1, r2, r3)
+
 # Clases
 
 #\c
@@ -121,6 +152,33 @@ class conica:
     # Otros métodos
 
     #\m
+    # Devuelve una tupla conteniendo los dos puntos de la cónica dadas dos de sus coordenadas. No se deben dar ni más ni menos.
+    # Devolverá dos veces el mismo punto si sólo hay un punto que cumpla esas condiciones.
+    #
+    # Uso: (P, Q) = c.puntos(x0 = x, y0 = y) (donde c es una cónica, x, y son números); similarmente:
+    # P = c.puntos(x0 = x, z0 = z), P = c.puntos(y0 = y, z0 = z)
+    #
+    # Implementación \\
+    # Resuelve la ecuación de la cónica sustituyendo los valores dados para la variable no dada.
+    #
+    # Parámetros \\
+    # x0: complejo - coordenada x del punto que se quiere obtener (si no se especifica será la que se calcule) \\
+    # y0: complejo - coordenada y del punto que se quiere obtener (si no se especifica será la que se calcule) \\
+    # z0: complejo - coordenada z del punto que se quiere obtener (si no se especifica será la que se calcule)
+    #
+    def puntos(self, x0 = None, y0 = None, z0 = None):
+        assert len(filter(lambda t: t is None, [x0, y0, z0])) == 1, "Se debe especificar el valor de dos variables exactamente"
+        if x0 is None:
+            sol = map(lambda s: s.rhs(), solve(self.ecuacion().substitute(self._vars[1] == y0, self._vars[2] == z0), self._vars[0]))
+            return (vector([sol[0], y0, z0]), vector([sol[-1], y0, z0]))
+        if y0 is None:
+            sol = map(lambda s: s.rhs(), solve(self.ecuacion().substitute(self._vars[0] == x0, self._vars[2] == z0), self._vars[1]))
+            return (vector([x0, sol[0], z0]), vector([x0, sol[-1], z0]))
+        if z0 is None:
+            sol = map(lambda s: s.rhs(), solve(self.ecuacion().substitute(self._vars[0] == x0, self._vars[1] == y0), self._vars[2]))
+            return (vector([x0, y0, sol[0]]), vector([x0, y0, sol[-1]]))
+
+    #\m
     # Determina si la recta dada es tangente a esta cónica.
     #
     # Implementación \\
@@ -144,18 +202,20 @@ class conica:
     # Devuelve una nueva cónica expresada en la nueva referencia (la que sea), dada la matriz del cambio
     # de referencia.
     #
+    # La matriz del cambio de referencia debería proceder de cambiar_referencia (espacios.sage).
+    #
     # Implementación \\
     # Si A es la matriz asociada a esta cónica y M la matriz del cambio de referencia entre dos referencias
-    # (que esta cónica desconoce), se crea una nueva cónica cuya matriz asociada sea M^t * A * M.
+    # (que esta cónica desconoce), se crea una nueva cónica cuya matriz asociada sea M^-t * A * M^-1.
     #
     # Parámetros \\
-    # matriz_cambio: matriz(3, 3) - matriz que representa el cambio de referencia
+    # matriz_cambio: matriz(3, 3) - matriz que representa el cambio de referencia: x' = Ax
     #
     def cambiar_referencia(self, matriz_cambio):
         assert matriz_cambio.nrows() == 3, "La matriz del cambio de referencia de una cónica es 3x3"
         assert matriz_cambio.det() != 0, "Una matriz de cambio de referencia debe ser invertible"
-        paso("La matriz de la conica en la nueva referencia se calcula:", matriz_cambio.T, self._matriz, matriz_cambio)
-        return conica(matriz_cambio.T * self._matriz * matriz_cambio)
+        paso("La matriz de la conica en la nueva referencia se calcula:", (matriz_cambio.T)^-1, self._matriz, matriz_cambio^-1)
+        return conica((matriz_cambio.T)^-1 * self._matriz * matriz_cambio^-1)
 
     #\m
     # Devuelve la cónica dual (de rectas tangentes) a esta cónica.
@@ -427,3 +487,151 @@ class conica:
 
     def __repr__(self):
         return "<Conica de ecuacion " + str(self.ecuacion()) + ">"
+
+#\c
+# Clase que representa una parametrización de una cónica no degenerada de la forma (p1(theta), p2(theta), p3(theta)),
+# siendo pi polinomios de grado 2.
+#
+class parametrizacion_conica:
+
+    #\i
+    # Construye una parametrización de una cónica dadas la matriz M que determina las coordenadas de cada punto, que se
+    # obtienen como M * (1, theta, theta^2). M será la matriz que hace que la cónica se exprese como y^2=xz.
+    #
+    # También se puede indicar una matriz de cambio de referencia extra para casos del tipo (por ejemplo) parametrizar una
+    # cónica como (1, theta, theta^2).
+    #
+    # Parámetros \\
+    # matriz: matriz(3, 3) - matriz que representa los puntos genéricos de la parametrización como se explica arriba \\
+    # matriz_cambio: matriz(3, 3) - matriz del cambio de referencia para convertir la referencia en que se encuentra la
+    # parametrización a la canónica (identidad por defecto, esto es, ya se expresa en la canónica)
+    #
+    def __init__(self, matriz, matriz_cambio = identity_matrix(3)):
+        assert matriz.dimensions() == (3, 3) and matriz_cambio.dimensions() == (3, 3), \
+            "Las matrices de la parametrizacion y cambio de referencia deben ser 3x3"
+        assert matriz.rank() == 3 and matriz_cambio.rank() == 3, \
+            "Las matrices de la parametrizacion y cambio de referencia deben ser invertibles"
+        self._matriz = matriz
+        self._matriz_cambio = matriz_cambio
+
+    # Métodos accedentes
+
+    #\m
+    # Devuelve el punto con coordenada theta.
+    #
+    # Uso: c[theta_0] (theta_0 es la coordenada del punto y c es parametrizacion_conica).
+    #
+    # Si se quiere un punto genérico de la cónica, sustituir por una variable (ej: c[x] devuelve un punto dependiente de x).
+    #
+    # Parámetros \\
+    # theta: complejo/Infinity - coordenada del punto de la cónica que se quiere obtener
+    #
+    def __getitem__(self, theta):
+        x = vector([1, theta, theta^2]) if not es_infinito(theta) else vector([0, 0, 1])
+        y = self._matriz * x
+        if self._matriz_cambio != identity_matrix(3):
+            paso("En la referencia de la parametrizacion el punto de coordenada: ", theta, " es: ", y)
+            paso("Cambiamos de referencia con la matriz del cambio: ", self._matriz_cambio, "^-1")
+        return self._matriz_cambio^-1 * y
+
+    #\m
+    # Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica
+    # (es decir, las columnas de la matriz del cambio).
+    def referencia(self):
+        return self._matriz_cambio.columns()
+
+    # Otros métodos
+
+    #\m
+    # Devuelve la coordenada no homogénea asociada al punto P dado.
+    #
+    # Implementación \\
+    # Resuelve la ecuación (p1(theta), p2(theta), p3(theta)) == P. Se asume que el punto está en la cónica.
+    #
+    # Parámetros \\
+    # p: vector(3) - punto de la cónica del que se quiere conocer su coordenada
+    #
+    def coordenada(self, p):
+        assert len(p) == 3, "El punto debe ser del plano"
+        t = var('theta', latex_name = '\\theta')
+        l = var('lambda0', latex_name = '\\lambda')
+        x = self._matriz * vector([1, t, t^2])
+        q = self._matriz_cambio^-1 * x
+        lp = l * p
+        paso("Resolvemos: ", matrix([q]).T, " = ", self._matriz_cambio, "^-1", matrix([x]).T, " = ", matrix([lp]).T)
+        sol = solve((q - lp).list(), t, l)
+        paso(sol)
+        # No hay solución
+        if len(sol) == 0:
+            _no_pasos()
+            r = matrix([self[Infinity], p]).rank() == 1
+            _no_pasos(False)
+            assert r, "El punto debe pertenecer a la conica"
+            paso("No habia solucion, pero el punto pertenecia a la conica, luego su coordenada es ", Infinity)
+            return Infinity
+        return sol[0][0].rhs()
+
+    #\f
+    # Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos
+    # de la cónica.
+    #
+    # Implementación \\
+    # Una vez obtenida la coordenada de cada punto se utiliza razon_doble_theta (ver recta_proyectiva.sage).
+    #
+    # Parámetros \\
+    # a: complejo/Infinity/vector(3) - primer punto de la razón doble \\
+    # b: complejo/Infinity/vector(3) - segundo punto de la razón doble \\
+    # c: complejo/Infinity/vector(3) - tercer punto de la razón doble \\
+    # d: complejo/Infinity/vector(3) - cuarto punto de la razón doble
+    #
+    def razon_doble(self, a, b, c, d):
+        if es_parametro(a):
+            assert es_parametro(b) and es_parametro(c) and es_parametro(d), "Todos los puntos deben ser del mismo tipo"
+            return razon_doble_theta(a, b, c, d)
+        _no_pasos()
+        theta0 = self.coordenada(a)
+        theta1 = self.coordenada(b)
+        theta2 = self.coordenada(c)
+        theta3 = self.coordenada(d)
+        _no_pasos(False)
+        paso("Las coordenadas de los puntos son: ", theta0, ", ", theta1, ", ", theta2, ", ", theta3, \
+             ", respectivamente (no se muestra procedimiento)")
+        return razon_doble_theta(theta0, theta1, theta2, theta3)
+
+    #\f
+    # Determina si los puntos dados forman una cuaterna armónica, esto es, {A, B; C, D} = -1. Es válido tanto
+    # para puntos como para parámetros inhomogéneos de una cónica.
+    #
+    # Parámetros \\
+    # a: complejo/Infinity/vector(3) - primer punto de la razón doble \\
+    # b: complejo/Infinity/vector(3) - segundo punto de la razón doble \\
+    # c: complejo/Infinity/vector(3) - tercer punto de la razón doble \\
+    # d: complejo/Infinity/vector(3) - cuarto punto de la razón doble
+    #
+    def es_cuaterna_armonica(self, a, b, c, d):
+        return bool(self.razon_doble(a, b, c, d) == -1)
+
+    #\f
+    # Devuelve el conjugado armónico de c respecto de a y b. Es válido tanto para puntos como para parámetros inhomogéneos
+    # de una cónica.
+    #
+    # Parámetros \\
+    # a: complejo/Infinity/vector(3) - primer punto de la razón doble \\
+    # b: complejo/Infinity/vector(3) - segundo punto de la razón doble \\
+    # c: complejo/Infinity/vector(3) - tercer punto de la razón doble
+    #
+    def conjugado_armonico(self, a, b, c):
+        if es_parametro(a):
+            assert es_parametro(b) and es_parametro(c), "Todos los puntos deben ser del mismo tipo"
+            return conjugado_armonico_theta(a, b, c)
+        _no_pasos()
+        theta0 = self.coordenada(a)
+        theta1 = self.coordenada(b)
+        theta2 = self.coordenada(c)
+        _no_pasos(False)
+        paso("Las coordenadas de los puntos son: ", theta0, ", ", theta1, ", ", theta2, ", respectivamente (no se muestra procedimiento)")
+        return self[conjugado_armonico_theta(theta0, theta1, theta2)]
+
+    def __repr__(self):
+        t = var('theta', latex_name = '\\theta')
+        return "<Conica parametrizada como " + str(self._matriz * vector([1, t, t^2])) + ">"
