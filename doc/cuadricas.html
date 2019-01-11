@@ -117,7 +117,7 @@ r: subespacio - recta a comprobar si es tangente o no <br>
 <div class='function'>
 <h3>Función: cambiar_referencia(matriz_cambio)</h3>
 <p>
-Devuelve una nueva cónica expresada en la nueva referencia (la que sea), dada la matriz del cambio de referencia. <br>
+Devuelve una nueva cónica expresada en la nueva referencia R', dada la matriz del cambio de referencia de R a R'. <br>
 La matriz del cambio de referencia debería proceder de cambiar_referencia (espacios.sage). <br>
 Implementación <br>
 Si A es la matriz asociada a esta cónica y M la matriz del cambio de referencia entre dos referencias (que esta cónica desconoce), se crea una nueva cónica cuya matriz asociada sea M^-t * A * M^-1. <br>
@@ -172,6 +172,16 @@ Calcula el núcleo de la matriz asociada, que será la intersección de las rect
 </p>
 </div>
 <div class='function'>
+<h3>Función: interseccion_recta(r)</h3>
+<p>
+Devuelve una tupla conteniendo los dos puntos de intersección de una recta (expresada como recta_proyectiva) con esta cónica. Si la recta fuera tangente (esto es, corta en un punto doble) devolverá dos veces el mismo punto. <br>
+Implementación <br>
+Tomado un punto genérico de la recta, P(theta), resuelve P^t(theta) * A * P(theta) = 0, siendo A la matriz que representa esta cónica. <br>
+Parámetros <br>
+r: recta_proyectiva(dim=2) - recta con la que intersecar <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: triangulo_autopolar(p, q)</h3>
 <p>
 Devuelve el tercer punto que forma un triángulo autopolar junto con los otros dos dados, asumiendo que cada uno está en la polar del otro. <br>
@@ -208,6 +218,18 @@ p: vector(3) - primer punto del triángulo autopolar <br>
 q: vector(3) - segundo punto del triángulo autopolar <br>
 r: vector(3) - tercer punto del triángulo autopolar <br>
 real: booleano - determina si la cónica debe ser necesariamente real o no (False por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: parametrizar(p, r, e)</h3>
+<p>
+Devuelve una parametrización de la cónica, dados tres puntos contenidos en ella que actuarán como primero, tercero y unidad de la referencia en la que la cónica tiene ecuación y^2=xz. <br>
+Implementación <br>
+Calcula las polares (tangentes por estar en la cónica) de los dos primeros puntos: P, R, para obtener el tercero, que será el corte de ambas rectas: Q. Tomando como referencia entonces {P, Q, R; E}, la ecuación de la cónica sería y^2=xz. Por tanto, se puede parametrizar como (1, theta, theta^2). <br>
+Parámetros <br>
+p: vector(3) - primer punto de la referencia (debe pertenecer a la cóncia) <br>
+r: vector(3) - tercer punto de la referencia (debe pertenecer a la cóncia) <br>
+e: vector(3) - punto unidad de la referencia (debe pertenecer a la cóncia) <br>
 </p>
 </div>
 <div class='function'>
@@ -251,6 +273,13 @@ matriz_cambio: matriz(3, 3) - matriz del cambio de referencia para convertir la 
 </p>
 </div>
 <div class='function'>
+<h3>Función: punto_generico()</h3>
+<p>
+Devuelve un punto genérico de la parametrización expresado en la referencia en que se encuentra la parametrización. <br>
+Diferenciar del operador [] en que c[theta_0] SÍ que cambia la referencia a la referencia original. Este método NO. <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: __getitem__(theta)</h3>
 <p>
 Devuelve el punto con coordenada theta. <br>
@@ -263,16 +292,47 @@ theta: complejo/Infinity - coordenada del punto de la cónica que se quiere obte
 <div class='function'>
 <h3>Función: referencia()</h3>
 <p>
-Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica (es decir, las columnas de la matriz del cambio). </p>
+Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica (es decir, las columnas de la inversa de la matriz del cambio). </p>
+</div>
+<div class='function'>
+<h3>Función: conica()</h3>
+<p>
+Devuelve la cónica que representa esta parametrización. <br>
+Implementación <br>
+Conociendo la matriz que representa la parametrización y la del cambio de referencia (ambas son cambios de referencia al fin y al cabo), la cónica tendrá ecuación y^2=xz, por tanto, hay que cambiar de referencia esa cónica primero por la matriz que representa la parametrización, P, y luego por la del cambio de referencia, M: M^-t * P^-t * A * P^-1 * M^-1 <br>
+</p>
 </div>
 <div class='function'>
 <h3>Función: coordenada(p)</h3>
 <p>
 Devuelve la coordenada no homogénea asociada al punto P dado. <br>
 Implementación <br>
-Resuelve la ecuación (p1(theta), p2(theta), p3(theta)) == P. Se asume que el punto está en la cónica. <br>
+Resuelve la ecuación (p1(theta) : p2(theta) : p3(theta)) == P. Se asume que el punto está en la cónica. <br>
 Parámetros <br>
 p: vector(3) - punto de la cónica del que se quiere conocer su coordenada <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: interseccion_recta(r, original = True)</h3>
+<p>
+Devuelve una tupla conteniendo los dos puntos de intersección de una recta (expresada como subespacio) con esta cónica. Si la recta fuera tangente (esto es, corta en un punto doble) devolverá dos veces el mismo punto. <br>
+La recta puede venir dada tanto para coordenadas en la referencia de la recta como para coordenadas en la referencia original. Esto sólo cambiará el orden del producto. <br>
+Implementación <br>
+Tomado un punto genérico de la cónica, P(theta), lo sustituye en la ecuación implícita de la recta y la resuelve. <br>
+Parámetros <br>
+r: subespacio(dim=1, dim_ambiente=2) - recta con la que intersecar <br>
+original: booleano - determina si se usa la referencia original o no (True por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __contains__(punto)</h3>
+<p>
+Operador in. Determina si un punto está contenido en esta cónica o no. El punto dado debe estar en la referencia inicial. Es decir, si la parametrización es (1 : theta : theta^2), por ejemplo, el punto (1:1:1) no tiene por qué estar contenido en la cónica si la referencia es otra. <br>
+Uso: P in c (P es un punto y c una parametrización de una cónica). <br>
+Implementación <br>
+Comprueba si la ecuación (p1(theta) : p2(theta) : p3(theta)) == P tiene solución. <br>
+Parámetros <br>
+punto: vector(3) - punto que comprobar si pertenece a la cónica <br>
 </p>
 </div>
 </div>

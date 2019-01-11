@@ -24,7 +24,9 @@ class haz_hiperplanos:
         assert d == h2.dimension_ambiente(), "Los hiperplanos deben pertencer al mismo espacio"
         assert d - h1.dim() == 1 and d - h2.dim() == 1, "Los hiperplanos tienen codimension 1"
         self._param = var('lambda0', latex_name = '\\lambda')
+        _no_pasos()
         self._generico = h1.dual().representantes()[0] + lambda0 * h2.dual().representantes()[0]
+        _no_pasos(False)
         self._cero = h1
         self._infinito = h2
 

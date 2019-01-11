@@ -199,8 +199,8 @@ class conica:
         return p in d
 
     #\m
-    # Devuelve una nueva cónica expresada en la nueva referencia (la que sea), dada la matriz del cambio
-    # de referencia.
+    # Devuelve una nueva cónica expresada en la nueva referencia R', dada la matriz del cambio
+    # de referencia de R a R'.
     #
     # La matriz del cambio de referencia debería proceder de cambiar_referencia (espacios.sage).
     #
@@ -303,6 +303,30 @@ class conica:
         return aplicacion_proyectiva(self._matriz).centro()
 
     #\m
+    # Devuelve una tupla conteniendo los dos puntos de intersección de una recta (expresada como recta_proyectiva)
+    # con esta cónica. Si la recta fuera tangente (esto es, corta en un punto doble) devolverá dos veces el mismo punto.
+    #
+    # Implementación \\
+    # Tomado un punto genérico de la recta, P(theta), resuelve P^t(theta) * A * P(theta) = 0, siendo A la matriz que
+    # representa esta cónica.
+    #
+    # Parámetros \\
+    # r: recta_proyectiva(dim=2) - recta con la que intersecar
+    #
+    def interseccion_recta(self, r):
+        assert r.dimension_ambiente() == 2, "La recta debe ser del plano"
+        var('theta', latex_name = '\\theta')
+        p = r[theta]
+        ec = (p * self._matriz * p).expand()
+        # Si queda una ecuación de primer grado es que una solución era infinito
+        sol = [] if ec.degree(theta) == 2 else [theta == Infinity]
+        paso("Resolvemos: ", matrix([p]), self._matriz, matrix([p]).T, " = ", ec, " = 0")
+        sol = sol + solve(ec, theta)
+        paso(sol)
+        paso("Sustituimos en la recta para obtener los dos puntos")
+        return (r[sol[0].rhs()], r[sol[-1].rhs()])
+
+    #\m
     # Devuelve el tercer punto que forma un triángulo autopolar junto con los otros dos dados, asumiendo que cada uno
     # está en la polar del otro.
     #
@@ -383,6 +407,33 @@ class conica:
         beta3 = sqrt(1/abs(c)).simplify_full() if c != 0 else 1
         paso("beta1 = ", beta1, "; beta2 = ", beta2, "; beta3 = ", beta3)
         return beta1 * p + beta2 * q + beta3 * r
+
+    #\m
+    # Devuelve una parametrización de la cónica, dados tres puntos contenidos en ella que actuarán como primero, tercero y unidad de
+    # la referencia en la que la cónica tiene ecuación y^2=xz.
+    #
+    # Implementación \\
+    # Calcula las polares (tangentes por estar en la cónica) de los dos primeros puntos: P, R, para obtener el tercero, que será el corte
+    # de ambas rectas: Q. Tomando como referencia entonces {P, Q, R; E}, la ecuación de la cónica sería y^2=xz. Por tanto, se puede
+    # parametrizar como (1, theta, theta^2).
+    #
+    # Parámetros \\
+    # p: vector(3) - primer punto de la referencia (debe pertenecer a la cóncia) \\
+    # r: vector(3) - tercer punto de la referencia (debe pertenecer a la cóncia) \\
+    # e: vector(3) - punto unidad de la referencia (debe pertenecer a la cóncia)
+    #
+    def parametrizar(self, p, r, e):
+        assert p in self and r in self and e in self, "Los puntos deben pertenecer a la conica"
+        paso("Calculamos las polares de: ", p, " y ", r)
+        polarp = self.polar(p)
+        polarr = self.polar(r)
+        _no_pasos()
+        q = polarp.interseccion(polarr).punto()
+        _no_pasos(False)
+        paso("Intersecamos: ", q)
+        paso("Calculamos la matriz asociada a la referencia  {", p, ", ", q, ", ", r, "; ", e, "} para los cambios de referencia futuros")
+        m = matriz_asociada(matrix([p, q, r, e]).T)
+        return parametrizacion_conica(identity_matrix(3), m)
 
     # ELIMINADO DE MOMENTO PORQUE PARECE NO FUNCIONAR BIEN
     '''
@@ -517,6 +568,15 @@ class parametrizacion_conica:
     # Métodos accedentes
 
     #\m
+    # Devuelve un punto genérico de la parametrización expresado en la referencia en que se encuentra la parametrización.
+    #
+    # Diferenciar del operador [] en que c[theta_0] SÍ que cambia la referencia a la referencia original. Este método NO.
+    #
+    def punto_generico(self):
+        theta = var('theta', latex_name = '\\theta')
+        return self._matriz * vector([1, theta, theta^2])
+
+    #\m
     # Devuelve el punto con coordenada theta.
     #
     # Uso: c[theta_0] (theta_0 es la coordenada del punto y c es parametrizacion_conica).
@@ -527,26 +587,40 @@ class parametrizacion_conica:
     # theta: complejo/Infinity - coordenada del punto de la cónica que se quiere obtener
     #
     def __getitem__(self, theta):
-        x = vector([1, theta, theta^2]) if not es_infinito(theta) else vector([0, 0, 1])
-        y = self._matriz * x
+        y = self.__punto_ref(theta)
         if self._matriz_cambio != identity_matrix(3):
             paso("En la referencia de la parametrizacion el punto de coordenada: ", theta, " es: ", y)
-            paso("Cambiamos de referencia con la matriz del cambio: ", self._matriz_cambio, "^-1")
-        return self._matriz_cambio^-1 * y
+            paso("Cambiamos de referencia con la matriz del cambio: ", self._matriz_cambio)
+        return self._matriz_cambio * y
 
     #\m
     # Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica
-    # (es decir, las columnas de la matriz del cambio).
+    # (es decir, las columnas de la inversa de la matriz del cambio).
     def referencia(self):
-        return self._matriz_cambio.columns()
+        return (self._matriz_cambio^-1).columns()
 
     # Otros métodos
+
+    #\m
+    # Devuelve la cónica que representa esta parametrización.
+    #
+    # Implementación \\
+    # Conociendo la matriz que representa la parametrización y la del cambio de referencia (ambas son cambios de
+    # referencia al fin y al cabo), la cónica tendrá ecuación y^2=xz, por tanto, hay que cambiar de referencia
+    # esa cónica primero por la matriz que representa la parametrización, P, y luego por la del cambio de referencia,
+    # M: M^-t * P^-t * A * P^-1 * M^-1
+    #
+    def conica(self):
+        a = matrix([[0, 0, -1], [0, 2, 0], [-1, 0, 0]])
+        paso("La matriz de la conica que representa esta parametrizacion sera:")
+        paso(self._matriz_cambio, "^-t * ", self._matriz, "^-t * ", a, " * ", self._matriz, "^-1 * ", self._matriz_cambio, "^-1")
+        return conica(self._matriz_cambio.T^-1 * self._matriz.T^-1 * a * self._matriz^-1 * self._matriz_cambio^-1)
 
     #\m
     # Devuelve la coordenada no homogénea asociada al punto P dado.
     #
     # Implementación \\
-    # Resuelve la ecuación (p1(theta), p2(theta), p3(theta)) == P. Se asume que el punto está en la cónica.
+    # Resuelve la ecuación (p1(theta) : p2(theta) : p3(theta)) == P. Se asume que el punto está en la cónica.
     #
     # Parámetros \\
     # p: vector(3) - punto de la cónica del que se quiere conocer su coordenada
@@ -556,9 +630,9 @@ class parametrizacion_conica:
         t = var('theta', latex_name = '\\theta')
         l = var('lambda0', latex_name = '\\lambda')
         x = self._matriz * vector([1, t, t^2])
-        q = self._matriz_cambio^-1 * x
+        q = self._matriz_cambio * x
         lp = l * p
-        paso("Resolvemos: ", matrix([q]).T, " = ", self._matriz_cambio, "^-1", matrix([x]).T, " = ", matrix([lp]).T)
+        paso("Resolvemos: ", matrix([q]).T, " = ", self._matriz_cambio, matrix([x]).T, " = ", matrix([lp]).T)
         sol = solve((q - lp).list(), t, l)
         paso(sol)
         # No hay solución
@@ -570,6 +644,70 @@ class parametrizacion_conica:
             paso("No habia solucion, pero el punto pertenecia a la conica, luego su coordenada es ", Infinity)
             return Infinity
         return sol[0][0].rhs()
+
+    #\m
+    # Devuelve una tupla conteniendo los dos puntos de intersección de una recta (expresada como subespacio)
+    # con esta cónica. Si la recta fuera tangente (esto es, corta en un punto doble) devolverá dos veces el mismo punto.
+    #
+    # La recta puede venir dada tanto para coordenadas en la referencia de la recta como para coordenadas en la referencia
+    # original. Esto sólo cambiará el orden del producto.
+    #
+    # Implementación \\
+    # Tomado un punto genérico de la cónica, P(theta), lo sustituye en la ecuación implícita de la recta y la resuelve.
+    #
+    # Parámetros \\
+    # r: subespacio(dim=1, dim_ambiente=2) - recta con la que intersecar \\
+    # original: booleano - determina si se usa la referencia original o no (True por defecto)
+    #
+    def interseccion_recta(self, r, original = True):
+        assert r.dim() == 1, "El subespacio debe ser una recta"
+        assert r.dimension_ambiente() == 2, "La recta debe ser del plano"
+        theta = var('theta', latex_name = '\\theta')
+        p = self._matriz * vector([1, theta, theta^2])
+        if original:
+            p = self._matriz_cambio * p
+        _no_pasos()
+        v = r.dual().punto()
+        _no_pasos(False)
+        ec = (v * p).expand()
+        paso("Resolvemos: ", ec, " = 0")
+        sol = [] if ec.degree(theta) == 2 else [theta == Infinity]
+        sol = sol + solve(ec, theta)
+        paso(sol)
+        if not original:
+            paso("Los puntos obtenidos han sido: ", self.__punto_ref(sol[0].rhs()), " y ", self.__punto_ref(sol[-1].rhs()))
+            paso("Cambiamos de referencia con la matriz del cambio: ", self._matriz_cambio)
+        res1 = self[sol[0].rhs()] if original else self._matriz_cambio * self.__punto_ref(sol[0].rhs())
+        res2 = self[sol[-1].rhs()] if original else self._matriz_cambio * self.__punto_ref(sol[-1].rhs())
+        return (res1, res2)
+
+    #\m
+    # Operador in. Determina si un punto está contenido en esta cónica o no. El punto dado debe estar en la
+    # referencia inicial. Es decir, si la parametrización es (1 : theta : theta^2), por ejemplo, el punto (1:1:1)
+    # no tiene por qué estar contenido en la cónica si la referencia es otra.
+    #
+    # Uso: P in c (P es un punto y c una parametrización de una cónica).
+    #
+    # Implementación \\
+    # Comprueba si la ecuación (p1(theta) : p2(theta) : p3(theta)) == P tiene solución.
+    #
+    # Parámetros \\
+    # punto: vector(3) - punto que comprobar si pertenece a la cónica
+    #
+    def __contains__(self, punto):
+        assert len(punto) == 3, "El punto debe ser del plano"
+        t = var('theta', latex_name = '\\theta')
+        l = var('lambda0', latex_name = '\\lambda')
+        x = self._matriz_cambio * self._matriz * vector([1, t, t^2])
+        lp = l * punto
+        sol = solve((x - lp).list(), t, l)
+        # No hay solución, pero quizá sea el punto infinito
+        if len(sol) == 0:
+            _no_pasos()
+            r = matrix([self[Infinity], punto]).rank() == 1
+            _no_pasos(False)
+            return r
+        return True
 
     #\f
     # Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos
@@ -632,6 +770,12 @@ class parametrizacion_conica:
         paso("Las coordenadas de los puntos son: ", theta0, ", ", theta1, ", ", theta2, ", respectivamente (no se muestra procedimiento)")
         return self[conjugado_armonico_theta(theta0, theta1, theta2)]
 
+    # Métodos auxiliares
+
+    def __punto_ref(self, theta):
+        x = vector([1, theta, theta^2]) if not es_infinito(theta) else vector([0, 0, 1])
+        return self._matriz * x
+
     def __repr__(self):
         t = var('theta', latex_name = '\\theta')
-        return "<Conica parametrizada como " + str(self._matriz * vector([1, t, t^2])) + ">"
+        return "<Conica parametrizada como " + str(self._matriz * vector([1, t, t^2])) + " en la referencia " + str(self.referencia()) + ">"

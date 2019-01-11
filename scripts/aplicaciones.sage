@@ -185,11 +185,12 @@ class aplicacion_proyectiva:
         #        [solve(((self._matriz - autovalor) * x).list(), vars) for autovalor in autovalores])
 
     #\m
-    # Devuelve una nueva aplicación con los cambios de referencia especificados.
+    # Devuelve una nueva aplicación con los cambios de referencia especificados. Si R1 y R2 son las referencias de cada
+    # uno de los espacios y R1', R2' las nuevas, se pasarán como parámetro las matrices del cambio de R1 a R1' y de R2 a R2'.
     #
     # Implementación \\
-    # REVISAR. Si las matrices son M, P y Q las de esta aplicación, el cambio de coordenadas incial y final, respectivamente,
-    # calcula Q*M*P^-1. Posiblemente esté al revés, esto es lo que hay que revisar.
+    # Si las matrices son M, P y Q las de esta aplicación, el cambio de coordenadas incial y final, respectivamente,
+    # calcula Q*M*P^-1.
     #
     # Parámetros \\
     # cambio_inicial: matriz(m, m) - matriz del cambio de referencia del espacio de salida (por defecto I) \\

@@ -115,9 +115,9 @@ Para cada autovalor lambda resuelve (f - lambda id)X = 0 para X (donde f es esta
 <div class='function'>
 <h3>Función: cambiar_referencias(cambio_inicial = None, cambio_final = None, misma = True)</h3>
 <p>
-Devuelve una nueva aplicación con los cambios de referencia especificados. <br>
+Devuelve una nueva aplicación con los cambios de referencia especificados. Si R1 y R2 son las referencias de cada uno de los espacios y R1', R2' las nuevas, se pasarán como parámetro las matrices del cambio de R1 a R1' y de R2 a R2'. <br>
 Implementación <br>
-REVISAR. Si las matrices son M, P y Q las de esta aplicación, el cambio de coordenadas incial y final, respectivamente, calcula Q*M*P^-1. Posiblemente esté al revés, esto es lo que hay que revisar. <br>
+Si las matrices son M, P y Q las de esta aplicación, el cambio de coordenadas incial y final, respectivamente, calcula Q*M*P^-1. <br>
 Parámetros <br>
 cambio_inicial: matriz(m, m) - matriz del cambio de referencia del espacio de salida (por defecto I) <br>
 cambio_final: matriz(n, n) - matriz del cambio de referencia del espacio de llegada (por defecto I o la misma que la anterior) <br>
