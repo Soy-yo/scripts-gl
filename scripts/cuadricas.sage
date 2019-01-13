@@ -63,7 +63,7 @@ def conica_cinco_puntos(a, b, c, d, e):
     _no_pasos(False)
     return res
 
-#\m
+#\f
 # Calcula la razón doble de 4 puntos sobre una cónica, dado un punto base también perteneciente a la misma. \\
 # Como una cónica queda definida por 5 puntos no es necesario especificar explícitamente la cónica. \\
 # Nótese que la razón doble debería ser la misma sea cual sea el punto base, siempre que se encuentre en la misma cónica
@@ -93,6 +93,138 @@ def razon_doble_conica(base, p0, p1, p2, p3):
     paso("Los coeficientes de cada una son: ", r0, ", ", r1, ", ", r2, ", ", r3)
     paso("Calculamos su razon doble")
     return razon_doble_puntos(r0, r1, r2, r3)
+
+#\f
+# Crea un objeto del tipo homografia_conica dados la parametrización de la cónica y tres puntos y sus imágenes.
+# Es válido tanto para puntos como parámetros inhomogéneos. \\
+# Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría
+# llamar de la siguiente forma: h = crear_homografia_conica(a, ap, b, bp, param = p, involucion = True).
+#
+# Implementación \\
+# Si se dan puntos se obtiene primero su coordenada de la cónica. Una vez obtenidas las coordenadas se crea una nueva
+# homografía de una falsa recta en sí misma (ver crear_homografia_recta_theta() en recta_proyectiva.sage), que se utilizará
+# para calcular la imagen de un parámetro no homogéneo.
+#
+# Parámetros \\
+# a: complejo/Infinity/vector(3) - primer punto a transformar \\
+# ap: complejo/Infinity/vector(3) - imagen del primer punto \\
+# b: complejo/Infinity/vector(3) - segundo punto a transformar \\
+# bp: complejo/Infinity/vector(3) - imagen del segundo punto \\
+# c: complejo/Infinity/vector(3) - tercer punto a transformar (no necesario si se va a crear una involución) \\
+# cp: complejo/Infinity/vector(3) - imagen del tercer punto (no necesario si se va a crear una involución) \\
+# param: parametrizacion_conica - cónica sobre la que actúa la homografía (por defecto (1, theta, theta^2)) \\
+# involucion: booleano - True si se quiere crear una involución, False si no necesariamente (False por defecto)
+#
+def crear_homografia_conica(a, ap, b, bp, c = None, cp = None, param = None, involucion = False):
+    assert c is not None and cp is not None or involucion, "Si no se crea una involucion se deben indicar los terceros puntos"
+    if param is None:
+        param = parametrizacion_conica(identity_matrix(3))
+    if es_parametro(a):
+        assert es_parametro(ap) and es_parametro(b) and es_parametro(bp), "Todos los puntos deben ser del mismo tipo"
+        # Si no es una involución también hay que comprobar el tercer punto
+        if not involucion:
+            assert es_parametro(c) and es_parametro(cp), "Todos los puntos deben ser del mismo tipo"
+        h = crear_homografia_recta_theta(a, ap, b, bp, c, cp, None, involucion)
+        return homografia_conica(h, param)
+    theta0 = param.coordenada(a)
+    theta0p = param.coordenada(ap)
+    theta1 = param.coordenada(b)
+    theta1p = param.coordenada(bp)
+    theta2 = param.coordenada(c) if not involucion else None
+    theta2p = param.coordenada(cp) if not involucion else None
+    paso("Las coordenadas en la recta de los puntos que se van a transformar son:")
+    paso(theta0, " -> ", theta0p)
+    paso(theta1, " -> ", theta1p)
+    if not involucion:
+        paso(theta2, " -> ", theta2p)
+    h = crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2, theta2p, None, involucion)
+    return homografia_conica(h, param)
+
+#\f
+# Crea una homografía de una cónica dados un punto y su imagen y el eje de la homografía (como subespacio).
+# Es válido tanto para puntos como parámetros inhomogéneos.
+#
+# Implementación \\
+# Obtiene los puntos P, Q de corte del eje con la cónica. Estos serán puntos fijos. Así que se crea una homografía que lleve
+# P a P, Q a Q y A a A' (el punto dado). En caso de obtenerse un único punto fijo (el eje era tangente) se calcula la imagen
+# del punto extra B dado hallanda el corte X entre BA' con el eje y de nuevo el corte de la recta AX con la cónica, que será
+# su imagen. Entonces ya tenemos una homografía que transforma P en P, A en A' y B en B'.
+#
+# NOTA. Por simplicidad no se hacen comprobaciones sobre puntos coincidentes, pero se debe asegurar que ninguno de los puntos
+# que se da como parámetros (tanto a, ap, como extra) coincida con la intersección (o entre ellos). En caso contrario es probable
+# encontrarse con resultados extraños o incluso errores.
+#
+# Parámetros \\
+# a: complejo/Infinity/vector(3) - punto a transformar \\
+# ap: complejo/Infinity/vector(3) - imagen del punto \\
+# param: parametrizacion_conica - cónica sobre la que actúa la homografía \\
+# eje: subespacio - eje de la homografía (nótese que se pide un subespacio) \\
+# extra: complejo/Infinity/vector(3) - punto extra de la cónica que se utilizará en caso de que el corte del eje con la cónica
+# sea un único punto (0)
+#
+def crear_homografia_conica_eje(a, ap, param, eje, extra = 0):
+    if es_parametro(a):
+        assert es_parametro(ap), "Todos los puntos deben ser del mismo tipo"
+        _no_pasos()
+        a = param[a]
+        ap = param[ap]
+        _no_pasos(False)
+    (x, y) = param.interseccion_recta(eje)
+    # Distinto punto de corte
+    if x != y:
+        paso("Los puntos de corte del eje con la conica son: ", x, ", ", y, "; son los puntos fijos")
+        paso("Creamos la homografia que ademas transforma: ", a, " -> ", ap)
+        return crear_homografia_conica(a, ap, x, x, y, y, param)
+    # Mismo punto de corte
+    else:
+        _no_pasos()
+        c = param[extra] if es_parametro(extra) else extra
+        _no_pasos(False)
+        paso("El punto de corte del eje con las rectas ha sido unico:", x)
+        paso("Hallamos la imagen del punto extra escogido:", c, ", uniendolo con A':", ap, " y cortando esta recta con el eje")
+        _no_pasos()
+        r = subespacio(c, ap)
+        z = r.interseccion(eje).punto()
+        s = subespacio(a, z)
+        (c1, c2) = param.interseccion_recta(s)
+        # Elegimos el punto que no sea A
+        cp = c2 if matrix([a, c]).rank() == 1 else c1
+        _no_pasos(False)
+        paso("Resumiendo, la recta corta en el eje en: ", z, ", y uniendolo con A corta la conica en: ", cp)
+        return crear_homografia_conica(a, ap, x, x, c, cp, param)
+
+#\f
+# Crea una homografía de una cónica dados un punto y su imagen y los puntos fijos. Es válido tanto para puntos como parámetros inhomogéneos.
+#
+# Implementación \\
+# Utiliza la función crear_homografia_conica_eje calculando primero el eje, que será la recta que une los puntos fijos o la
+# tangente en el caso de un único punto fijo. Si se tienen dos puntos fijos se puede usar directamente la función principal, sin necesidad
+# de calcular el eje.
+#
+# NOTA. Por simplicidad no se hacen comprobaciones sobre puntos coincidentes, pero se debe asegurar que ninguno de los puntos
+# que se da como parámetros (tanto a, ap, como extra) coincida con la intersección (o entre ellos). En caso contrario es probable
+# encontrarse con resultados extraños o incluso errores.
+#
+# Parámetros \\
+# a: complejo/Infinity/vector(3) - punto a transformar \\
+# ap: complejo/Infinity/vector(3) - imagen del punto \\
+# param: parametrizacion_conica - cónica sobre la que actúa la homografía \\
+# m: complejo/Infinity/vector(3) - primer punto fijo \\
+# n: complejo/Infinity/vector(3) - segundo punto fijo (por defecto ninguno) \\
+# extra: complejo/Infinity/vector(3) - punto extra de la cónica que se utilizará si sólo hay un punto fijo (por defecto 0)
+#
+def crear_homografia_conica_fijos(a, ap, param, m, n = None, extra = 0):
+    if es_parametro(m):
+        assert n is None or es_parametro(n), "Todos los puntos deben ser del mismo tipo"
+        _no_pasos()
+        m = param[m]
+        if n is not None:
+            n = param[n]
+        _no_pasos(False)
+    paso("El eje une los puntos fijos o es la tangente a la conica")
+    eje = subespacio(m, n) if n is not None else param.conica().polar(m)
+    paso("El eje tiene ecuacion: ", eje.implicitas()[0])
+    return crear_homografia_conica_eje(a, ap, param, eje, extra)
 
 # Clases
 
@@ -595,9 +727,9 @@ class parametrizacion_conica:
 
     #\m
     # Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica
-    # (es decir, las columnas de la inversa de la matriz del cambio).
+    # (es decir, las columnas de la matriz del cambio).
     def referencia(self):
-        return (self._matriz_cambio^-1).columns()
+        return self._matriz_cambio.columns()
 
     # Otros métodos
 
@@ -779,3 +911,190 @@ class parametrizacion_conica:
     def __repr__(self):
         t = var('theta', latex_name = '\\theta')
         return "<Conica parametrizada como " + str(self._matriz * vector([1, t, t^2])) + " en la referencia " + str(self.referencia()) + ">"
+
+#\c
+# Clase que representa una homografía de una cónica en sí misma.
+#
+# Se representa mediante una falsa homografía de una recta en sí misma, que para lo único que servirá será para aprovechar sus métodos.
+#
+class homografia_conica:
+
+    #\i
+    # Construye una homografía de una cónica dada una homografía de una falsa recta en sí misma y la parametrización de la cónica.
+    #
+    # En general, no se usará este constructor directamente, sino que se creará a partir de funciones creadoras externas.
+    #
+    # Parámetros \\
+    # homografia: homografia_recta - homografía que convierte la coordenada inhomogénea de un punto de la cónica en su imagen \\
+    # param: parametrizacion_conica - conica sobre la que actúa la homografía
+    #
+    def __init__(self, homografia, param):
+        self._homografia = homografia
+        self._conica = param
+
+    # Métodos accedentes
+
+    #\m
+    # Devuelve la matriz asociada a esta homografía.
+    def matriz_asociada(self):
+        return self._homografia.matriz_asociada()
+
+    #\m
+    # Devuelve la parametrización de la cónica de esta homografía.
+    def parametrizacion_conica(self):
+        return self._conica
+
+    #\m
+    # Devuelve la referencia en la que está expresada la cónica.
+    def referencia(self):
+        return self._conica.referencia()
+
+    #\m
+    # Devuelve la homografía expresada como una transformación de Möbius.
+    def expresion_mobius(self):
+        return self._homografia.expresion_mobius()
+
+    #\m
+    # Devuelve la ecuación en theta y theta' de esta homografía.
+    def ecuacion(self):
+        return self._homografia.ecuacion()
+
+    # Otros métodos
+
+    #\m
+    # Calcula la imagen mediante esta homografía del punto dado.
+    #
+    # Uso: h(x) ó h(p) (donde r es una homografia_conica, x un complejo/Infinity y p un punto).
+    #
+    # Implementación \\
+    # Calcula el parámetro no homogéneo asociado a la imagen del punto dado mediante la falsa homografía. \\
+    # Si se ha dado un parámetro devolverá el parámetro y si se ha dado un punto devolverá el punto.
+    #
+    # Parámetros \\
+    # x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen
+    #
+    def __call__(self, x):
+        # Estamos recibiendo un parámetro no homogéneo, simplemente calculamos su imagen
+        if es_parametro(x):
+            return self._homografia(x)
+        # Asumimos que es un vector
+        assert x in self._conica, "El punto debe pertenecer a la cónica"
+        _no_pasos()
+        coord = self._conica.coordenada(x)
+        _no_pasos(False)
+        paso("La coordenada de ", x, " en la conica es: ", coord, ". Calculamos su imagen y recuperamos el punto")
+        return self._conica[self(coord)]
+
+    #\m
+    # Devuelve los parámetros de los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
+    #
+    # Implementación \\
+    # Ver homografia_recta.puntos_fijos_theta() (recta_proyectiva.sage).
+    #
+    def puntos_fijos_theta(self):
+        return self._homografia.puntos_fijos_theta()
+
+    #\m
+    # Devuelve los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad.
+    #
+    # Implementación \\
+    # Ver homografia_recta.puntos_fijos() (recta_proyectiva.sage).
+    #
+    def puntos_fijos(self):
+        fijos = self.puntos_fijos_theta()
+        paso("Las coordenadas de los puntos fijos son: ", fijos)
+        paso("Recuperamos los puntos:")
+        return map(lambda theta: self._conica[theta], fijos)
+
+    #\m
+    # Calcula el eje de esta homografía.
+    #
+    # Implementación \\
+    # Se unen los puntos fijos en caso de haber dos o se obtiene la recta tangente al punto fijo en caso de haber uno.
+    #
+    def eje(self):
+        paso("Calculamos los puntos fijos:")
+        fijos = self.puntos_fijos()
+        assert len(fijos) != 0, "No tiene sentido calcular el eje de la identidad"
+        paso("Los puntos fijos son: ", fijos)
+        if len(fijos) == 2:
+            paso("Los unimos")
+            return subespacio(fijos[0], fijos[1])
+        paso("Tomamos la recta tangente (para ello necesitamos saber la matriz de la conica)")
+        return self._conica.conica().polar(fijos[0])
+
+    #\m
+    # Determina si esta homografía es una involución.
+    #
+    # Implementación \\
+    # Comprueba que la homografía al cuadrado sea la identidad.
+    #
+    def es_involucion(self):
+        h2 = (self._homografia^2).matriz_asociada()
+        paso("Comprobamos que esta homografia al cuadrado sea la identidad: h^2 = ", h2)
+        return h2 / max(max(h2, key = abs), key = abs) == identity_matrix(2)
+
+    #\m
+    # Calcula el módulo de esta homografía. Ver homografia_recta.modulo() (recta_proyectiva.sage).
+    #
+    def modulo(self):
+        return self._homografia.modulo()
+
+    #\m
+    # Calcula el punto centro de esta involución.
+    #
+    # Implementación \\
+    # Calcula el corte de las rectas tangentes de los puntos fijos. Se asume que esta homografía es una involución.
+    #
+    def centro(self):
+        _no_pasos()
+        inv = self.es_involucion()
+        _no_pasos(False)
+        assert inv, "El interes de calcular el centro es para involuciones"
+        _no_pasos()
+        fijos = self.puntos_fijos()
+        _no_pasos(False)
+        paso("Calculamos los puntos fijos: ", fijos, "; y ahora necesitaremos la ecuacion de la conica")
+        c = self._conica.conica()
+        paso(c.ecuacion())
+        paso("Calculamos las tangentes (o polares porque pertenecen a ella) de los puntos a la conica")
+        t1 = c.polar(fijos[0])
+        t2 = c.polar(fijos[1])
+        paso("Intersecamos")
+        return t1.interseccion(t2).punto()
+
+    #\m
+    # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). Ambas deben ser de la misma
+    # cónica, con la misma parametrización.
+    #
+    # Uso: h * k (h y k son homografías de la misma cónica).
+    #
+    # Implementación \\
+    # Crea una nueva homografía de la cónica cuya homografía de la recta asociada sea el producto de la homografía asociada a esta cónica
+    # por la de la otra. Ver operador * (__mul__) de homografia_recta (recta_proyectiva.sage). \\
+    # NOTA. Por simplicidad NO se comprueba que las parametrizaciones sean iguales. En caso contrario, el resultado no será válido
+    # (nótese que se usa la cónica de esta homografía para crear la nueva).
+    #
+    # Parámetros \\
+    # otra: homografia_conica - homografía con la que componer
+    #
+    def __mul__(self, otra):
+        return homografia_conica(self._homografia * otra._homografia, self._conica)
+
+    #\m
+    # Operador ^ (ó **). Devuelve el resultado de componer una homografía con sí misma n veces (^-1 devuelve la inversa).
+    #
+    # Uso h^n (ó h**n) (h es una homografía de una cónica y n un entero).
+    #
+    # Implementación \\
+    # Crea una nueva homografía de la cónica cuya homografía de la recta asociada sea la homografía asociada a esta cónica elevada a n.
+    # Ver operador ^/** (__pow__) de homografia_recta (recta_proyectiva.sage).
+    #
+    # Parámetros \\
+    # n: entero - exponente al que elevar
+    #
+    def __pow__(self, n):
+        return homografia_conica(self._homografia^n, self._conica)
+
+    def __repr__(self):
+        return "<Homografia " + str(self._homografia.ecuacion()) + "de la conica " + str(self._conica) + ">"

@@ -38,7 +38,7 @@ def crear_aplicacion_proyectiva(iniciales, finales, centro = []):
     # Matriz del cambio de referencia a la canónica
     p = matriz_asociada(matrix(iniciales[0 : len(iniciales) - 1] + centro + [iniciales[-1]]).T)
     paso(p)
-    coef = vector([var('alfa' + str(i + 1), latex_name = r'alfa_' + str(i + 1)) for i in range(len(iniciales) - 1)])
+    coef = vector([var('alfa' + str(i + 1), latex_name = '\\alfa_' + str(i + 1)) for i in range(len(iniciales) - 1)])
     ec = (matrix(finales[0 : len(finales) - 1]).T * coef).simplify_full()
     paso("Forzamos [f(e_1 + ... + e_(k-1))] = f(e_k):")
     paso(matrix([ec]).T, "=", matrix([finales[-1]]).T)
@@ -147,7 +147,7 @@ class aplicacion_proyectiva:
     def autovalores(self):
         assert self._matriz.ncols() == self._matriz.nrows(), \
                 "Para calcular autovalores la aplicacion debe ser de un espacio en si mismo"
-        var('lambda0', latex_name = r'lambda')
+        var('lambda0', latex_name = '\\lambda')
         paso("det", self._matriz - lambda0, "=0")
         return map(lambda sol: sol.rhs(), solve((self._matriz - lambda0).det(), lambda0))
 
@@ -171,7 +171,7 @@ class aplicacion_proyectiva:
         _no_pasos()
         autovalores = self.autovalores()
         _no_pasos(False)
-        var('lambda0', latex_name = r'lambda')
+        var('lambda0', latex_name = '\\lambda')
         paso("Resolvemos", self._matriz - lambda0, "*X = 0 para los autovalores:", self.autovalores())
         vars = [var('x' + str(i)) for i in range(self._matriz.ncols())]
         x = vector(vars)

@@ -438,6 +438,17 @@ Se representa mediante una falsa homografía de una recta en sí misma, que para
 </p>
 <div class='methods'>
 <div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una homografía entre dos rectas dadas la homografía de una falsa recta en sí misma y las dos rectas. <br>
+En general, no se usará este constructor directamente, sino que se creará a partir de funciones creadoras externas. <br>
+Parámetros <br>
+homografia: homografia_recta - homografía que convierte la coordenada inhomogénea de un punto de la primera recta en la de su imagen <br>
+recta1: recta_proyectiva - recta origen de la homografía <br>
+recta2: recta_proyectiva - recta destino de la homografía <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: aplicacion()</h3>
 <p>
 Devuelve esta homografía como una aplicacion_proyectiva. Nótese que así dejará de estar restringida a las rectas origen y destino. </p>

@@ -241,7 +241,7 @@ def crear_homografia_recta(a, ap, b, bp, c = None, cp = None, recta = None, invo
         if not involucion:
             assert es_parametro(c) and es_parametro(cp), "Todos los puntos deben ser del mismo tipo"
         return crear_homografia_recta_theta(a, ap, b, bp, c, cp, recta, involucion)
-    assert recta != None, "Si no se especifica la recta se deben usar parametros inhomogeneos"
+    assert recta is not None, "Si no se especifica la recta se deben usar parametros inhomogeneos"
     theta0 = recta.coordenada(a)
     theta0p = recta.coordenada(ap)
     theta1 = recta.coordenada(b)
@@ -280,7 +280,10 @@ def crear_homografia_recta(a, ap, b, bp, c = None, cp = None, recta = None, invo
 #
 def crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2 = None, theta2p = None, recta = None, involucion = False):
     assert theta2 is not None and theta2p is not None or involucion, "Si no se crea una involucion se deben indicar los terceros puntos"
-    var('a b c d')
+    a = var('a_var', latex_name = 'a')
+    b = var('b_var', latex_name = 'b')
+    c = var('c_var', latex_name = 'c')
+    d = var('d_var', latex_name = 'd')
     rhs0 = a / c if es_infinito(theta0) else (a * theta0 + b) / (c * theta0 + d)
     rhs1 = a / c if es_infinito(theta1) else (a * theta1 + b) / (c * theta1 + d)
     if not involucion:
@@ -331,7 +334,7 @@ def crear_homografia_dos_rectas(a, ap, b, bp, c, cp, r_origen, r_destino):
     if es_parametro(a):
         assert es_parametro(ap) and es_parametro(b) and es_parametro(bp) and es_parametro(c) and es_parametro(cp), \
                 "Todos los puntos deben ser del mismo tipo"
-        paso("Creamos una homografia sobre una falsa recta que convierta: ", a, " -> ", ap, ",", b, " -> ", bp, ",", c, " -> ", cp)
+        paso("Creamos una homografia que convierta: ", a, " -> ", ap, ",", b, " -> ", bp, ",", c, " -> ", cp)
         h = crear_homografia_recta_theta(a, ap, b, bp, c, cp)
         return homografia_dos_rectas(h, r_origen, r_destino)
     # No es un parámetro, será un punto
@@ -394,6 +397,8 @@ def crear_homografia_dos_rectas_eje(a, ap, r_origen, r_destino, eje, extra = Non
     else:
         b = x.representantes()[0]
         c = a + b if extra is None else extra
+        if es_parametro(c):
+            c = r_origen[c]
         # Comprobemos que el punto extra no coincide con ninguno de los otros
         paso("El punto de corte del eje con las rectas ha sido unico:", b)
         paso("Hallamos la imagen del punto extra escogido:", c, ", uniendolo con A':", ap, " y cortando esta recta con el eje")
@@ -439,7 +444,7 @@ class recta_proyectiva:
         paso(a, "*", p0, " + ", b, "*", p1, " = ", a * p0 + b * p1, " = ", p2)
         coef = solve((a * p0 + b * p1 - p2).list(), a, b)
         paso(coef[0])
-        self._theta = var('theta', latex_name = r'theta')
+        self._theta = var('theta', latex_name = '\\theta')
         self._infinito = p0
         self._valores = (b * p1 + self._theta * a * p0).substitute(coef[0])
         paso("Sustituimos y combinamos con theta: ", self._valores)
@@ -549,8 +554,8 @@ class homografia_recta:
             _no_pasos(False)
         self._matriz = matriz
         self._recta = recta
-        self._theta1 = var('theta', latex_name = r'theta')
-        self._theta2 = var('theta2', latex_name = r'theta_2')
+        self._theta1 = var('theta', latex_name = '\\theta')
+        self._theta2 = var('theta2', latex_name = '\\theta\'')
         self._expresion_mobius = theta2 == (matriz[0][0] * theta + matriz[0][1]) / (matriz[1][0] * theta + matriz[1][1])
         # Multiplicamos por el denominador y restamos el numerador
         self._expresion = (theta2 * self._expresion_mobius.rhs().denominator() - self._expresion_mobius.rhs().numerator()).expand() == 0
@@ -628,7 +633,7 @@ class homografia_recta:
     #
     def puntos_fijos_theta(self):
         paso("Podemos obtener los puntos fijos directamente de:", self._expresion.substitute(self._theta1 == self._theta2), \
-                ", pero vamos a usar los autovectores porque es más sencillo para el algoritmo")
+                ", pero vamos a usar los autovectores porque es mas sencillo para el algoritmo")
         if self.es_identidad():
             return []
         return map(lambda x: Infinity if x[1] == 0 else x[0] / x[1], self.aplicacion().puntos_fijos())
@@ -675,7 +680,7 @@ class homografia_recta:
     # Calcula el módulo de esta homografía, esto es el cociente de sus autovalores (en cualquier orden).
     #
     def modulo(self):
-        paso("El módulo se calcula mediante el cociente de los autovalores:")
+        paso("El modulo se calcula mediante el cociente de los autovalores:")
         autovalores = self.autovalores()
         paso("Autovalores:", autovalores)
         # Autovalor doble: la división siempre da 1
@@ -830,6 +835,16 @@ class homografia_recta:
 #
 class homografia_dos_rectas:
 
+    #\i
+    # Construye una homografía entre dos rectas dadas la homografía de una falsa recta en sí misma y las dos rectas.
+    #
+    # En general, no se usará este constructor directamente, sino que se creará a partir de funciones creadoras externas.
+    #
+    # Parámetros \\
+    # homografia: homografia_recta - homografía que convierte la coordenada inhomogénea de un punto de la primera recta en la de su imagen \\
+    # recta1: recta_proyectiva - recta origen de la homografía \\
+    # recta2: recta_proyectiva - recta destino de la homografía
+    #
     def __init__(self, homografia, recta1, recta2):
         assert recta1.dimension_ambiente() == recta2.dimension_ambiente(), "Las rectas deben pertenecer al mismo espacio"
         _no_pasos()
@@ -887,7 +902,6 @@ class homografia_dos_rectas:
     # Devuelve la ecuación en theta y theta' de esta homografía.
     def ecuacion(self):
         return self._homografia.ecuacion()
-
 
     # Otros métodos
 
@@ -972,8 +986,11 @@ class homografia_dos_rectas:
     # de intersección y a un parámetro cualquiera.
     #
     def es_perspectividad(self):
-        var('param')
-        return len(solve((self(self._interseccion) - param * self._interseccion).list(), param)) == 1
+        _no_pasos()
+        imagen = self(self._interseccion)
+        _no_pasos()
+        paso("Calculamos h", self._interseccion, " = ", imagen, ", y comprobamos que sea un punto fijo")
+        return matrix([self._interseccion, imagen]).rank() == 1
 
     #\m
     # Calcula el punto centro de esta perspectividad.
@@ -982,7 +999,10 @@ class homografia_dos_rectas:
     # Calcula el corte de las rectas que forman dos pares arbitrarios que no coincidan con la intersección.
     #
     def centro(self):
-        assert self.es_perspectividad(), "El interes de calcular el centro es para perspectividades"
+        _no_pasos()
+        persp = self.es_perspectividad()
+        _no_pasos(False)
+        assert persp, "El interes de calcular el centro es para perspectividades"
         _no_pasos()
         a = self(Infinity)
         b = self(0)

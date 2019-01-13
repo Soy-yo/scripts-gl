@@ -49,6 +49,55 @@ p2: vector(3) - tercer punto de la razón doble (debe pertenecer a la cónica) <
 p3: vector(3) - cuarto punto de la razón doble (debe pertenecer a la cónica) <br>
 </p>
 </div>
+<div class='function'>
+<h3>Función: crear_homografia_conica(a, ap, b, bp, c = None, cp = None, param = None, involucion = False)</h3>
+<p>
+Crea un objeto del tipo homografia_conica dados la parametrización de la cónica y tres puntos y sus imágenes. Es válido tanto para puntos como parámetros inhomogéneos. <br>
+Si se quiere crear una involución dados dos puntos y sus imágenes se pueden omitir los terceros puntos. La función se podría llamar de la siguiente forma: h = crear_homografia_conica(a, ap, b, bp, param = p, involucion = True). <br>
+Implementación <br>
+Si se dan puntos se obtiene primero su coordenada de la cónica. Una vez obtenidas las coordenadas se crea una nueva homografía de una falsa recta en sí misma (ver crear_homografia_recta_theta() en recta_proyectiva.sage), que se utilizará para calcular la imagen de un parámetro no homogéneo. <br>
+Parámetros <br>
+a: complejo/Infinity/vector(3) - primer punto a transformar <br>
+ap: complejo/Infinity/vector(3) - imagen del primer punto <br>
+b: complejo/Infinity/vector(3) - segundo punto a transformar <br>
+bp: complejo/Infinity/vector(3) - imagen del segundo punto <br>
+c: complejo/Infinity/vector(3) - tercer punto a transformar (no necesario si se va a crear una involución) <br>
+cp: complejo/Infinity/vector(3) - imagen del tercer punto (no necesario si se va a crear una involución) <br>
+param: parametrizacion_conica - cónica sobre la que actúa la homografía (por defecto (1, theta, theta^2)) <br>
+involucion: booleano - True si se quiere crear una involución, False si no necesariamente (False por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: crear_homografia_conica_eje(a, ap, param, eje, extra = 0)</h3>
+<p>
+Crea una homografía de una cónica dados un punto y su imagen y el eje de la homografía (como subespacio). Es válido tanto para puntos como parámetros inhomogéneos. <br>
+Implementación <br>
+Obtiene los puntos P, Q de corte del eje con la cónica. Estos serán puntos fijos. Así que se crea una homografía que lleve P a P, Q a Q y A a A' (el punto dado). En caso de obtenerse un único punto fijo (el eje era tangente) se calcula la imagen del punto extra B dado hallanda el corte X entre BA' con el eje y de nuevo el corte de la recta AX con la cónica, que será su imagen. Entonces ya tenemos una homografía que transforma P en P, A en A' y B en B'. <br>
+NOTA. Por simplicidad no se hacen comprobaciones sobre puntos coincidentes, pero se debe asegurar que ninguno de los puntos que se da como parámetros (tanto a, ap, como extra) coincida con la intersección (o entre ellos). En caso contrario es probable encontrarse con resultados extraños o incluso errores. <br>
+Parámetros <br>
+a: complejo/Infinity/vector(3) - punto a transformar <br>
+ap: complejo/Infinity/vector(3) - imagen del punto <br>
+param: parametrizacion_conica - cónica sobre la que actúa la homografía <br>
+eje: subespacio - eje de la homografía (nótese que se pide un subespacio) <br>
+extra: complejo/Infinity/vector(3) - punto extra de la cónica que se utilizará en caso de que el corte del eje con la cónica sea un único punto (0) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: crear_homografia_conica_fijos(a, ap, param, m, n = None, extra = 0)</h3>
+<p>
+Crea una homografía de una cónica dados un punto y su imagen y los puntos fijos. Es válido tanto para puntos como parámetros inhomogéneos. <br>
+Implementación <br>
+Utiliza la función crear_homografia_conica_eje calculando primero el eje, que será la recta que une los puntos fijos o la tangente en el caso de un único punto fijo. Si se tienen dos puntos fijos se puede usar directamente la función principal, sin necesidad de calcular el eje. <br>
+NOTA. Por simplicidad no se hacen comprobaciones sobre puntos coincidentes, pero se debe asegurar que ninguno de los puntos que se da como parámetros (tanto a, ap, como extra) coincida con la intersección (o entre ellos). En caso contrario es probable encontrarse con resultados extraños o incluso errores. <br>
+Parámetros <br>
+a: complejo/Infinity/vector(3) - punto a transformar <br>
+ap: complejo/Infinity/vector(3) - imagen del punto <br>
+param: parametrizacion_conica - cónica sobre la que actúa la homografía <br>
+m: complejo/Infinity/vector(3) - primer punto fijo <br>
+n: complejo/Infinity/vector(3) - segundo punto fijo (por defecto ninguno) <br>
+extra: complejo/Infinity/vector(3) - punto extra de la cónica que se utilizará si sólo hay un punto fijo (por defecto 0) <br>
+</p>
+</div>
 <div class='class'>
 <h2>Clase: conica</h2>
 <p>
@@ -292,7 +341,7 @@ theta: complejo/Infinity - coordenada del punto de la cónica que se quiere obte
 <div class='function'>
 <h3>Función: referencia()</h3>
 <p>
-Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica (es decir, las columnas de la inversa de la matriz del cambio). </p>
+Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica (es decir, las columnas de la matriz del cambio). </p>
 </div>
 <div class='function'>
 <h3>Función: conica()</h3>
@@ -370,6 +419,131 @@ a: complejo/Infinity/vector(3) - primer punto de la razón doble <br>
 b: complejo/Infinity/vector(3) - segundo punto de la razón doble <br>
 c: complejo/Infinity/vector(3) - tercer punto de la razón doble <br>
 </p>
+</div>
+<div class='class'>
+<h2>Clase: homografia_conica</h2>
+<p>
+Clase que representa una homografía de una cónica en sí misma. <br>
+Se representa mediante una falsa homografía de una recta en sí misma, que para lo único que servirá será para aprovechar sus métodos. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una homografía de una cónica dada una homografía de una falsa recta en sí misma y la parametrización de la cónica. <br>
+En general, no se usará este constructor directamente, sino que se creará a partir de funciones creadoras externas. <br>
+Parámetros <br>
+homografia: homografia_recta - homografía que convierte la coordenada inhomogénea de un punto de la cónica en su imagen <br>
+param: parametrizacion_conica - conica sobre la que actúa la homografía <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: matriz_asociada()</h3>
+<p>
+Devuelve la matriz asociada a esta homografía. </p>
+</div>
+<div class='function'>
+<h3>Función: parametrizacion_conica()</h3>
+<p>
+Devuelve la parametrización de la cónica de esta homografía. </p>
+</div>
+<div class='function'>
+<h3>Función: referencia()</h3>
+<p>
+Devuelve la referencia en la que está expresada la cónica. </p>
+</div>
+<div class='function'>
+<h3>Función: expresion_mobius()</h3>
+<p>
+Devuelve la homografía expresada como una transformación de Möbius. </p>
+</div>
+<div class='function'>
+<h3>Función: ecuacion()</h3>
+<p>
+Devuelve la ecuación en theta y theta' de esta homografía. </p>
+</div>
+<div class='function'>
+<h3>Función: __call__(x)</h3>
+<p>
+Calcula la imagen mediante esta homografía del punto dado. <br>
+Uso: h(x) ó h(p) (donde r es una homografia_conica, x un complejo/Infinity y p un punto). <br>
+Implementación <br>
+Calcula el parámetro no homogéneo asociado a la imagen del punto dado mediante la falsa homografía. <br>
+Si se ha dado un parámetro devolverá el parámetro y si se ha dado un punto devolverá el punto. <br>
+Parámetros <br>
+x: complejo/Infinity/vector(n) - punto del que se quiere calcular su imagen <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_fijos_theta()</h3>
+<p>
+Devuelve los parámetros de los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad. <br>
+Implementación <br>
+Ver homografia_recta.puntos_fijos_theta() (recta_proyectiva.sage). <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_fijos()</h3>
+<p>
+Devuelve los puntos fijos de esta homografía. Devuelve una lista vacía en caso de que sea la identidad. <br>
+Implementación <br>
+Ver homografia_recta.puntos_fijos() (recta_proyectiva.sage). <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: eje()</h3>
+<p>
+Calcula el eje de esta homografía. <br>
+Implementación <br>
+Se unen los puntos fijos en caso de haber dos o se obtiene la recta tangente al punto fijo en caso de haber uno. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_involucion()</h3>
+<p>
+Determina si esta homografía es una involución. <br>
+Implementación <br>
+Comprueba que la homografía al cuadrado sea la identidad. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: modulo()</h3>
+<p>
+Calcula el módulo de esta homografía. Ver homografia_recta.modulo() (recta_proyectiva.sage). <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: centro()</h3>
+<p>
+Calcula el punto centro de esta involución. <br>
+Implementación <br>
+Calcula el corte de las rectas tangentes de los puntos fijos. Se asume que esta homografía es una involución. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __mul__(otra)</h3>
+<p>
+Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). Ambas deben ser de la misma cónica, con la misma parametrización. <br>
+Uso: h * k (h y k son homografías de la misma cónica). <br>
+Implementación <br>
+Crea una nueva homografía de la cónica cuya homografía de la recta asociada sea el producto de la homografía asociada a esta cónica por la de la otra. Ver operador * (__mul__) de homografia_recta (recta_proyectiva.sage). <br>
+NOTA. Por simplicidad NO se comprueba que las parametrizaciones sean iguales. En caso contrario, el resultado no será válido (nótese que se usa la cónica de esta homografía para crear la nueva). <br>
+Parámetros <br>
+otra: homografia_conica - homografía con la que componer <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __pow__(n)</h3>
+<p>
+Operador ^ (ó **). Devuelve el resultado de componer una homografía con sí misma n veces (^-1 devuelve la inversa). <br>
+Uso h^n (ó h**n) (h es una homografía de una cónica y n un entero). <br>
+Implementación <br>
+Crea una nueva homografía de la cónica cuya homografía de la recta asociada sea la homografía asociada a esta cónica elevada a n. Ver operador ^/** (__pow__) de homografia_recta (recta_proyectiva.sage). <br>
+Parámetros <br>
+n: entero - exponente al que elevar <br>
+</p>
+</div>
+</div>
 </div>
 </body>
 </html>
