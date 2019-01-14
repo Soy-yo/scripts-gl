@@ -668,6 +668,9 @@ class conica:
         s3 = 1 if m12 == m[1][2] else -1
         return (s1 * s2 * uxv1, s1 * s3 * uxv2, s2 * s3 * uxv3)
 
+    def _tipo(self):
+        return 0
+
     def __repr__(self):
         return "<Conica de ecuacion " + str(self.ecuacion()) + ">"
 
@@ -908,6 +911,9 @@ class parametrizacion_conica:
         x = vector([1, theta, theta^2]) if not es_infinito(theta) else vector([0, 0, 1])
         return self._matriz * x
 
+    def _tipo(self):
+        return 1
+
     def __repr__(self):
         t = var('theta', latex_name = '\\theta')
         return "<Conica parametrizada como " + str(self._matriz * vector([1, t, t^2])) + " en la referencia " + str(self.referencia()) + ">"
@@ -1064,6 +1070,47 @@ class homografia_conica:
         return t1.interseccion(t2).punto()
 
     #\m
+    # Descompone esta homografía en dos involuciones dado el centro de la primera (s2), de forma que h = s2*s1, donde h es esta homografía.
+    # Téngase en cuenta la forma de calcular las imágenes: primero se aplica s1 y luego s2 (s2(s1(x))).
+    #
+    # El centro dado debe encontrarse en el eje de la homografía, porque si no se complica demasiado.
+    #
+    # El resultado se da como una tupla que contiene dos objetos del tipo involucion_conica.
+    #
+    # Implementación \\
+    # Crea una primera involución con el centro dado. Se obtienen sus puntos fijos. Uno de ellos al menos no es fijo en la homografía.
+    # Este punto fijo de la involución se une con una recta con su imagen original y se interseca con el eje de la homografía. Este será
+    # el centro de la segunda homografía (si tenía un solo punto fijo ambas involuciones lo mantienen y si tenía dos ambas involuciones
+    # los intercambian).
+    #
+    # Parámetros \\
+    # centro: vector(3) - punto que actuará como centro de la primera involución (debe pertenecer al eje de la homografía) \\
+    # tipo_conica: booleano - determina si la involución se creará con la parametrización de la cónica o la cónica como tal
+    # (False por defecto; no se mostrará procedimiento de la transformación igualmente)
+    #
+    def descomponer(self, centro, tipo_conica = False):
+        paso("Necesitaremos ele eje, lo calculamos:")
+        eje = self.eje()
+        assert centro in eje, "El centro dado para descomponer en involuciones debe pertenecer al eje"
+        _no_pasos()
+        c = self._conica if not tipo_conica else self._conica.conica()
+        _no_pasos(False)
+        s1 = involucion_conica(c, centro)
+        paso("Obtenemos los puntos fijos de la involucion dada por el centro: ", centro, "; y nos quedamos con uno que no coincida con el de esta")
+        (m, n) = s1.puntos_fijos()
+        _no_pasos()
+        fijos = self.puntos_fijos()
+        # Si la homografía tiene dos fijos distintos cogemos cualquiera; si no, el que sea distinto
+        x = m if len(fijos) == 2 or matrix([m, fijos[0]]).rank() == 2 else n
+        hx = self(x)
+        _no_pasos(False)
+        paso("Calculamos la imagen a traves de esta homografia del punto fijo de la involucion elegido: h", x, " = ", hx)
+        paso("Los unimos e intersecamos con el eje para obtener el otro centro:")
+        v = subespacio(x, hx).interseccion(eje).punto()
+        s2 = involucion_conica(c, v)
+        return (s1, s2)
+
+    #\m
     # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). Ambas deben ser de la misma
     # cónica, con la misma parametrización.
     #
@@ -1098,3 +1145,129 @@ class homografia_conica:
 
     def __repr__(self):
         return "<Homografia " + str(self._homografia.ecuacion()) + "de la conica " + str(self._conica) + ">"
+
+#\c
+# Clase que define una involución sobre una cónica, conocido alguno de sus elementos.
+#
+class involucion_conica:
+
+    #\i
+    # Construye una involución sabiendo la cónica al menos unos de sus elementos: vértice, puntos fijos o eje.
+    #
+    # Nótese que si se da una cónica y el eje, este debe ser del tipo recta_proyectiva y si se da una parametrización de la cónica
+    # el eje debe ser un subespacio.
+    #
+    # En caso de dar más información de la necesaria, sólo se hará caso al parámetro que aparezca antes. \\
+    # Por ejemplo involucion_conica(c, v, e) ignorará el eje y sólo se quedará con el vértice; o
+    # involucion_conica(c, eje = e, fijos = (m, n)) ignorará los puntos fijos.
+    #
+    # Implementación \\
+    # Si no se da el vértice se calcula como el polo del eje: la recta que une los puntos fijos.
+    #
+    # Parámetros \\
+    # conica: conica/parametrizacion_conica - cónica sobre la que actúa la involución \\
+    # vertice: vector(3) - vértice de la involución (por defecto el cálculo que se explica más arriba) \\
+    # eje: recta_proyectiva(dim=2)/subespacio(dim=1,dim_ambiente=2) - eje de la involución (por defecto no se determina) \\
+    # fijos: tupla(vector(3), vector(3)) - puntos fijos de la involución, ambos puntos de la cónica (por defecto no se determinan)
+    #
+    def __init__(self, conica, vertice = None, fijos = None, eje = None):
+        assert vertice is not None or fijos is not None or eje is not None, "Se debe indicar alguna informacion para crear una involucion"
+        self._es_conica = conica._tipo() == 0
+        self._conica = conica
+        if vertice is not None:
+            self._vertice = vertice
+            self._fijos = None
+            self._eje = None
+        else:
+            if not self._es_conica:
+                paso("Necesitaremos la conica sin parametrizar para lo siguiente:")
+            c = conica if self._es_conica else conica.conica()
+            if eje is not None:
+                self._eje = eje
+                self._fijos = None
+            else:
+                self._eje = None
+                self._fijos = fijos
+                paso("El vertice se calcula como el polo del eje:")
+                e = subespacio(fijos[0], fijos[1])
+                self._vertice = c.polo(e)
+                paso("El vertice es: ", self._vertice)
+
+    # Métodos accedentes
+
+    #\m
+    # Devuelve la cónica sobre la que se aplica esta involución. Puede ser de tipo conica o parametrizacion_conica.
+    def conica(self):
+        return self._conica
+
+    #\m
+    # Devuelve el vértice de esta involución.
+    def vertice(self):
+        return self._vertice
+
+    # Otros métodos
+
+    #\m
+    # Devuelve el eje de esta involución.
+    #
+    # Implementación \\
+    # Si se conocía en el momento de la creación simplemente lo devuelve. \\
+    # Si no, calcula la polar del vértice.
+    #
+    def eje(self):
+        if self._eje is not None:
+            return self._eje
+        paso("El eje es simplemente la polar del vertice")
+        if self._es_conica:
+            return self._conica.polar(self._vertice)
+        paso("Recuperamos la conica sin parametrizar")
+        return self._conica.conica().polar(self._vertice)
+
+    #\m
+    # Devuelve los dos puntos fijos de esta involución.
+    #
+    # Implementación \\
+    # Si se conocían en el momento de la creación simplemente los devuelve. \\
+    # Si no, calcula la intersección del eje con la cónica.
+    #
+    def puntos_fijos(self):
+        if self._fijos is not None:
+            return self._fijos
+        paso("Los puntos fijos son la interseccion del eje con la conica")
+        eje = self.eje()
+        if self._es_conica:
+            rep = eje.representantes()
+            _no_pasos()
+            r = recta_proyectiva(rep[0], rep[1])
+            _no_pasos(False)
+            theta = var('theta_var', latex_name = '\\theta')
+            paso("Obtenemos una parametrizacion de la recta con: ", rep, "; ", r[theta])
+            return self._conica.interseccion_recta(r)
+        return self._conica.interseccion_recta(eje)
+
+    #\m
+    # Calcula la imagen mediante esta involución del punto dado. Si se tiene una parametrización de la cónica se puede
+    # dar la coordenada no homogénea del punto.
+    #
+    # Uso: h(x) (donde h es una involución y x un punto de la cónica).
+    #
+    # Implementación \\
+    # Calcula V(V, x) como subespacio o recta_proyectiva dependiendo de cómo sea haya dado la cónica y lo interseca con
+    # esta. Se devuelve el otro punto de intersección.
+    #
+    # Parámetros \\
+    # x: complejo/Infinity/vector(3) - punto de la cónica que se quiere calcular su imagen
+    #
+    def __call__(self, x):
+        if es_parametro(x):
+            assert not self._es_conica, "Solo se puede dar un parametro para calcular la imagen si la conica esta parametrizada"
+            x = self._conica[x]
+        else:
+            assert x in self._conica, "El punto debe pertenecer a la conica"
+        paso("Montamos la recta que pasa por el vertice y el punto dado para luego intersecar con la conica")
+        r = recta_proyectiva(self._vertice, x) if self._es_conica else subespacio(self._vertice, x)
+        (p, q) = self._conica.interseccion_recta(r)
+        return p if matrix([p, x]).rank() == 2 else q
+
+    def __repr__(self):
+        return "<Involucion con vertice " + str(self._vertice) + " sobre la conica " + str(self._conica) + ">"

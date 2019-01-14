@@ -521,6 +521,19 @@ Calcula el corte de las rectas tangentes de los puntos fijos. Se asume que esta 
 </p>
 </div>
 <div class='function'>
+<h3>Función: descomponer(centro, tipo_conica = False)</h3>
+<p>
+Descompone esta homografía en dos involuciones dado el centro de la primera (s2), de forma que h = s2*s1, donde h es esta homografía. Téngase en cuenta la forma de calcular las imágenes: primero se aplica s1 y luego s2 (s2(s1(x))). <br>
+El centro dado debe encontrarse en el eje de la homografía, porque si no se complica demasiado. <br>
+El resultado se da como una tupla que contiene dos objetos del tipo involucion_conica. <br>
+Implementación <br>
+Crea una primera involución con el centro dado. Se obtienen sus puntos fijos. Uno de ellos al menos no es fijo en la homografía. Este punto fijo de la involución se une con una recta con su imagen original y se interseca con el eje de la homografía. Este será el centro de la segunda homografía (si tenía un solo punto fijo ambas involuciones lo mantienen y si tenía dos ambas involuciones los intercambian). <br>
+Parámetros <br>
+centro: vector(3) - punto que actuará como centro de la primera involución (debe pertenecer al eje de la homografía) <br>
+tipo_conica: booleano - determina si la involución se creará con la parametrización de la cónica o la cónica como tal (False por defecto; no se mostrará procedimiento de la transformación igualmente) <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: __mul__(otra)</h3>
 <p>
 Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). Ambas deben ser de la misma cónica, con la misma parametrización. <br>
@@ -541,6 +554,69 @@ Implementación <br>
 Crea una nueva homografía de la cónica cuya homografía de la recta asociada sea la homografía asociada a esta cónica elevada a n. Ver operador ^/** (__pow__) de homografia_recta (recta_proyectiva.sage). <br>
 Parámetros <br>
 n: entero - exponente al que elevar <br>
+</p>
+</div>
+</div>
+</div>
+<div class='class'>
+<h2>Clase: involucion_conica</h2>
+<p>
+Clase que define una involución sobre una cónica, conocido alguno de sus elementos. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye una involución sabiendo la cónica al menos unos de sus elementos: vértice, puntos fijos o eje. <br>
+Nótese que si se da una cónica y el eje, este debe ser del tipo recta_proyectiva y si se da una parametrización de la cónica el eje debe ser un subespacio. <br>
+En caso de dar más información de la necesaria, sólo se hará caso al parámetro que aparezca antes. <br>
+Por ejemplo involucion_conica(c, v, e) ignorará el eje y sólo se quedará con el vértice; o involucion_conica(c, eje = e, fijos = (m, n)) ignorará los puntos fijos. <br>
+Implementación <br>
+Si no se da el vértice se calcula como el polo del eje: la recta que une los puntos fijos. <br>
+Parámetros <br>
+conica: conica/parametrizacion_conica - cónica sobre la que actúa la involución <br>
+vertice: vector(3) - vértice de la involución (por defecto el cálculo que se explica más arriba) <br>
+eje: recta_proyectiva(dim=2)/subespacio(dim=1,dim_ambiente=2) - eje de la involución (por defecto no se determina) <br>
+fijos: tupla(vector(3), vector(3)) - puntos fijos de la involución, ambos puntos de la cónica (por defecto no se determinan) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: conica()</h3>
+<p>
+Devuelve la cónica sobre la que se aplica esta involución. Puede ser de tipo conica o parametrizacion_conica. </p>
+</div>
+<div class='function'>
+<h3>Función: vertice()</h3>
+<p>
+Devuelve el vértice de esta involución. </p>
+</div>
+<div class='function'>
+<h3>Función: eje()</h3>
+<p>
+Devuelve el eje de esta involución. <br>
+Implementación <br>
+Si se conocía en el momento de la creación simplemente lo devuelve. <br>
+Si no, calcula la polar del vértice. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_fijos()</h3>
+<p>
+Devuelve los dos puntos fijos de esta involución. <br>
+Implementación <br>
+Si se conocían en el momento de la creación simplemente los devuelve. <br>
+Si no, calcula la intersección del eje con la cónica. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __call__(x)</h3>
+<p>
+Calcula la imagen mediante esta involución del punto dado. Si se tiene una parametrización de la cónica se puede dar la coordenada no homogénea del punto. <br>
+Uso: h(x) (donde h es una involución y x un punto de la cónica). <br>
+Implementación <br>
+Calcula V(V, x) como subespacio o recta_proyectiva dependiendo de cómo sea haya dado la cónica y lo interseca con esta. Se devuelve el otro punto de intersección. <br>
+Parámetros <br>
+x: complejo/Infinity/vector(3) - punto de la cónica que se quiere calcular su imagen <br>
 </p>
 </div>
 </div>
