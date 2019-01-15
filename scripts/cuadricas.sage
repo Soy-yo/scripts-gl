@@ -450,13 +450,44 @@ class conica:
         var('theta', latex_name = '\\theta')
         p = r[theta]
         ec = (p * self._matriz * p).expand()
-        # Si queda una ecuación de primer grado es que una solución era infinito
+        assert ec != 0, "La recta con la que se intenta intersecar esta contenida en la conica"
+        # Si queda una ecuación de primer grado o grado cero es que una solución era infinito
         sol = [] if ec.degree(theta) == 2 else [theta == Infinity]
         paso("Resolvemos: ", matrix([p]), self._matriz, matrix([p]).T, " = ", ec, " = 0")
         sol = sol + solve(ec, theta)
         paso(sol)
         paso("Sustituimos en la recta para obtener los dos puntos")
         return (r[sol[0].rhs()], r[sol[-1].rhs()])
+
+    #\m
+    # Devuelve una tupla con los cuatro puntos de intersección de esta cónica con otra cónica, dada su parametrización.
+    #
+    # NOTA. No será posible intersecar cónicas ambas degeneradas, pues ninguna se podría parametrizar. En tal caso,
+    # es recomendable buscar las rectas que forman alguna de ellas e intersecar con las rectas.
+    #
+    # Implementación \\
+    # Resuelve la ecuación c^t(theta) * A * c(theta), donde c es la parametrización de la otra cónica y A es la matriz
+    # de esta.
+    #
+    # Parámetros \\
+    # param: parametrizacion_conica - parametrización de la cónica con la que intersecar
+    #
+    def interseccion_conica(self, param):
+        theta = var('theta_var', latex_name = '\\theta')
+        _no_pasos()
+        c = param[theta]
+        _no_pasos(False)
+        ec = (c * self._matriz * c).expand()
+        paso("Resolvemos: ", matrix([c]), self._matriz, matrix([c]).T, " = ", ec, " = 0")
+        assert ec != 0, "La conica con la que se intenta intersecar esta contenida en la conica"
+        # Por cada término que falte hay una solución que es infinito
+        inf = [theta == Infinity for i in range(4, ec.degree(theta), -1)]
+        # Resolvemos con multiplicidad
+        (res, mult) = solve(ec, theta, multiplicities = True)
+        # Ponemos todo junto
+        sol = inf + flatten([[res[i]] * mult[i] for i in range(len(res))])
+        paso(sol)
+        return tuple(map(lambda t: param[t.rhs()], sol))
 
     #\m
     # Devuelve el tercer punto que forma un triángulo autopolar junto con los otros dos dados, asumiendo que cada uno
@@ -555,6 +586,7 @@ class conica:
     # e: vector(3) - punto unidad de la referencia (debe pertenecer a la cóncia)
     #
     def parametrizar(self, p, r, e):
+        assert not self.es_degenerada(), "No se pueden parametrizar conicas degeneradas"
         assert p in self and r in self and e in self, "Los puntos deben pertenecer a la conica"
         paso("Calculamos las polares de: ", p, " y ", r)
         polarp = self.polar(p)
@@ -806,6 +838,7 @@ class parametrizacion_conica:
         _no_pasos(False)
         ec = (v * p).expand()
         paso("Resolvemos: ", ec, " = 0")
+        assert ec != 0, "La recta con la que se intenta intersecar esta contenida en la conica"
         sol = [] if ec.degree(theta) == 2 else [theta == Infinity]
         sol = sol + solve(ec, theta)
         paso(sol)

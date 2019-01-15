@@ -64,6 +64,7 @@ p: vector(n) - punto por el que pasa el hiperplano del haz <br>
 <h2>Clase: haz_conicas</h2>
 <p>
 Clase que representa un haz de cónicas (puntutales o duales). <br>
+NOTA. No se implementa el método para obtener la base porque requeriría que una de las cónicas estuviera parametrizada. Si se quiere obtener la base deberá hacerse la intersección de dos cónicas representantes del haz a mano, eligiendo la parametrización de una de ellas. <br>
 </p>
 <div class='methods'>
 <div class='function'>
@@ -95,16 +96,10 @@ x: complejo/Infinity - coordenada de la cónica que se quiere obtener <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: base()</h3>
-<p>
-NO IMPLEMENTADO AÚN. <br>
-Devuelve los puntos base del haz, esto es, los puntos por los que pasan todas las cónicas. <br>
-</p>
-</div>
-<div class='function'>
 <h3>Función: forzar_punto(p)</h3>
 <p>
 Devuelve la cónica del haz que pasa por el punto dado. <br>
+NOTA. No se comprueba que el punto no esté en la base, pero se debe evitar para no obtener resultados inesperados. <br>
 Implementación <br>
 Resuelve la ecuación p^t * H(lambda) * p = 0, donde H es la matriz representante del haz. <br>
 Parámetros <br>

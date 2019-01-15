@@ -102,6 +102,10 @@ class haz_hiperplanos:
 #\c
 # Clase que representa un haz de cónicas (puntutales o duales).
 #
+# NOTA. No se implementa el método para obtener la base porque requeriría que una de las cónicas estuviera
+# parametrizada. Si se quiere obtener la base deberá hacerse la intersección de dos cónicas representantes del haz
+# a mano, eligiendo la parametrización de una de ellas.
+#
 class haz_conicas:
 
     #\i
@@ -146,16 +150,20 @@ class haz_conicas:
 
     # Otros métodos
 
-    #\m
-    # NO IMPLEMENTADO AÚN.
     #
-    # Devuelve los puntos base del haz, esto es, los puntos por los que pasan todas las cónicas.
+    # Devuelve una tupla conteniendo los cuatro puntos base del haz, esto es, los puntos por los que pasan todas las cónicas.
     #
-    def base(self):
-        return []
+    # Implementación \\
+    # Se obtiene una parametrización de una de las cónicas y se interseca con la otra directamente (ver conica.interseccion_conica
+    # (cuadricas.sage)).
+    #
+    #def base(self):
+    #    return []
 
     #\m
     # Devuelve la cónica del haz que pasa por el punto dado.
+    #
+    # NOTA. No se comprueba que el punto no esté en la base, pero se debe evitar para no obtener resultados inesperados.
     #
     # Implementación \\
     # Resuelve la ecuación p^t * H(lambda) * p = 0, donde H es la matriz representante del haz.
@@ -164,10 +172,10 @@ class haz_conicas:
     # p: vector(3) - punto por el que pasa la cónica del haz
     #
     def forzar_punto(self, p):
-        _no_pasos()
-        base = self.base()
-        _no_pasos(False)
-        assert p not in base, "No se puede forzar que la conica pase por un punto base, pues todas pasan por ellos"
+        #_no_pasos()
+        #base = self.base()
+        #_no_pasos(False)
+        #assert all([matrix([p, x]).rank() == 2 for x in base]), "No se puede forzar que la conica pase por un punto base, pues todas pasan por ellos"
         ec = p * self._matriz * p
         paso("Resolvemos:", matrix([p]), self._matriz, matrix([p]).T, " = ", ec, " = 0")
         # Resolvemos y nos quedamos con el resultado para sustituir

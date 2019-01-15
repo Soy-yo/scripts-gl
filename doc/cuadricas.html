@@ -231,6 +231,17 @@ r: recta_proyectiva(dim=2) - recta con la que intersecar <br>
 </p>
 </div>
 <div class='function'>
+<h3>Función: interseccion_conica(param)</h3>
+<p>
+Devuelve una tupla con los cuatro puntos de intersección de esta cónica con otra cónica, dada su parametrización. <br>
+NOTA. No será posible intersecar cónicas ambas degeneradas, pues ninguna se podría parametrizar. En tal caso, es recomendable buscar las rectas que forman alguna de ellas e intersecar con las rectas. <br>
+Implementación <br>
+Resuelve la ecuación c^t(theta) * A * c(theta), donde c es la parametrización de la otra cónica y A es la matriz de esta. <br>
+Parámetros <br>
+param: parametrizacion_conica - parametrización de la cónica con la que intersecar <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: triangulo_autopolar(p, q)</h3>
 <p>
 Devuelve el tercer punto que forma un triángulo autopolar junto con los otros dos dados, asumiendo que cada uno está en la polar del otro. <br>
