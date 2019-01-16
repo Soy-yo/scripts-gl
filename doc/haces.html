@@ -20,7 +20,8 @@ Clase que representa un haz de hiperplanos (puntutales o duales). <br>
 Crea un haz de hiperplanos dados dos hiperplanos representantes del haz. Será h1 + lambda * h2. <br>
 Parámetros <br>
 h1: subespacio - primer hiperplano representante del haz <br>
-h2: subespacio - segundo hiperplano representante del haz </p>
+h2: subespacio - segundo hiperplano representante del haz <br>
+</p>
 </div>
 <div class='function'>
 <h3>Función: ecuacion()</h3>
@@ -31,6 +32,11 @@ Devuelve la ecuación de este haz de hiperplanos. Nótese que puede quedar un de
 <h3>Función: dimension_ambiente()</h3>
 <p>
 Devuelve la dimensión del espacio en que se encuentra este haz. </p>
+</div>
+<div class='function'>
+<h3>Función: parametro()</h3>
+<p>
+Devuelve la variable simbólica que utilzia este haz como parámetro. </p>
 </div>
 <div class='function'>
 <h3>Función: __getitem__(x)</h3>
@@ -84,6 +90,11 @@ Devuelve la matriz asociada a este haz de cónicas. </p>
 <h3>Función: ecuacion()</h3>
 <p>
 Devuelve la ecuación de este haz de cónicas. </p>
+</div>
+<div class='function'>
+<h3>Función: variables()</h3>
+<p>
+Devuelve el vector de variables simbólicas que utiliza este haz para su representación. </p>
 </div>
 <div class='function'>
 <h3>Función: __getitem__(x)</h3>

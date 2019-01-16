@@ -7,7 +7,6 @@
 
 # Clases
 
-
 #\c
 # Clase que representa un haz de hiperplanos (puntutales o duales).
 #
@@ -19,13 +18,14 @@ class haz_hiperplanos:
     # Parámetros \\
     # h1: subespacio - primer hiperplano representante del haz \\
     # h2: subespacio - segundo hiperplano representante del haz
+    #
     def __init__(self, h1, h2):
         d = h1.dimension_ambiente()
         assert d == h2.dimension_ambiente(), "Los hiperplanos deben pertencer al mismo espacio"
         assert d - h1.dim() == 1 and d - h2.dim() == 1, "Los hiperplanos tienen codimension 1"
-        self._param = var('lambda0', latex_name = '\\lambda')
+        self._param = var('lambda_var', latex_name = '\\lambda')
         _no_pasos()
-        self._generico = h1.dual().representantes()[0] + lambda0 * h2.dual().representantes()[0]
+        self._generico = h1.dual().punto() + self._param * h2.dual().punto()
         _no_pasos(False)
         self._cero = h1
         self._infinito = h2
@@ -44,6 +44,11 @@ class haz_hiperplanos:
     # Devuelve la dimensión del espacio en que se encuentra este haz.
     def dimension_ambiente(self):
         return self._cero.dimension_ambiente()
+
+    #\m
+    # Devuelve la variable simbólica que utilzia este haz como parámetro.
+    def parametro(self):
+        return self._param
 
     #\m
     # Devuelve el hiperplano para la coordenada dada.
@@ -115,9 +120,10 @@ class haz_conicas:
     # c1: cónica - primera cónica representante del haz \\
     # c2: cónica - segunda cónica representante del haz
     def __init__(self, c1, c2):
-        self._param = var('lambda0', latex_name = '\\lambda')
+        self._param = var('lambda_var', latex_name = '\\lambda')
         self._matriz = c1.matriz_asociada() + self._param * c2.matriz_asociada()
-        self._vars = vector(var('x y z'))
+        variables = (var('x_var', latex_name = 'x'), var('y_var', latex_name = 'y'), var('z_var', latex_name = 'z'))
+        self._vars = vector(variables)
         self._ecuacion = (self._vars * self._matriz * self._vars).factor()
         self._infinito = c2
 
@@ -132,6 +138,11 @@ class haz_conicas:
     # Devuelve la ecuación de este haz de cónicas.
     def ecuacion(self):
         return self._ecuacion == 0
+
+    #\m
+    # Devuelve el vector de variables simbólicas que utiliza este haz para su representación.
+    def variables(self):
+        return self._vars
 
     #\m
     # Devuelve la cónica para la coordenada dada.

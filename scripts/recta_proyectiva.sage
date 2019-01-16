@@ -202,7 +202,7 @@ def conjugado_armonico_puntos(p0, p1, p2):
 # theta2: complejo/Infinity - tercer punto de la razón doble
 #
 def conjugado_armonico_theta(theta0, theta1, theta2):
-    theta = var('theta', latex_name = '\\theta')
+    theta = var('theta_var', latex_name = '\\theta')
     paso("Resolvemos {", theta0, ", ", theta1, ", ", theta2, ", ", theta, "} = -1")
     res = solve([es_cuaterna_armonica_theta(theta0, theta1, theta2, theta)], theta)
     # No ha habido solución
@@ -439,12 +439,13 @@ class recta_proyectiva:
         _no_pasos(False)
         assert self._subespacio.dim() == 1, "Los puntos deben estar alineados"
         # Forzamos p2: theta == 1
-        var('a b')
+        a = var('a_var', latex_name = 'a')
+        b = var('b_var', latex_name = 'b')
         paso("Forzamos P2: theta = 1:")
         paso(a, "*", p0, " + ", b, "*", p1, " = ", a * p0 + b * p1, " = ", p2)
         coef = solve((a * p0 + b * p1 - p2).list(), a, b)
         paso(coef[0])
-        self._theta = var('theta', latex_name = '\\theta')
+        self._theta = var('theta_var', latex_name = '\\theta')
         self._infinito = p0
         self._valores = (b * p1 + self._theta * a * p0).substitute(coef[0])
         paso("Sustituimos y combinamos con theta: ", self._valores)
@@ -494,7 +495,7 @@ class recta_proyectiva:
     #
     def coordenada(self, p):
         assert p in self, "El punto debe pertenecer a la recta"
-        var('alpha')
+        alpha = var('alpha_var', latex_name = '\\alpha')
         inf = len(solve([self._infinito[i] == alpha * p[i] for i in range(len(p))], alpha)) > 0
         if inf:
             return Infinity
@@ -554,11 +555,11 @@ class homografia_recta:
             _no_pasos(False)
         self._matriz = matriz
         self._recta = recta
-        self._theta1 = var('theta', latex_name = '\\theta')
-        self._theta2 = var('theta2', latex_name = '\\theta\'')
-        self._expresion_mobius = theta2 == (matriz[0][0] * theta + matriz[0][1]) / (matriz[1][0] * theta + matriz[1][1])
+        self._theta1 = var('theta_var1', latex_name = '\\theta')
+        self._theta2 = var('theta_var2', latex_name = '\\theta\'')
+        self._expresion_mobius = self._theta2 == (matriz[0][0] * self._theta1 + matriz[0][1]) / (matriz[1][0] * self._theta1 + matriz[1][1])
         # Multiplicamos por el denominador y restamos el numerador
-        self._expresion = (theta2 * self._expresion_mobius.rhs().denominator() - self._expresion_mobius.rhs().numerator()).expand() == 0
+        self._expresion = (self._theta2 * self._expresion_mobius.rhs().denominator() - self._expresion_mobius.rhs().numerator()).expand() == 0
 
     # Métodos accedentes
 
@@ -782,7 +783,8 @@ class homografia_recta:
         assert ap != b and bp != a, "Para generar el haz de ecuaciones cuadraticas no se puede especificar un par de la involucion"
         paso("Los dos pares especificados son:")
         paso((a, ap), ", ", (b, bp))
-        var('mu theta')
+        mu = var('mu_var', latex_name = '\\mu')
+        theta = var('theta_var', latex_name = '\\theta')
         # Cuidado con infinitos
         p0 = (a - theta) if not es_infinito(a) else 1
         p1 = (ap - theta) if not es_infinito(ap) else 1
@@ -823,7 +825,7 @@ class homografia_recta:
 
     def __sustituir(self, x):
         # Devuelve el límite para los casos de infinito o división por 0
-        return limit(self._expresion_mobius.rhs(), theta = x)
+        return limit(self._expresion_mobius.rhs(), theta_var1 = x)
 
     def __repr__(self):
         return "<Homografia " + str(self._expresion) + " de " + str(self._recta) + ">"

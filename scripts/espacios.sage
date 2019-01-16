@@ -56,7 +56,7 @@ def referencia_canonica(n):
 def matriz_asociada(ref):
     assert es_referencia(ref), "La matriz debe ser una referencia (nx(n+1) y rango maximo)"
     m = ref.matrix_from_columns(range(ref.ncols() - 1))
-    coef = vector([var('alfa' + str(i + 1), latex_name = r'alfa_' + str(i + 1)) for i in range(0, m.nrows())])
+    coef = vector([var('alpha_var' + str(i + 1), latex_name = '\\alpha_' + str(i + 1)) for i in range(0, m.nrows())])
     ec = m * coef
     paso("Forzamos [x_0 + ... + x_n] = x_{n+1}:")
     paso(matrix([ec]).T, "=", matrix([ref.columns()[-1]]).T)
@@ -312,10 +312,10 @@ class subespacio:
         return self.es_vacio() or otro.es_vacio() or self._dimension_ambiente == otro._dimension_ambiente
 
     def __params(self):
-        return vector([var('lambda' + str(i + 1), latex_name = r'lambda_' + str(i + 1)) for i in range(self._dim + 1)])
+        return vector([var('lambda_var' + str(i + 1), latex_name = '\\lambda_' + str(i + 1)) for i in range(self._dim + 1)])
 
     def __vars(self):
-        return vector([var('x' + str(i + 1), latex_name = 'x_' + str(i + 1)) for i in range(self._dimension_ambiente + 1)])
+        return vector([var('x_var' + str(i + 1), latex_name = 'x_' + str(i + 1)) for i in range(self._dimension_ambiente + 1)])
 
     def __parametricas(self):
         arr = (self._matriz * self._params).list()

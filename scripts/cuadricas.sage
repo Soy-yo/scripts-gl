@@ -245,7 +245,8 @@ class conica:
     def __init__(self, matriz):
         assert matriz.is_symmetric(), "La matriz de una conica debe ser simetrica"
         assert matriz.nrows() == 3, "La matriz de una conica es 3x3"
-        self._vars = vector(var('x y z'))
+        variables = (var('x_var', latex_name = 'x'), var('y_var', latex_name = 'y'), var('z_var', latex_name = 'z'))
+        self._vars = vector(variables)
         self._matriz = matriz
         self._ecuacion = (self._vars * matriz * self._vars).factor()
 
@@ -740,7 +741,7 @@ class parametrizacion_conica:
     # Diferenciar del operador [] en que c[theta_0] SÍ que cambia la referencia a la referencia original. Este método NO.
     #
     def punto_generico(self):
-        theta = var('theta', latex_name = '\\theta')
+        theta = var('theta_var', latex_name = '\\theta')
         return self._matriz * vector([1, theta, theta^2])
 
     #\m
@@ -765,6 +766,14 @@ class parametrizacion_conica:
     # (es decir, las columnas de la matriz del cambio).
     def referencia(self):
         return self._matriz_cambio.columns()
+
+    #\m
+    # Devuelve la referencia en que esta cónica tiene coordenadas (1, theta, theta^2) (las columnas de la matriz que
+    # representa los puntos genéricos de la parametrización).
+    #
+    # NOTA. No estoy muy seguro pero creo que esto está dado en función de la primera referencia.
+    def referencia2(self):
+        return self._matriz.columns()
 
     # Otros métodos
 
@@ -794,8 +803,8 @@ class parametrizacion_conica:
     #
     def coordenada(self, p):
         assert len(p) == 3, "El punto debe ser del plano"
-        t = var('theta', latex_name = '\\theta')
-        l = var('lambda0', latex_name = '\\lambda')
+        t = var('theta_var', latex_name = '\\theta')
+        l = var('lambda_var', latex_name = '\\lambda')
         x = self._matriz * vector([1, t, t^2])
         q = self._matriz_cambio * x
         lp = l * p
@@ -829,7 +838,7 @@ class parametrizacion_conica:
     def interseccion_recta(self, r, original = True):
         assert r.dim() == 1, "El subespacio debe ser una recta"
         assert r.dimension_ambiente() == 2, "La recta debe ser del plano"
-        theta = var('theta', latex_name = '\\theta')
+        theta = var('theta_var', latex_name = '\\theta')
         p = self._matriz * vector([1, theta, theta^2])
         if original:
             p = self._matriz_cambio * p
@@ -864,8 +873,8 @@ class parametrizacion_conica:
     #
     def __contains__(self, punto):
         assert len(punto) == 3, "El punto debe ser del plano"
-        t = var('theta', latex_name = '\\theta')
-        l = var('lambda0', latex_name = '\\lambda')
+        t = var('theta_var', latex_name = '\\theta')
+        l = var('lambda_var', latex_name = '\\lambda')
         x = self._matriz_cambio * self._matriz * vector([1, t, t^2])
         lp = l * punto
         sol = solve((x - lp).list(), t, l)
@@ -948,7 +957,7 @@ class parametrizacion_conica:
         return 1
 
     def __repr__(self):
-        t = var('theta', latex_name = '\\theta')
+        t = var('theta_var', latex_name = '\\theta')
         return "<Conica parametrizada como " + str(self._matriz * vector([1, t, t^2])) + " en la referencia " + str(self.referencia()) + ">"
 
 #\c
