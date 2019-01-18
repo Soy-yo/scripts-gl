@@ -195,5 +195,62 @@ class haz_conicas:
             return self[Infinity]
         return self[sol[0].rhs()]
 
+    #\m
+    # Devuelve una tupla conteniendo las tres cónicas degeneradas de este haz.
+    #
+    # Implementación \\
+    # Resuelve det(A0 + lambda*A1) = 0 para lambda, donde Ai son las matrices de las cónicas que generan el haz.
+    # Después sustituye los tres resultados obtenidos para obtener las cónicas.
+    #
+    def degeneradas(self):
+        ec = self._matriz.det()
+        paso("Resolvemos det", self._matriz, " = ", ec, " = 0")
+        sol = [self._param == Infinity for i in range(ec.degree(self._param), 3)]
+        sol = sol + solve(ec, self._param)
+        paso(sol)
+        paso("Obtenemos las conicas con esas coordenadas de: ", self._ecuacion)
+        return tuple(map(lambda x: self[x.rhs()], sol))
+
+    #\m
+    # Devuelve la involución sobre una recta que genera este haz de cónicas, dada la recta.
+    # No se comprueba, pero la recta no puede contener ningún punto base del haz.
+    #
+    # Implementación \\
+    # Cada par de puntos en los que el haz corta la recta son los pares de la involución, con lo cual se interseca con las cónicas 0 e infinito y se
+    # crea una homografía con esos dos pares, pues una involución queda determinada por dos pares.
+    #
+    # Parámetros \\
+    # r: recta_proyectiva(dim=2) - recta sobre la que actuará la involución
+    #
+    def involucion_generada(self, r):
+        assert r.dimension_ambiente() == 2, "La recta debe ser del plano"
+        paso("Intersecamos la retca con las conicas de coordenada 0 e infinito")
+        c1 = self[0]
+        c2 = self[Infinity]
+        paso("H[0] = ", c1.matriz_asociada(), "; H[", Infinity, "] = ", c2.matriz_asociada())
+        (a, ap) = self[0].interseccion_recta(r)
+        (b, bp) = self[Infinity].interseccion_recta(r)
+        paso("Los pares son: ", (a, ap), " y ", (b, bp))
+        return crear_homografia_recta(a, ap, b, bp, recta = r, involucion = True)
+
+    #\m
+    # Devuelve una tupla conteniendo las dos cónicas del haz tangentes a la recta dada.
+    #
+    # Implementación \\
+    # Calcula los puntos fijos de la homografía que genera el haz con la recta dada y obtiene las cónicas que pasan por cada uno de ellos, pues cortan
+    # la recta en puntos dobles.
+    #
+    # Parámetros \\
+    # r: recta_proyectiva(dim=2) - recta de la que calcular las tangentes
+    #
+    def conicas_tangentes(self, r):
+        assert r.dimension_ambiente() == 2, "La recta debe ser del plano"
+        paso("Obtenemos la involucion que genera la recta:")
+        h = self.involucion_generada(r)
+        paso("Obtenemos los puntos fijos de la involucion")
+        fijos = h.puntos_fijos()
+        paso("Obtenemos las conicas que pasan por esos puntos fijos")
+        return tuple(map(lambda x: self.forzar_punto(x), fijos))
+
     def __repr__(self):
         return "<Haz de conicas de ecuacion " + str(self.ecuacion()) + ">"

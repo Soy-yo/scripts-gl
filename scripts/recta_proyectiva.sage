@@ -981,6 +981,24 @@ class homografia_dos_rectas:
         return subespacio(x1, x2, x3)
 
     #\m
+    # Calcula el eje de esta homografía si no es una perspectividad.
+    #
+    # Implementación \\
+    # Devuelve la recta que une h(O) con h^-1(O), donde O es el punto de intersección de las rectas y h es esta homografía.
+    #
+    def eje2(self):
+        _no_pasos()
+        pers = self.es_perspectividad()
+        _no_pasos(False)
+        assert not pers, "No se puede utilizar eje2 para calcular el eje de una perspectividad"
+        paso("El punto de interseccion es O = ", self._interseccion)
+        imagen = self(self._interseccion)
+        inversa = self.inversa()
+        preimagen = inversa(self._interseccion)
+        paso("h(O) = ", imagen, "; h^-1(O) = ", preimagen, "; los unimos")
+        return subespacio(imagen, preimagen)
+
+    #\m
     # Determina si esta homografía es una perspectividad.
     #
     # Implementación \\

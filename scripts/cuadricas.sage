@@ -1112,7 +1112,7 @@ class homografia_conica:
         return t1.interseccion(t2).punto()
 
     #\m
-    # Descompone esta homografía en dos involuciones dado el centro de la primera (s2), de forma que h = s2*s1, donde h es esta homografía.
+    # Descompone esta homografía en dos involuciones dado el centro de la primera (s1), de forma que h = s2*s1, donde h es esta homografía.
     # Téngase en cuenta la forma de calcular las imágenes: primero se aplica s1 y luego s2 (s2(s1(x))).
     #
     # El centro dado debe encontrarse en el eje de la homografía, porque si no se complica demasiado.

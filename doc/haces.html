@@ -117,6 +117,34 @@ Parámetros <br>
 p: vector(3) - punto por el que pasa la cónica del haz <br>
 </p>
 </div>
+<div class='function'>
+<h3>Función: degeneradas()</h3>
+<p>
+Devuelve una tupla conteniendo las tres cónicas degeneradas de este haz. <br>
+Implementación <br>
+Resuelve det(A0 + lambda*A1) = 0 para lambda, donde Ai son las matrices de las cónicas que generan el haz. Después sustituye los tres resultados obtenidos para obtener las cónicas. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: involucion_generada(r)</h3>
+<p>
+Devuelve la involución sobre una recta que genera este haz de cónicas, dada la recta. No se comprueba, pero la recta no puede contener ningún punto base del haz. <br>
+Implementación <br>
+Cada par de puntos en los que el haz corta la recta son los pares de la involución, con lo cual se interseca con las cónicas 0 e infinito y se crea una homografía con esos dos pares, pues una involución queda determinada por dos pares. <br>
+Parámetros <br>
+r: recta_proyectiva(dim=2) - recta sobre la que actuará la involución <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: conicas_tangentes(r)</h3>
+<p>
+Devuelve una tupla conteniendo las dos cónicas del haz tangentes a la recta dada. <br>
+Implementación <br>
+Calcula los puntos fijos de la homografía que genera el haz con la recta dada y obtiene las cónicas que pasan por cada uno de ellos, pues cortan la recta en puntos dobles. <br>
+Parámetros <br>
+r: recta_proyectiva(dim=2) - recta de la que calcular las tangentes <br>
+</p>
+</div>
 </div>
 </div>
 </body>
