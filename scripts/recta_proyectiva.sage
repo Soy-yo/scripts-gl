@@ -113,6 +113,9 @@ def razon_doble_theta(theta0, theta1, theta2, theta3):
 # para puntos como para parámetros inhomogéneos de una recta proyectiva (ver es_cuaterna_armonica_puntos y
 # es_cuaterna_armonica_theta, respectivamente).
 #
+# NOTA. Puede ser que devuelva algo tipo (-1) = (-1); en tal caso habrá que comprobar que sea una
+# igualdad realmente o usar bool(es_cuaterna_armonica(a, b, c, d)).
+#
 # Parámetros \\
 # a: complejo/Infinity/vector(n>1) - primer punto de la razón doble \\
 # b: complejo/Infinity/vector(n>1) - segundo punto de la razón doble \\

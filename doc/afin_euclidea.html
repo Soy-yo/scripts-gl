@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+<title>afin_euclidea</title><link rel='stylesheet' type='text/css' href='style.css'></head>
+<body>
+<a href='index.html'>Página principal</a><h1>afin_euclidea</h1>
+<p>
+Archivo con clases representantes de espacios tanto afines como euclídeos con diversas funciones relacionadas con aplicaciones, cónicas, etc. <br>
+Autor: Pablo Sanz Sanz <br>
+</p>
+<div class='class'>
+<h2>Clase: espacio_afin</h2>
+<p>
+Clase que representa un espacio afín de una dimensión arbitraria. Sirve para diversos cálculos relacionados con aplicaciones, cónicas, etc. <br>
+NOTA. Se puede indicar que por defecto los resultados sean devueltos en la referencia canónica o no. En cualquier caso los puntos que se pasan como parámetro deben estar en la referencia de este espacio. Si, por ejemplo, queremos calcular el punto medio de los puntos (-1 : 0 : 1) y (1 : 0 : 1) (dados en la referencia canónica), pero la referencia de este espacio no es la canónica, hay que cambiar primero esos puntos a la referencia de este espacio a mano con la inversa de la matriz que devuelva el método matriz_cambio (M^-1 * X) y después llamar al método con estos dos nuevos puntos. Finalmente, en función del valor que se haya indicado a cambio_defecto, se cambiará la referencia del resultado no. <br>
+Todo esto se aplica en general, salvo que se indique lo contrario. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye un espacio afín, dados el hiperplano del infinito y la referencia que se está utilizando. Nótese que el hiperplano se supone que viene expresado en la referencia dada. <br>
+Parámetros <br>
+hiperplano_infinito: subespacio(dim=n-1) - hiperplano que se está considerando como infinito (xn = 0 por defecto) <br>
+referencia: lista(vector(n+1))(long=n+2) - referencia en la que estarán expresados los puntos que se consideren en los métodos de esta clase (canónica ([(1 : 0 : ... : 0), (0 : ... 0 : 1), (1 : ... : 1)]) por defecto) <br>
+cambio: booleano - indica si los valores devueltos deben ser previamente cambiados de referencia o no (True por defecto) <br>
+dimension: natural - dimensión de este espacio si no se han especificado los dos anteriores parámetros; por ejemplo, espacio_afin(dimension = 2) crea un espacio afín cuya recta del infinto es z = 0 y la referencia es la canónica (2 por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: cambio_defecto(b)</h3>
+<p>
+Hace que los métodos cambien la referencia a la canónica por defecto. Si se usa s.cambio_defecto(True) (donde s es este espacio), a partir de entonces las funciones devolverán los resultados cambiando primero la referencia. <br>
+Parámetros <br>
+b: booleano - indica si se cambiará la referencia o no <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: dim()</h3>
+<p>
+Devuelve la dimensión de este espacio afín. </p>
+</div>
+<div class='function'>
+<h3>Función: hiperplano_infinito()</h3>
+<p>
+Devuelve el hiperplano del infinito de este espacio afín en la referencia en que está expresado el espacio. </p>
+</div>
+<div class='function'>
+<h3>Función: referencia()</h3>
+<p>
+Devuelve la referencia en que está expresado este espacio. </p>
+</div>
+<div class='function'>
+<h3>Función: matriz_cambio()</h3>
+<p>
+Devuelve la matriz del cambio de referencia de la referencia en que se encuentra este espacio a la canónica. Calcular la inversa para el cambio contrario. </p>
+</div>
+<div class='function'>
+<h3>Función: es_referencia_valida(referencia)</h3>
+<p>
+Determina si la referencia indicada es válida para es espacio, esto es, todos los vectores son de longitud adecuada, son suficientes y todos menos el último son proyectivamente independientes. <br>
+Parámetros <br>
+referencia: lista(vector(n+1))(long=n+2) - referencia a comprobar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_referencia_afin(referencia = None)</h3>
+<p>
+Determina si la referencia indicada (la propia de este espacio si no se indica ninguna) es una referencia afín, esto es, cada punto de los n primeros pertenece al hiperplano del infinito. <br>
+Parámetros <br>
+referencia: lista(vector(n+1))(long=n+2) - referencia a comprobar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: cambiar_referencia(referencia)</h3>
+<p>
+Devuelve un nuevo espacio afín (no modifica este) cuya referencia es la nueva indicada con el hiperplano del infinito transformado correctamente. La variable que indica si se debe cambiar de referencia mantendrá su valor. <br>
+NOTA. Se supone que los puntos dados están dados en coordenadas canónicas. <br>
+Parámetros <br>
+referencia: lista(vector(n+1))(long=n+2) - nueva referencia del espacio <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_infinitos(s)</h3>
+<p>
+Determina los puntos del infinito del subespacio dado, esto es la intersección de este con el hiperplano del infinito. Devuelve un objeto del tipo subespacio. Si el subespacio dado es una recta se puede tomar el único punto de intersección con el método punto() de la clase subespacio. <br>
+NOTA. ¡No se cambia la referencia del subespacio devuelto! Habría que hacerlo a mano. <br>
+Parámetros <br>
+s: subespacio(dim_ambiente=n) - subespacio del que se quiere conocer los puntos del infinito <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: paralelos(r, s)</h3>
+<p>
+Determina si dos subespacios son paralelos, esto es, si la intersección con el hiperplano del infinito de uno esá contenida (o es igual) en la del otro. <br>
+Parámetros <br>
+r: subespacio(dim_ambiente=n) - uno de los subespacios que se quiere comprobar si son paralelos <br>
+s: subespacio(dim_ambiente=n) - el otro <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: razon_simple(a, b, c)</h3>
+<p>
+Calcula la razón simple (A, B, C) de los puntos alineados dados. <br>
+Implementación <br>
+Calcula la razón doble {Pinf, A; B, C}, donde Pinf es el punto de intersección entre la recta que forman los puntos y el hiperplano del infinito (ver razon_doble (recta_proyectiva.sage)). <br>
+Parámetros <br>
+a: vector(n+1) - primer punto de la razón simple <br>
+b: vector(n+1) - segundo punto de la razón simple <br>
+c: vector(n+1) - tercer punto de la razón simple <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: son_simetricos(p1, p2, centro)</h3>
+<p>
+Determina si los puntos dados son simétricos respecto del centro dado. Para ello deben yacer todos en la misma recta. <br>
+Implementación <br>
+Determina si {P1, P2 ; C, Pinf} es una cuaterna armónica, donde Pinf es el punto de intersección entre la recta que forman los puntos y el hiperplano del infinito (ver es_cuaterna_armonica (recta_proyectiva.sage)). <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: simetrico(punto, centro)</h3>
+<p>
+Calcula el punto simétrico a un punto respecto de un punto "centro" de la simetría. El punto calculado estará en la recta que forman los puntos dados. <br>
+Implementación <br>
+Monta la recta (ver recta_proyectiva (recta_proyectiva.sage)) que pasa por los puntos, tomando como referencia {Pinf, C; P}, donde Pinf es el punto del infinito de la recta PC y C el centro dado. Entonces, el simétrico de P será aquel cuya coordenada sea la opuesta a la de P, esto es, el punto de coordenada -1. <br>
+Parámetros <br>
+punto: vector(n+1) - punto del que se quiere calcular su simétrico <br>
+centro: vector(n+1) - punto centro de la simetría <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: punto_medio(p1, p2)</h3>
+<p>
+Calcula el punto medio entre p1 y p2. Es lo contrario al método simetrico. <br>
+Implementación <br>
+Calcula el conjugado armónico de Pinf respecto de P1 y P2, donde Pinf es el punto del infinito de la recta P1P2 (ver conjugado_armonico (recta_proyectiva.sage)). <br>
+Parámetros <br>
+p1: vector(n+1) - uno de los puntos de los que se quiere calcular el punto medio <br>
+p2: vector(n+1) - el otro punto <br>
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

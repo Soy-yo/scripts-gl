@@ -196,20 +196,20 @@ class haz_conicas:
         return self[sol[0].rhs()]
 
     #\m
-    # Devuelve una tupla conteniendo las tres cónicas degeneradas de este haz.
+    # Devuelve una lista conteniendo las hasta tres cónicas degeneradas de este haz.
     #
     # Implementación \\
     # Resuelve det(A0 + lambda*A1) = 0 para lambda, donde Ai son las matrices de las cónicas que generan el haz.
-    # Después sustituye los tres resultados obtenidos para obtener las cónicas.
+    # Después sustituye los resultados obtenidos para obtener las cónicas.
     #
     def degeneradas(self):
         ec = self._matriz.det()
         paso("Resolvemos det", self._matriz, " = ", ec, " = 0")
-        sol = [self._param == Infinity for i in range(ec.degree(self._param), 3)]
+        sol = [] if ec.degree(self._param) == 3 else [self._param == Infinity]
         sol = sol + solve(ec, self._param)
         paso(sol)
         paso("Obtenemos las conicas con esas coordenadas de: ", self._ecuacion)
-        return tuple(map(lambda x: self[x.rhs()], sol))
+        return map(lambda x: self[x.rhs()], sol)
 
     #\m
     # Devuelve la involución sobre una recta que genera este haz de cónicas, dada la recta.

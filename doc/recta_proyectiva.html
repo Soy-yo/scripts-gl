@@ -50,6 +50,7 @@ theta3: complejo/Infinity - cuarto punto de la razón doble <br>
 <h3>Función: es_cuaterna_armonica(a, b, c, d)</h3>
 <p>
 Determina si los puntos dados forman una cuaterna armónica, esto es, {A, B; C, D} = -1. Es válido tanto para puntos como para parámetros inhomogéneos de una recta proyectiva (ver es_cuaterna_armonica_puntos y es_cuaterna_armonica_theta, respectivamente). <br>
+NOTA. Puede ser que devuelva algo tipo (-1) = (-1); en tal caso habrá que comprobar que sea una igualdad realmente o usar bool(es_cuaterna_armonica(a, b, c, d)). <br>
 Parámetros <br>
 a: complejo/Infinity/vector(n>1) - primer punto de la razón doble <br>
 b: complejo/Infinity/vector(n>1) - segundo punto de la razón doble <br>
