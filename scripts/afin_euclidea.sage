@@ -9,7 +9,7 @@
 
 #\c
 # Clase que representa un espacio afín de una dimensión arbitraria. Sirve para diversos cálculos relacionados con
-# aplicaciones, cónicas, etc.
+# subespacios, cónicas, etc.
 #
 # NOTA. Se puede indicar que por defecto los resultados sean devueltos en la referencia canónica o no. En cualquier caso los
 # puntos que se pasan como parámetro deben estar en la referencia de este espacio.
@@ -19,7 +19,8 @@
 # dos nuevos puntos. Finalmente, en función del valor que se haya indicado a cambio_defecto, se cambiará la referencia del
 # resultado no.
 #
-# Todo esto se aplica en general, salvo que se indique lo contrario.
+# Todo esto se aplica en general, salvo que se indique lo contrario. En el caso de métodos que devuelvan subespacios (p.e:
+# asintotas_conica) lo normal será que no se cambie la referencia automáticamente por defecto. Importante tenerlo en cuenta.
 #
 class espacio_afin:
 
@@ -29,49 +30,20 @@ class espacio_afin:
     #
     # Parámetros \\
     # hiperplano_infinito: subespacio(dim=n-1) - hiperplano que se está considerando como infinito (xn = 0 por defecto) \\
-    # referencia: lista(vector(n+1))(long=n+2) - referencia en la que estarán expresados los puntos que se consideren en los
-    # métodos de esta clase (canónica ([(1 : 0 : ... : 0), (0 : ... 0 : 1), (1 : ... : 1)]) por defecto) \\
-    # cambio: booleano - indica si los valores devueltos deben ser previamente cambiados de referencia o no (True por defecto) \\
     # dimension: natural - dimensión de este espacio si no se han especificado los dos anteriores parámetros; por ejemplo,
     # espacio_afin(dimension = 2) crea un espacio afín cuya recta del infinto es z = 0 y la referencia es la canónica
     # (2 por defecto)
     #
-    def __init__(self, hiperplano_infinito = None, referencia = None, cambio = True, dimension = 2):
-        self._dim = hiperplano_infinito.dimension_ambiente() if hiperplano_infinito is not None else \
-                    len(referencia[0]) - 1 if referencia is not None else \
-                    dimension
+    def __init__(self, hiperplano_infinito = None, dimension = 2):
+        self._dim = hiperplano_infinito.dimension_ambiente() if hiperplano_infinito is not None else dimension
         _no_pasos()
         # xn = 0 por defecto
         if hiperplano_infinito is None:
-            hiperplano_infinito = subespacio(vector(([0] * (self._dim + 1)) + [1])).dual()
+            hiperplano_infinito = subespacio(vector(([0] * self._dim) + [1])).dual()
         _no_pasos(False)
-        # I por defecto
-        if referencia is None:
-            referencia = referencia_canonica(self._dim).columns()
         assert hiperplano_infinito.dimension_ambiente() == self._dim, "La dimension ambiente del hiperplano debe coincidir con la de este espacio"
         assert hiperplano_infinito.dim() == self._dim - 1, "El subespacio debe ser un hiperplano"
-        assert self.es_referencia_valida(referencia), "La referencia dada debe ser una referencia valida para este espacio afin"
         self._infinito = hiperplano_infinito
-        self._referencia = referencia
-        self._cambio = cambio
-        m = matrix(referencia).T
-        if m != 1:
-            paso("Calculamos la matriz del cambio a la referencia canonica")
-            self._matriz_cambio = matriz_asociada(m)
-        else:
-            _no_pasos()
-            self._matriz_cambio = matriz_asociada(m)
-            _no_pasos(False)
-
-    #\m
-    # Hace que los métodos cambien la referencia a la canónica por defecto. Si se usa s.cambio_defecto(True) (donde s es este espacio),
-    # a partir de entonces las funciones devolverán los resultados cambiando primero la referencia.
-    #
-    # Parámetros \\
-    # b: booleano - indica si se cambiará la referencia o no
-    #
-    def cambio_defecto(self, b):
-        self._cambio = b
 
     # Métodos accedentes
 
@@ -84,17 +56,6 @@ class espacio_afin:
     # Devuelve el hiperplano del infinito de este espacio afín en la referencia en que está expresado el espacio.
     def hiperplano_infinito(self):
         return self._infinito
-
-    #\m
-    # Devuelve la referencia en que está expresado este espacio.
-    def referencia(self):
-        return self._referencia
-
-    #\m
-    # Devuelve la matriz del cambio de referencia de la referencia en que se encuentra este espacio a la canónica.
-    # Calcular la inversa para el cambio contrario.
-    def matriz_cambio(self):
-        return self._matriz_cambio
 
     # Otros métodos
 
@@ -115,54 +76,47 @@ class espacio_afin:
         return True
 
     #\m
-    # Determina si la referencia indicada (la propia de este espacio si no se indica ninguna) es una referencia afín, esto
-    # es, cada punto de los n primeros pertenece al hiperplano del infinito.
+    # Determina si la referencia indicada es una referencia afín, esto es, cada punto de los n primeros pertenece al hiperplano
+    # del infinito.
     #
     # Parámetros \\
     # referencia: lista(vector(n+1))(long=n+2) - referencia a comprobar
     #
-    def es_referencia_afin(self, referencia = None):
-        if referencia is None:
-            referencia = self._referencia
-        else:
-            assert self.es_referencia_valida(referencia), "La referencia dada debe ser valida"
+    def es_referencia_afin(self, referencia):
+        assert self.es_referencia_valida(referencia), "La referencia dada debe ser valida"
         for p in referencia[0 : -2]:
             if p not in self._infinito:
                 return False
         return True
 
     #\m
-    # Devuelve un nuevo espacio afín (no modifica este) cuya referencia es la nueva indicada con el hiperplano del infinito
-    # transformado correctamente. La variable que indica si se debe cambiar de referencia mantendrá su valor.
+    # Devuelve un nuevo espacio afín (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio
+    # de la referencia actual del espacio a R'.
     #
-    # NOTA. Se supone que los puntos dados están dados en coordenadas canónicas.
+    # Implementación \\
+    # Cambia la referencia del hiperplano del infinito usando M^-t * u, donde u es el vector asociado a las coordenadas de H
+    # (el vector dual al subespacio).
     #
     # Parámetros \\
-    # referencia: lista(vector(n+1))(long=n+2) - nueva referencia del espacio
+    # matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia de R a R'
     #
-    def cambiar_referencia(self, referencia):
-        assert self.es_referencia_valida(referencia), "La referencia dada debe ser valida"
-        ini = matrix(self._referencia).T
-        fin = matrix(referencia).T
-        paso("Obtenemos la matriz del cambio entre las referencias: ", self._referencia, ", ", referencia)
-        m = cambiar_referencia(ini, fin)
-        paso(m)
-        paso("Cambiamos el hiperplano del infinito de referencia, cambiando de referencia el punto dual que representa con " + \
-                "la matriz del cambio inversa y traspuesta M^-t = ", m.T^-1, " (resultado de Algebra)")
+    def cambiar_referencia(self, matriz_cambio):
+        assert matriz_cambio.is_square() and matriz_cambio.nrows() == self._dim + 1, "La matriz debe representar un cambio en este espacio"
+        assert matriz_cambio.det() != 0, "Una matriz de cambio de referencia debe ser invertible"
+        paso("Cambiamos el hiperplano del infinito de referencia, cambiando de referencia el punto dual que lo representa con " + \
+                "la matriz del cambio inversa y traspuesta M^-t = ", matriz_cambio.T^-1)
         _no_pasos()
         dual = self._infinito.dual().punto()
-        coord = m.T^-1 * dual
+        coord = matriz_cambio.T^-1 * dual
         h = subespacio(coord).dual()
         _no_pasos(False)
         paso("Sus coordenadas: ", dual, " se convierten en: ", coord, ": ", h.implicitas()[0])
-        return espacio_afin(h, referencia, self._cambio)
+        return espacio_afin(h)
 
     #\m
     # Determina los puntos del infinito del subespacio dado, esto es la intersección de este con el hiperplano del infinito.
     # Devuelve un objeto del tipo subespacio. Si el subespacio dado es una recta se puede tomar el único punto de intersección
     # con el método punto() de la clase subespacio.
-    #
-    # NOTA. ¡No se cambia la referencia del subespacio devuelto! Habría que hacerlo a mano.
     #
     # Parámetros \\
     # s: subespacio(dim_ambiente=n) - subespacio del que se quiere conocer los puntos del infinito
@@ -249,7 +203,7 @@ class espacio_afin:
         paso("El punto del infinito es: ", pinf, "; montamos la recta (realmente es la misma, pero parametrizada)")
         r = recta_proyectiva(pinf, centro, punto)
         paso("El simetrico de: ", punto, " sera el punto de la recta con coordenada -1")
-        return self.__p(r[-1])
+        return r[-1]
 
     #\m
     # Calcula el punto medio entre p1 y p2. Es lo contrario al método simetrico.
@@ -268,17 +222,211 @@ class espacio_afin:
         r = subespacio(p1, p2)
         pinf = self.puntos_infinitos(r).punto()
         paso("El punto del infinito es: ", pinf, "; calculamos su conjugado armonico respecto de los otros dos:")
-        return self.__p(conjugado_armonico(p1, p2, pinf))
+        return conjugado_armonico(p1, p2, pinf)
+
+    #
+    # Plano afín
+    #
+
+    #\m
+    # Devuelve los dos puntos de intersección de la recta del infinito con la cónica dada.
+    #
+    # Parámetros \\
+    # c: conica/parametrizacion_conica - cónica a intersecar
+    #
+    def puntos_infinitos_conica(self, c):
+        assert self._dim == 2, "Las funciones sobre conicas son para el plano afin (dimension 2)"
+        r = self._infinito
+        if c._tipo() == 0:
+            _no_pasos()
+            rep = self._infinito.representantes()
+            r = recta_proyectiva(rep[0], rep[1])
+            _no_pasos(False)
+            theta = var('theta_var', latex_name = '\\theta')
+            paso("La recta del infinito se puede expresar como: ", r[theta])
+        return c.interseccion_recta(r)
+
+    #\m
+    # Devuelve una cadena de texto que indica el tipo de la cónica dada por parámetro. No se diferencian casos
+    # reales de imaginarios (p.e: elipse real o imaginaria).
+    #
+    # Implementación \\
+    # Calcula la intersección de la cónica con la recta del infinito y se pueden dar los siguientes casos: \\
+    # · Intersección en dos puntos reales: hipérbola. \\
+    # · Intersección en dos puntos complejos: elipse \\
+    # · Intersección en un punto doble: parábola
+    #
+    # Parámetros \\
+    # c: conica/parametrizacion_conica - cónica a clasificar
+    #
+    def clasificacion_conica(self, c):
+        t = self.__tipo_conica(c)
+        return "hiperbola" if t == 0 else "elipse" if t == 1 else "parabola"
+
+    #\m
+    # Devuelve el centro de la cónica dada, esto es, el polo de la recta del infinito. Si la cónica es una parábola no tendrá centro y
+    # devolverá un vector vacío.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que se quiere saber el centro
+    #
+    def centro_conica(self, c):
+        assert self._dim == 2, "Las funciones sobre conicas son para el plano afin (dimension 2)"
+        paso("El centro es el polo de la recta del infinito")
+        centro = c.polo(self._infinito)
+        return centro if centro not in self._infinito else vector([])
+
+    #\m
+    # Devuelve una tupla conteniendo las asíntotas de la cónica dada. Nótese que en caso de ser una elipse estas serán rectas imaginarias
+    # y en caso de ser una parábola no tendrá (pues no tiene centro) y se devolverán dos subespacios vacíos.
+    #
+    # Implementación \\
+    # Las asíntotas son tangentes a la cónica en la recta del infinito. Se calcula la intersección con ella y el resultado serán las
+    # tangentes (las polares) de cada punto.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que obtener las asíntotas
+    #
+    def asintotas_conica(self, c):
+        paso("Intersecamos la conica con la recta del infinito")
+        (a, b) = self.puntos_infinitos_conica(c)
+        if matrix([a, b]).rank() == 1:
+            paso("La interseccion es un punto doble: ", a, "; no hay asintotas")
+            # Subespacio vacío
+            return (subespacio(), subespacio())
+        paso("Calculamos las tangentes (las polares) de los puntos obtenidos: ", (a, b))
+        r1 = c.polar(a)
+        r2 = c.polar(b)
+        return (r1, r2)
+
+    #\m
+    # Devuelve una lista con los vectores de la referencia afín en que la cónica dada tendrá ecuación reducid x^2 +/- y^2 +/- z^2 = 0.
+    #
+    # NOTA. Cuidado de no usar asíntotas como diámetro en el parámetro, pues son tangentes a la cónica.
+    #
+    # Implementación \\
+    # Si la cónica tiene centro, se toma como origen de coordenadas, esto es, X2 = C. Los otros dos puntos, X0 y X1, se toman como los
+    # puntos del infinito de dos diámetros conjugados cualesquiera (se debe indicar uno de ellos como parámetro). \\
+    # En el caso de la parábola se tomará como origen un punto de la cónica del que se podrá indicar su coordenada x (z será 1 por defecto). Se
+    # tomarán, además, X0 el punto de tangencia con la recta del infinito y el polo de X0X2 como X1. \\
+    # El punto unidad será escogido en ambos casos por el método referencia_autopolar de la cónica (conica (cuadricas.sage)).
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que obtener la referencia en la que tiene ecuación reducida \\
+    # diam: subespacio(dim=1,dim_amb=2) - diámetro que se quiera usar para el primer caso (por defecto ninguno) \\
+    # x2: vector(3) - tercer punto que se quiera tomar en la referencia en el segundo caso (por defecto ninguno) \\
+    # e: vector(3) - punto unidad que se quiera tomar en la referencia en el segundo caso (por defecto ninguno) \\
+    # real: booleano - determina si la cónica debe ser necesariamente real o no (True por defecto)
+    #
+    def referencia_ecuacion_reducida(self, c, diam = None, x2 = None, e = None, real = True):
+        paso("Calculamos el centro de la conica si lo tiene")
+        centro = self.centro_conica(c)
+        # Parábola
+        if len(centro) == 0:
+            assert x2 is not None and e is not None, "Se deben indicar los puntos X2 y unidad para la parabola"
+            _no_pasos()
+            # Tomamos el primero de los puntos del infinito (son el mismo)
+            x_0 = self.puntos_infinitos_conica(c)[0]
+            _no_pasos(False)
+            paso("No hay centro, usamos el punto de tangencia que hubiera sido el centro como X0 = ", x_0)
+            x_2 = x2
+            paso("Usamos como X2 y unidad los puntos indicados: X2 = ", x_2, "; E = ", e)
+            _no_pasos()
+            r = subespacio(x_0, x_2)
+            _no_pasos(False)
+            paso("X1 es el polo de la recta X0X2: ", r.implicitas()[0])
+            x_1 = c.polo(r)
+            paso("X1 = ", x_1)
+            return [x_0, x_1, x_2, e]
+        # Elipse/hipérbola
+        else:
+            x_2 = centro
+            paso("Tomamos el centro obtenido como origen de coordenadas: X2 = ", x_2)
+            _no_pasos()
+            b = d is not None and self.es_diametro(c, diam)
+            _no_pasos(False)
+            assert b, "Se debe indicar un diametro de la conica con el que continuar"
+            paso("Obtenemos el diametro donjugado del dado:")
+            conj = self.diametro_conjugado(c, diam)
+            _no_pasos()
+            x_0 = self.puntos_infinitos(diam).punto()
+            x_1 = self.puntos_infinitos(conj).punto()
+            _no_pasos(False)
+            paso("El conjugado es: ", conj.implicitas()[0], "; y los puntos del infinito de cada diametro: X0 = ", x_0, ", X1 = ", x_1)
+            paso("Completamos la referencia con el punto unidad adecuado:")
+            return [x_0, x_1, x_2, c.referencia_autopolar(x_0, x_1, x_2, real)]
+
+    #\m
+    # Determina si una recta d dada como subespacio es un diámetro de la cónica indicada, es decir, si pasa por su centro.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que se quiere saber si d es diámetro \\
+    # d: subespacio(dim=1,dim_amb=2) - recta candidata a ser diámetro
+    #
+    def es_diametro(self, c, d):
+        assert self._dim == 2, "Las funciones sobre conicas son para el plano afin (dimension 2)"
+        assert d.dim() == 1, "El diametro debe ser una recta"
+        assert d.dimension_ambiente() == 2, "La recta debe ser del plano"
+        paso("Obtenemos el centro")
+        centro = self.centro_conica(c)
+        # No tiene centro
+        if len(centro) == 0:
+            paso("La conica no tiene centro")
+            return False
+        paso("El centro es: ", centro, "; comprobamos si pertenece al diametro")
+        return centro in d
+
+    #\m
+    # Calcula el diámetro conjugado del dado respecto de la conica indicada.
+    #
+    # Implementación \\
+    # Obtiene la recta polar del punto del infinito del diámetro respecto de la cónica.
+    #
+    # Parámetros \\
+    # c: conica - cónica sobre la que se quiere calcular el diámetro conjugado \\
+    # d: subespacio(dim=1,dim_amb=2) - diámetro del que se quiere calcular su conjugado
+    #
+    def diametro_conjugado(self, c, d):
+        _no_pasos()
+        b = self.es_diametro(c, d)
+        _no_pasos(False)
+        assert b, "La recta dada debe ser diametro de la conica"
+        pinf = self.puntos_infinitos(d).punto()
+        paso("El punto del infinito es: ", pinf, "; calculamos su polar")
+        return c.polar(pinf)
+
+    #\m
+    # Determina si los diámetros d1 y d2 son conjugados respecto a la cónica c. Esto ocurre cuando sus puntos del infinito
+    # son conjugados respecto a c, o lo que es lo mismo, que la polar del punto del infinito de uno sea el otro diámetro.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que se quiere saber si los diámetros son conjugados \\
+    # d1: subespacio(dim=1,dim_amb=2) - primer diámetro \\
+    # d2: subespacio(dim=1,dim_amb=2) - segundo diámetro
+    #
+    def son_diametros_conjugados(self, c, d1, d2):
+        _no_pasos()
+        b = self.es_diametro(c, d1) and self.es_diametro(c, d2)
+        _no_pasos(False)
+        assert b, "Las rectas dadas deben ser diametros de la conica"
+        paso("Calculamos el diametro conjugado del primero y vemos si coincide con el segundo")
+        conj = self.diametro_conjugado(c, d1)
+        paso("La polar tiene ecuacion: ", conj.implicitas()[0], "; el otro diametro: ", d2.implicitas()[0], "; comprobamos que coincidan")
+        return conj == d2
 
     # Métodos auxiliares
 
-    # Para cambiar de referencia
-    def __p(self, p):
-        if self._cambio and self._matriz_cambio != 1:
-            paso("Devolvemos el punto a la referencia canonica")
-            return self._matriz_cambio * p
-        return p
+    def __tipo_conica(self, c):
+        paso("Intersecamos la conica con la recta del infinito")
+        (a, b) = self.puntos_infinitos_conica(c)
+        paso("La interseccion es: ", a, ", ", b)
+        # Los puntos son distintos (con que uno sea real los dos deberían serlo pero se comprueba de todos modos)
+        if matrix([a, b]).rank() == 2:
+            return 0 if self.__es_real(a) and self.__es_real(b) else 1
+        return 2
+
+    def __es_real(self, p):
+        return p == conjugate(p)
 
     def __repr__(self):
-        return "<Espacio afin de dimension " + str(self._dim) + " con hiperplano del infinito de ecuacion " + \
-                str(self._infinito.implicitas()[0]) + " y referencia " + str(self._referencia) + ">"
+        return "<Espacio afin de dimension " + str(self._dim) + " con hiperplano del infinito de ecuacion " + str(self._infinito.implicitas()[0]) + ">"

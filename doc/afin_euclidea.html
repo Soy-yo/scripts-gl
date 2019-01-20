@@ -11,9 +11,9 @@ Autor: Pablo Sanz Sanz <br>
 <div class='class'>
 <h2>Clase: espacio_afin</h2>
 <p>
-Clase que representa un espacio afín de una dimensión arbitraria. Sirve para diversos cálculos relacionados con aplicaciones, cónicas, etc. <br>
+Clase que representa un espacio afín de una dimensión arbitraria. Sirve para diversos cálculos relacionados con subespacios, cónicas, etc. <br>
 NOTA. Se puede indicar que por defecto los resultados sean devueltos en la referencia canónica o no. En cualquier caso los puntos que se pasan como parámetro deben estar en la referencia de este espacio. Si, por ejemplo, queremos calcular el punto medio de los puntos (-1 : 0 : 1) y (1 : 0 : 1) (dados en la referencia canónica), pero la referencia de este espacio no es la canónica, hay que cambiar primero esos puntos a la referencia de este espacio a mano con la inversa de la matriz que devuelva el método matriz_cambio (M^-1 * X) y después llamar al método con estos dos nuevos puntos. Finalmente, en función del valor que se haya indicado a cambio_defecto, se cambiará la referencia del resultado no. <br>
-Todo esto se aplica en general, salvo que se indique lo contrario. <br>
+Todo esto se aplica en general, salvo que se indique lo contrario. En el caso de métodos que devuelvan subespacios (p.e: asintotas_conica) lo normal será que no se cambie la referencia automáticamente por defecto. Importante tenerlo en cuenta. <br>
 </p>
 <div class='methods'>
 <div class='function'>
@@ -22,17 +22,7 @@ Todo esto se aplica en general, salvo que se indique lo contrario. <br>
 Construye un espacio afín, dados el hiperplano del infinito y la referencia que se está utilizando. Nótese que el hiperplano se supone que viene expresado en la referencia dada. <br>
 Parámetros <br>
 hiperplano_infinito: subespacio(dim=n-1) - hiperplano que se está considerando como infinito (xn = 0 por defecto) <br>
-referencia: lista(vector(n+1))(long=n+2) - referencia en la que estarán expresados los puntos que se consideren en los métodos de esta clase (canónica ([(1 : 0 : ... : 0), (0 : ... 0 : 1), (1 : ... : 1)]) por defecto) <br>
-cambio: booleano - indica si los valores devueltos deben ser previamente cambiados de referencia o no (True por defecto) <br>
 dimension: natural - dimensión de este espacio si no se han especificado los dos anteriores parámetros; por ejemplo, espacio_afin(dimension = 2) crea un espacio afín cuya recta del infinto es z = 0 y la referencia es la canónica (2 por defecto) <br>
-</p>
-</div>
-<div class='function'>
-<h3>Función: cambio_defecto(b)</h3>
-<p>
-Hace que los métodos cambien la referencia a la canónica por defecto. Si se usa s.cambio_defecto(True) (donde s es este espacio), a partir de entonces las funciones devolverán los resultados cambiando primero la referencia. <br>
-Parámetros <br>
-b: booleano - indica si se cambiará la referencia o no <br>
 </p>
 </div>
 <div class='function'>
@@ -46,16 +36,6 @@ Devuelve la dimensión de este espacio afín. </p>
 Devuelve el hiperplano del infinito de este espacio afín en la referencia en que está expresado el espacio. </p>
 </div>
 <div class='function'>
-<h3>Función: referencia()</h3>
-<p>
-Devuelve la referencia en que está expresado este espacio. </p>
-</div>
-<div class='function'>
-<h3>Función: matriz_cambio()</h3>
-<p>
-Devuelve la matriz del cambio de referencia de la referencia en que se encuentra este espacio a la canónica. Calcular la inversa para el cambio contrario. </p>
-</div>
-<div class='function'>
 <h3>Función: es_referencia_valida(referencia)</h3>
 <p>
 Determina si la referencia indicada es válida para es espacio, esto es, todos los vectores son de longitud adecuada, son suficientes y todos menos el último son proyectivamente independientes. <br>
@@ -64,27 +44,27 @@ referencia: lista(vector(n+1))(long=n+2) - referencia a comprobar <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: es_referencia_afin(referencia = None)</h3>
+<h3>Función: es_referencia_afin(referencia)</h3>
 <p>
-Determina si la referencia indicada (la propia de este espacio si no se indica ninguna) es una referencia afín, esto es, cada punto de los n primeros pertenece al hiperplano del infinito. <br>
+Determina si la referencia indicada es una referencia afín, esto es, cada punto de los n primeros pertenece al hiperplano del infinito. <br>
 Parámetros <br>
 referencia: lista(vector(n+1))(long=n+2) - referencia a comprobar <br>
 </p>
 </div>
 <div class='function'>
-<h3>Función: cambiar_referencia(referencia)</h3>
+<h3>Función: cambiar_referencia(matriz_cambio)</h3>
 <p>
-Devuelve un nuevo espacio afín (no modifica este) cuya referencia es la nueva indicada con el hiperplano del infinito transformado correctamente. La variable que indica si se debe cambiar de referencia mantendrá su valor. <br>
-NOTA. Se supone que los puntos dados están dados en coordenadas canónicas. <br>
+Devuelve un nuevo espacio afín (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio de la referencia actual del espacio a R'. <br>
+Implementación <br>
+Cambia la referencia del hiperplano del infinito usando M^-t * u, donde u es el vector asociado a las coordenadas de H (el vector dual al subespacio). <br>
 Parámetros <br>
-referencia: lista(vector(n+1))(long=n+2) - nueva referencia del espacio <br>
+matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia de R a R' <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: puntos_infinitos(s)</h3>
 <p>
 Determina los puntos del infinito del subespacio dado, esto es la intersección de este con el hiperplano del infinito. Devuelve un objeto del tipo subespacio. Si el subespacio dado es una recta se puede tomar el único punto de intersección con el método punto() de la clase subespacio. <br>
-NOTA. ¡No se cambia la referencia del subespacio devuelto! Habría que hacerlo a mano. <br>
 Parámetros <br>
 s: subespacio(dim_ambiente=n) - subespacio del que se quiere conocer los puntos del infinito <br>
 </p>
@@ -138,6 +118,92 @@ Calcula el conjugado armónico de Pinf respecto de P1 y P2, donde Pinf es el pun
 Parámetros <br>
 p1: vector(n+1) - uno de los puntos de los que se quiere calcular el punto medio <br>
 p2: vector(n+1) - el otro punto <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: puntos_infinitos_conica(c)</h3>
+<p>
+Devuelve los dos puntos de intersección de la recta del infinito con la cónica dada. <br>
+Parámetros <br>
+c: conica/parametrizacion_conica - cónica a intersecar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: clasificacion_conica(c)</h3>
+<p>
+Devuelve una cadena de texto que indica el tipo de la cónica dada por parámetro. No se diferencian casos reales de imaginarios (p.e: elipse real o imaginaria). <br>
+Implementación <br>
+Calcula la intersección de la cónica con la recta del infinito y se pueden dar los siguientes casos: <br>
+· Intersección en dos puntos reales: hipérbola. <br>
+· Intersección en dos puntos complejos: elipse <br>
+· Intersección en un punto doble: parábola <br>
+Parámetros <br>
+c: conica/parametrizacion_conica - cónica a clasificar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: centro_conica(c)</h3>
+<p>
+Devuelve el centro de la cónica dada, esto es, el polo de la recta del infinito. Si la cónica es una parábola no tendrá centro y devolverá un vector vacío. <br>
+Parámetros <br>
+c: conica - cónica de la que se quiere saber el centro <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: asintotas_conica(c)</h3>
+<p>
+Devuelve una tupla conteniendo las asíntotas de la cónica dada. Nótese que en caso de ser una elipse estas serán rectas imaginarias y en caso de ser una parábola no tendrá (pues no tiene centro) y se devolverán dos subespacios vacíos. <br>
+Implementación <br>
+Las asíntotas son tangentes a la cónica en la recta del infinito. Se calcula la intersección con ella y el resultado serán las tangentes (las polares) de cada punto. <br>
+Parámetros <br>
+c: conica - cónica de la que obtener las asíntotas <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: referencia_ecuacion_reducida(c, diam = None, x2 = None, e = None, real = True)</h3>
+<p>
+Devuelve una lista con los vectores de la referencia afín en que la cónica dada tendrá ecuación reducid x^2 +/- y^2 +/- z^2 = 0. <br>
+NOTA. Cuidado de no usar asíntotas como diámetro en el parámetro, pues son tangentes a la cónica. <br>
+Implementación <br>
+Si la cónica tiene centro, se toma como origen de coordenadas, esto es, X2 = C. Los otros dos puntos, X0 y X1, se toman como los puntos del infinito de dos diámetros conjugados cualesquiera (se debe indicar uno de ellos como parámetro). <br>
+En el caso de la parábola se tomará como origen un punto de la cónica del que se podrá indicar su coordenada x (z será 1 por defecto). Se tomarán, además, X0 el punto de tangencia con la recta del infinito y el polo de X0X2 como X1. <br>
+El punto unidad será escogido en ambos casos por el método referencia_autopolar de la cónica (conica (cuadricas.sage)). <br>
+Parámetros <br>
+c: conica - cónica de la que obtener la referencia en la que tiene ecuación reducida <br>
+diam: subespacio(dim=1,dim_amb=2) - diámetro que se quiera usar para el primer caso (por defecto ninguno) <br>
+x2: vector(3) - tercer punto que se quiera tomar en la referencia en el segundo caso (por defecto ninguno) <br>
+e: vector(3) - punto unidad que se quiera tomar en la referencia en el segundo caso (por defecto ninguno) <br>
+real: booleano - determina si la cónica debe ser necesariamente real o no (True por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_diametro(c, d)</h3>
+<p>
+Determina si una recta d dada como subespacio es un diámetro de la cónica indicada, es decir, si pasa por su centro. <br>
+Parámetros <br>
+c: conica - cónica de la que se quiere saber si d es diámetro <br>
+d: subespacio(dim=1,dim_amb=2) - recta candidata a ser diámetro <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: diametro_conjugado(c, d)</h3>
+<p>
+Calcula el diámetro conjugado del dado respecto de la conica indicada. <br>
+Implementación <br>
+Obtiene la recta polar del punto del infinito del diámetro respecto de la cónica. <br>
+Parámetros <br>
+c: conica - cónica sobre la que se quiere calcular el diámetro conjugado <br>
+d: subespacio(dim=1,dim_amb=2) - diámetro del que se quiere calcular su conjugado <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: son_diametros_conjugados(c, d1, d2)</h3>
+<p>
+Determina si los diámetros d1 y d2 son conjugados respecto a la cónica c. Esto ocurre cuando sus puntos del infinito son conjugados respecto a c, o lo que es lo mismo, que la polar del punto del infinito de uno sea el otro diámetro. <br>
+Parámetros <br>
+c: conica - cónica de la que se quiere saber si los diámetros son conjugados <br>
+d1: subespacio(dim=1,dim_amb=2) - primer diámetro <br>
+d2: subespacio(dim=1,dim_amb=2) - segundo diámetro <br>
 </p>
 </div>
 </div>

@@ -763,9 +763,9 @@ class parametrizacion_conica:
 
     #\m
     # Devuelve la referencia en que está expresada esta parametrización en función de la referencia canónica
-    # (es decir, las columnas de la matriz del cambio).
+    # (es decir, las columnas de la matriz del cambio y la suma de ellas).
     def referencia(self):
-        return self._matriz_cambio.columns()
+        return self._matriz_cambio.columns() + [sum(self._matriz_cambio.columns())]
 
     #\m
     # Devuelve la referencia en que esta cónica tiene coordenadas (1, theta, theta^2) (las columnas de la matriz que
@@ -773,7 +773,7 @@ class parametrizacion_conica:
     #
     # NOTA. No estoy muy seguro pero creo que esto está dado en función de la primera referencia.
     def referencia2(self):
-        return self._matriz.columns()
+        return self._matriz.columns() + [sum(self._matriz.columns())]
 
     # Otros métodos
 
