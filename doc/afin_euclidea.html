@@ -12,14 +12,12 @@ Autor: Pablo Sanz Sanz <br>
 <h2>Clase: espacio_afin</h2>
 <p>
 Clase que representa un espacio afín de una dimensión arbitraria. Sirve para diversos cálculos relacionados con subespacios, cónicas, etc. <br>
-NOTA. Se puede indicar que por defecto los resultados sean devueltos en la referencia canónica o no. En cualquier caso los puntos que se pasan como parámetro deben estar en la referencia de este espacio. Si, por ejemplo, queremos calcular el punto medio de los puntos (-1 : 0 : 1) y (1 : 0 : 1) (dados en la referencia canónica), pero la referencia de este espacio no es la canónica, hay que cambiar primero esos puntos a la referencia de este espacio a mano con la inversa de la matriz que devuelva el método matriz_cambio (M^-1 * X) y después llamar al método con estos dos nuevos puntos. Finalmente, en función del valor que se haya indicado a cambio_defecto, se cambiará la referencia del resultado no. <br>
-Todo esto se aplica en general, salvo que se indique lo contrario. En el caso de métodos que devuelvan subespacios (p.e: asintotas_conica) lo normal será que no se cambie la referencia automáticamente por defecto. Importante tenerlo en cuenta. <br>
 </p>
 <div class='methods'>
 <div class='function'>
 <h3>Constructor</h3>
 <p>
-Construye un espacio afín, dados el hiperplano del infinito y la referencia que se está utilizando. Nótese que el hiperplano se supone que viene expresado en la referencia dada. <br>
+Construye un espacio afín, dado el hiperplano del infinito. <br>
 Parámetros <br>
 hiperplano_infinito: subespacio(dim=n-1) - hiperplano que se está considerando como infinito (xn = 0 por defecto) <br>
 dimension: natural - dimensión de este espacio si no se han especificado los dos anteriores parámetros; por ejemplo, espacio_afin(dimension = 2) crea un espacio afín cuya recta del infinto es z = 0 y la referencia es la canónica (2 por defecto) <br>
@@ -54,11 +52,11 @@ referencia: lista(vector(n+1))(long=n+2) - referencia a comprobar <br>
 <div class='function'>
 <h3>Función: cambiar_referencia(matriz_cambio)</h3>
 <p>
-Devuelve un nuevo espacio afín (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio de la referencia actual del espacio a R'. <br>
+Devuelve un nuevo espacio afín (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio de la referencia canónica a R'. <br>
 Implementación <br>
 Cambia la referencia del hiperplano del infinito usando M^-t * u, donde u es el vector asociado a las coordenadas de H (el vector dual al subespacio). <br>
 Parámetros <br>
-matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia de R a R' <br>
+matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia a R' <br>
 </p>
 </div>
 <div class='function'>
@@ -67,6 +65,14 @@ matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia de R a R' <br>
 Determina los puntos del infinito del subespacio dado, esto es la intersección de este con el hiperplano del infinito. Devuelve un objeto del tipo subespacio. Si el subespacio dado es una recta se puede tomar el único punto de intersección con el método punto() de la clase subespacio. <br>
 Parámetros <br>
 s: subespacio(dim_ambiente=n) - subespacio del que se quiere conocer los puntos del infinito <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: direccion(r)</h3>
+<p>
+Devuelve la dirección de la recta indicada, esto es, su corte con la recta del infinito. <br>
+Parámetros <br>
+r: subespacio(dim=1,dim_amb=n) - recta de la que calcular su dirección <br>
 </p>
 </div>
 <div class='function'>
@@ -79,6 +85,17 @@ s: subespacio(dim_ambiente=n) - el otro <br>
 </p>
 </div>
 <div class='function'>
+<h3>Función: paralela(r, p)</h3>
+<p>
+Calcula la recta paralela la recta r que pasa por el punto P. <br>
+Implementación <br>
+Calcula el punto del infinito de la recta y lo une con P. <br>
+Parámetros <br>
+r: subespacio(dim=1,dim_amb=n) - recta de la que obtener la paralela <br>
+p: vector(m+1) - punto por el que debe pasar la paralela <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: razon_simple(a, b, c)</h3>
 <p>
 Calcula la razón simple (A, B, C) de los puntos alineados dados. <br>
@@ -88,6 +105,18 @@ Parámetros <br>
 a: vector(n+1) - primer punto de la razón simple <br>
 b: vector(n+1) - segundo punto de la razón simple <br>
 c: vector(n+1) - tercer punto de la razón simple <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: desplazar(p, a, b)</h3>
+<p>
+Devuelve el punto que se obtiene al desplazar el punto P dado en la dirección del vector AB y distancia |AB|. <br>
+Implementación <br>
+Calcula la recta paralela desde P al vector AB y halla la intersección con la paralela a PA desde B. <br>
+Parámetros <br>
+p: vector(n+1) - punto a desplazar <br>
+a: vector(n+1) - punto de origen del vector <br>
+b: vector(n+1) - punto de destino del vector <br>
 </p>
 </div>
 <div class='function'>
@@ -204,6 +233,102 @@ Parámetros <br>
 c: conica - cónica de la que se quiere saber si los diámetros son conjugados <br>
 d1: subespacio(dim=1,dim_amb=2) - primer diámetro <br>
 d2: subespacio(dim=1,dim_amb=2) - segundo diámetro <br>
+</p>
+</div>
+</div>
+</div>
+<div class='class'>
+<h2>Clase: espacio_euclideo</h2>
+<p>
+Clase que representa un espacio euclídeo de dimensión 2. Sirve para diversos cálculos relacionados con subespacios, cónicas, etc. No utiliza la cuádrica del absoluto, pero sí los puntos conjugados del infinito. <br>
+IMPORTANTE. Cuidado de no llamar a ninguna variable I por ningún lugar o probablemente esto deje de funcionar. <br>
+NOTA. Esta clase está basada en espacio_afin, pero no me he molestado en aprender herencia en Python, así que, si se quieren usar métodos de espacio_afin, se deberá acceder al que esta clase proporciona mediante el método espacio_afin(). <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor</h3>
+<p>
+Construye un espacio euclídeo dado uno de sus puntos conjugados del infinito. <br>
+Parámetros <br>
+i: vector(3)(imaginario) - uno de los puntos cíclicos conjugados del infinito, del que se obtiene la recta del infinito ((1 : i : 0) por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: espacio_afin()</h3>
+<p>
+Devuelve el espacio afín asociado a este espacio euclídeo. </p>
+</div>
+<div class='function'>
+<h3>Función: recta_infinito()</h3>
+<p>
+Devuelve la recta del infinito de este espacio euclídeo. </p>
+</div>
+<div class='function'>
+<h3>Función: conjugados_infinito()</h3>
+<p>
+Devuelve una tupla conteniendo los puntos conjugados del infinito. </p>
+</div>
+<div class='function'>
+<h3>Función: I()</h3>
+<p>
+Devuelve el primer punto conjugado del infinito. </p>
+</div>
+<div class='function'>
+<h3>Función: J()</h3>
+<p>
+Devuelve el segundo punto conjugado del infinito. </p>
+</div>
+<div class='function'>
+<h3>Función: cambiar_referencia(matriz_cambio)</h3>
+<p>
+Devuelve un nuevo espacio euclídeo (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio de la referencia canónica a R'. <br>
+Implementación <br>
+Cambia la referencia del espacio afín asociado a este y las coordenadas de los puntos conjugados del infinito. <br>
+Parámetros <br>
+matriz_cambio: matriz(3,3) - matriz del cambio de referencia a R' <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: perpendiculares(u, v)</h3>
+<p>
+Determina si las direcciones son ortogonales. <br>
+Para determinar si lo son dos rectas, primero calcular su dirección. <br>
+Implementación <br>
+Determina si los puntos forman una cuaterna armónica con los puntos conjugados del infinito. <br>
+u: vector(3) - uno de los puntos del infinito de los que se quiere saber si son perpendiculares <br>
+v: vector(3) - el otro <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: direccion_perpendicular(u)</h3>
+<p>
+Determina la dirección perpendicular a la dada. <br>
+Implementación <br>
+Calcula el cuarto armónico de u respecto de los puntos conjugados del infinito. <br>
+Parámetros <br>
+u: vector(3) - el punto del infinito del que se quiere saber su perpendicular <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: perpendicular(u, p)</h3>
+<p>
+Determina la recta perpendicular a la dada que pasa por el punto P dado. <br>
+Implementación <br>
+Calcula la dirección perpendicular y une con P. <br>
+Parámetros <br>
+u: vector(3) - el punto del infinito del que se quiere saber su perpendicular <br>
+p: vector(3) - punto por el que debe pasar la perpendicular calculada <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: angulo(u, v)</h3>
+<p>
+Calcula el ángulo entre dos direcciones. <br>
+Para calcularlo para rectas, calcular su dirección primero. <br>
+Implementación <br>
+Calcula 1/2i * Log{u, v; I, J} <br>
+u: vector(3) - uno de los puntos del infinito de los que se quiere saber si son perpendiculares <br>
+v: vector(3) - el otro <br>
 </p>
 </div>
 </div>

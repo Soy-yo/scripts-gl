@@ -38,7 +38,7 @@ def crear_aplicacion_proyectiva(iniciales, finales, centro = []):
     # Matriz del cambio de referencia a la canónica
     p = matriz_asociada(matrix(iniciales[0 : len(iniciales) - 1] + centro + [iniciales[-1]]).T)
     paso(p)
-    coef = vector([var('alfa_var' + str(i + 1), latex_name = '\\alfa_' + str(i + 1)) for i in range(len(iniciales) - 1)])
+    coef = vector([var('alpha_var' + str(i + 1), latex_name = '\\alpha_' + str(i + 1)) for i in range(len(iniciales) - 1)])
     ec = (matrix(finales[0 : len(finales) - 1]).T * coef).simplify_full()
     paso("Forzamos [f(e_1 + ... + e_(k-1))] = f(e_k):")
     paso(matrix([ec]).T, "=", matrix([finales[-1]]).T)
@@ -46,7 +46,7 @@ def crear_aplicacion_proyectiva(iniciales, finales, centro = []):
     # Finales * Alfa y rellenamos los demás con 0
     m = matrix([finales[i] * coef[i].substitute(res[0][i]) for i in range(len(finales) - 1)] \
                 + [vector([0 for j in range(d)]) for i in range(d - len(finales) + 1)]).T
-    paso("En la referencia formada por", iniciales[0 : len(iniciales) - 1] + centro + [iniciales[-1]], ", la matriz de la aplicación es:")
+    paso("En la referencia formada por", iniciales[0 : len(iniciales) - 1] + centro + [iniciales[-1]], ", la matriz de la aplicacion es:")
     paso(m)
     paso("El cambio de referencia se hace:")
     paso(m, p, "^-1 = ", m * p^-1)

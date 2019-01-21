@@ -11,22 +11,10 @@
 # Clase que representa un espacio afín de una dimensión arbitraria. Sirve para diversos cálculos relacionados con
 # subespacios, cónicas, etc.
 #
-# NOTA. Se puede indicar que por defecto los resultados sean devueltos en la referencia canónica o no. En cualquier caso los
-# puntos que se pasan como parámetro deben estar en la referencia de este espacio.
-# Si, por ejemplo, queremos calcular el punto medio de los puntos (-1 : 0 : 1) y (1 : 0 : 1) (dados en la referencia canónica),
-# pero la referencia de este espacio no es la canónica, hay que cambiar primero esos puntos a la referencia de este espacio a
-# mano con la inversa de la matriz que devuelva el método matriz_cambio (M^-1 * X) y después llamar al método con estos
-# dos nuevos puntos. Finalmente, en función del valor que se haya indicado a cambio_defecto, se cambiará la referencia del
-# resultado no.
-#
-# Todo esto se aplica en general, salvo que se indique lo contrario. En el caso de métodos que devuelvan subespacios (p.e:
-# asintotas_conica) lo normal será que no se cambie la referencia automáticamente por defecto. Importante tenerlo en cuenta.
-#
 class espacio_afin:
 
     #\i
-    # Construye un espacio afín, dados el hiperplano del infinito y la referencia que se está utilizando.
-    # Nótese que el hiperplano se supone que viene expresado en la referencia dada.
+    # Construye un espacio afín, dado el hiperplano del infinito.
     #
     # Parámetros \\
     # hiperplano_infinito: subespacio(dim=n-1) - hiperplano que se está considerando como infinito (xn = 0 por defecto) \\
@@ -91,14 +79,14 @@ class espacio_afin:
 
     #\m
     # Devuelve un nuevo espacio afín (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio
-    # de la referencia actual del espacio a R'.
+    # de la referencia canónica a R'.
     #
     # Implementación \\
     # Cambia la referencia del hiperplano del infinito usando M^-t * u, donde u es el vector asociado a las coordenadas de H
     # (el vector dual al subespacio).
     #
     # Parámetros \\
-    # matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia de R a R'
+    # matriz_cambio: matriz(n+1,n+1) - matriz del cambio de referencia a R'
     #
     def cambiar_referencia(self, matriz_cambio):
         assert matriz_cambio.is_square() and matriz_cambio.nrows() == self._dim + 1, "La matriz debe representar un cambio en este espacio"
@@ -127,6 +115,16 @@ class espacio_afin:
         return s.interseccion(self._infinito)
 
     #\m
+    # Devuelve la dirección de la recta indicada, esto es, su corte con la recta del infinito.
+    #
+    # Parámetros \\
+    # r: subespacio(dim=1,dim_amb=n) - recta de la que calcular su dirección
+    #
+    def direccion(self, r):
+        assert r.dim() == 1, "El subespacio debe ser una recta"
+        return self.puntos_infinitos(r).punto()
+
+    #\m
     # Determina si dos subespacios son paralelos, esto es, si la intersección con el hiperplano del infinito de uno esá contenida
     # (o es igual) en la del otro.
     #
@@ -144,6 +142,25 @@ class espacio_afin:
         inf2 = self.puntos_infinitos(s)
         # ¿Están todos los puntos representantes del pequeño en el grande?
         return all(map(lambda p: p in inf2, inf1.representantes()))
+
+    #\m
+    # Calcula la recta paralela la recta r que pasa por el punto P.
+    #
+    # Implementación \\
+    # Calcula el punto del infinito de la recta y lo une con P.
+    #
+    # Parámetros \\
+    # r: subespacio(dim=1,dim_amb=n) - recta de la que obtener la paralela \\
+    # p: vector(m+1) - punto por el que debe pasar la paralela
+    #
+    def paralela(self, r, p):
+        assert len(p) == self._dim + 1, "El punto debe pertenecer a este espacio"
+        paso("Calculamos la direccion de la recta dada, que es la interseccion con el hiperplano del infinito")
+        _no_pasos()
+        u = self.direccion(r)
+        _no_pasos(False)
+        paso(u, "; unimos con el punto dado: ", p)
+        return subespacio(p, u)
 
     #\m
     # Calcula la razón simple (A, B, C) de los puntos alineados dados.
@@ -165,6 +182,34 @@ class espacio_afin:
         pinf = self.puntos_infinitos(r).punto()
         paso("El punto del infinito es: ", pinf, "; calculamos la razon doble:")
         return razon_doble_puntos(pinf, a, b, c)
+
+    #\m
+    # Devuelve el punto que se obtiene al desplazar el punto P dado en la dirección del vector AB y distancia |AB|.
+    #
+    # Implementación \\
+    # Calcula la recta paralela desde P al vector AB y halla la intersección con la paralela a PA desde B.
+    #
+    # Parámetros \\
+    # p: vector(n+1) - punto a desplazar \\
+    # a: vector(n+1) - punto de origen del vector \\
+    # b: vector(n+1) - punto de destino del vector
+    #
+    def desplazar(self, p, a, b):
+        assert len(p) == self._dim + 1 and len(a) == self._dim + 1 and len(b) == self._dim + 1, "Los puntos deben pertenecer a este espacio"
+        paso("Calculamos la recta que une los puntos del vector: ", a, ", ", b , ", para luego calcular la paralela a esta que pasa por el punto dado:")
+        _no_pasos()
+        ab = subespacio(a, b)
+        _no_pasos(False)
+        paso("La recta es: ", ab.implicitas()[0])
+        r = self.paralela(ab, p)
+        paso("Calculamos la recta que une el punto: ", p, " con el primer punto del vector: ", a, ", para luego calcular su paralela por: ", b)
+        _no_pasos()
+        pa = subespacio(p, a)
+        _no_pasos(False)
+        paso("La recta es: ", pa.implicitas()[0])
+        s = self.paralela(pa, b)
+        paso("El resultado es la interseccion")
+        return r.interseccion(s).punto()
 
     #\m
     # Determina si los puntos dados son simétricos respecto del centro dado. Para ello deben yacer todos en la misma recta.
@@ -430,3 +475,139 @@ class espacio_afin:
 
     def __repr__(self):
         return "<Espacio afin de dimension " + str(self._dim) + " con hiperplano del infinito de ecuacion " + str(self._infinito.implicitas()[0]) + ">"
+
+#\c
+# Clase que representa un espacio euclídeo de dimensión 2. Sirve para diversos cálculos relacionados con subespacios, cónicas, etc.
+# No utiliza la cuádrica del absoluto, pero sí los puntos conjugados del infinito.
+#
+# IMPORTANTE. Cuidado de no llamar a ninguna variable I por ningún lugar o probablemente esto deje de funcionar.
+#
+# NOTA. Esta clase está basada en espacio_afin, pero no me he molestado en aprender herencia en Python, así que, si se quieren usar métodos de
+# espacio_afin, se deberá acceder al que esta clase proporciona mediante el método espacio_afin().
+#
+class espacio_euclideo:
+
+    #\i
+    # Construye un espacio euclídeo dado uno de sus puntos conjugados del infinito.
+    #
+    # Parámetros \\
+    # i: vector(3)(imaginario) - uno de los puntos cíclicos conjugados del infinito, del que se obtiene la recta del infinito ((1 : i : 0) por defecto)
+    #
+    def __init__(self, i = vector([1, I, 0])):
+        assert len(i) == 3, "El punto conjugado del infinito debe pertenecer al plano"
+        self._i = i
+        # Por vaguería
+        self._j = conjugate(i)
+        paso("Obtenemos la recta del infinito a partir de los puntos conjugados del infinito I y J")
+        infinito = subespacio(self._i, self._j)
+        self._afin = espacio_afin(infinito)
+
+    # Métodos accedentes
+
+    #\m
+    # Devuelve el espacio afín asociado a este espacio euclídeo.
+    def espacio_afin(self):
+        return self._afin
+
+    #\m
+    # Devuelve la recta del infinito de este espacio euclídeo.
+    def recta_infinito(self):
+        return self._afin.hiperplano_infinito()
+
+    #\m
+    # Devuelve una tupla conteniendo los puntos conjugados del infinito.
+    def conjugados_infinito(self):
+        return (self._i, self._j)
+
+    #\m
+    # Devuelve el primer punto conjugado del infinito.
+    def I(self):
+        return self._i
+
+    #\m
+    # Devuelve el segundo punto conjugado del infinito.
+    def J(self):
+        return self._j
+
+    # Otros métodos
+
+    #\m
+    # Devuelve un nuevo espacio euclídeo (no modifica este) que se supone expresado en una referencia R' dada la matriz del cambio
+    # de la referencia canónica a R'.
+    #
+    # Implementación \\
+    # Cambia la referencia del espacio afín asociado a este y las coordenadas de los puntos conjugados del infinito.
+    #
+    # Parámetros \\
+    # matriz_cambio: matriz(3,3) - matriz del cambio de referencia a R'
+    #
+    def cambiar_referencia(self, matriz_cambio):
+        afin = self._afin.cambiar_referencia(matriz_cambio)
+        i2 = matriz_cambio * self._i
+        paso("Calculamos las nuevas coordenadas de I: ", matriz_cambio, self._i, " = ", i2)
+        return espacio_euclideo(afin.hiperplano_infinito(), i2)
+
+    #\m
+    # Determina si las direcciones son ortogonales.
+    #
+    # Para determinar si lo son dos rectas, primero calcular su dirección.
+    #
+    # Implementación \\
+    # Determina si los puntos forman una cuaterna armónica con los puntos conjugados del infinito.
+    #
+    # u: vector(3) - uno de los puntos del infinito de los que se quiere saber si son perpendiculares \\
+    # v: vector(3) - el otro
+    #
+    def perpendiculares(self, u, v):
+        assert u in self.recta_infinito() and v in self.recta_infinito(), "Los puntos deben ser puntos del infinito"
+        paso("Dos direcciones son perpendiculares si forman una cuaterna armonica con los conjugados del infinito: ", self._i, ", ", self._j)
+        return bool(es_cuaterna_armonica_puntos(u, v, self._i, self._j))
+
+    #\m
+    # Determina la dirección perpendicular a la dada.
+    #
+    # Implementación \\
+    # Calcula el cuarto armónico de u respecto de los puntos conjugados del infinito.
+    #
+    # Parámetros \\
+    # u: vector(3) - el punto del infinito del que se quiere saber su perpendicular
+    #
+    def direccion_perpendicular(self, u):
+        assert u in self.recta_infinito(), "El punto debe ser del infinito"
+        paso("La direccion perpendicular sera el cuarto armonico con los conjugados del infinito: ", self._i, ", ", self._j)
+        return conjugado_armonico_puntos(self._i, self._j, u)
+
+    #\m
+    # Determina la recta perpendicular a la dada que pasa por el punto P dado.
+    #
+    # Implementación \\
+    # Calcula la dirección perpendicular y une con P.
+    #
+    # Parámetros \\
+    # u: vector(3) - el punto del infinito del que se quiere saber su perpendicular \\
+    # p: vector(3) - punto por el que debe pasar la perpendicular calculada
+    #
+    def perpendicular(self, u, p):
+        v = self.direccion_perpendicular(u)
+        return subespacio(p, v)
+
+    #\m
+    # Calcula el ángulo entre dos direcciones.
+    #
+    # Para calcularlo para rectas, calcular su dirección primero.
+    #
+    # Implementación \\
+    # Calcula 1/2i * Log{u, v; I, J}
+    #
+    # u: vector(3) - uno de los puntos del infinito de los que se quiere saber si son perpendiculares \\
+    # v: vector(3) - el otro
+    #
+    def angulo(self, u, v):
+        paso("La formula para el angulo es 1/2i * Log{", u, ", ", v, "; ", self._i, ", ", self._j, "}")
+        r = razon_doble_puntos(u, v, self._i, self._j)
+        paso("La razon doble es: ", r)
+        return 1/(2*I) * log(r)
+
+    def __repr__(self):
+        return "<Espacio euclideo de dimension 2 con recta del infinito de ecuacion " + str(self.recta_infinito().implicitas()[0]) + \
+            " y puntos ciclicos conjugados del infinito I = " + str(self._i) + ", J = " + str(self._j) + ">"
