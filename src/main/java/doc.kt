@@ -41,8 +41,9 @@ fun main() {
 
 fun makeHead(bw: BufferedWriter, title: String) {
     bw.write("<head>\n")
-    bw.write("<title>$title</title>")
-    bw.write("<link rel='stylesheet' type='text/css' href='style.css'>")
+    bw.write("<title>$title</title>\n")
+    bw.write("<meta charset='utf-8'>")
+    bw.write("<link rel='stylesheet' type='text/css' href='style.css'>\n")
     bw.write("</head>\n")
 }
 
