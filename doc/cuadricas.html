@@ -145,7 +145,7 @@ Determina si esta cónica es una recta doble, esto es, si el rango de su matriz 
 <div class='function'>
 <h3>Función: puntos(x0 = None, y0 = None, z0 = None)</h3>
 <p>
-Devuelve una tupla conteniendo los dos puntos de la cónica dadas dos de sus coordenadas. No se deben dar ni más ni menos. Devolverá dos veces el mismo punto si sólo hay un punto que cumpla esas condiciones. <br>
+Devuelve una tupla conteniendo los dos puntos de la cónica dadas dos de sus coordenadas. No se deben dar ni más ni menos. Devolverá dos veces el mismo punto si sólo hay un punto que cumpla esas condiciones. Devolverá una tupla con dos vectores vacíos en caso de no encontrar ninguno. <br>
 Uso: (P, Q) = c.puntos(x0 = x, y0 = y) (donde c es una cónica, x, y son números); similarmente: P = c.puntos(x0 = x, z0 = z), P = c.puntos(y0 = y, z0 = z) <br>
 Implementación <br>
 Resuelve la ecuación de la cónica sustituyendo los valores dados para la variable no dada. <br>
@@ -292,6 +292,14 @@ Parámetros <br>
 p: vector(3) - primer punto de la referencia (debe pertenecer a la cóncia) <br>
 r: vector(3) - tercer punto de la referencia (debe pertenecer a la cóncia) <br>
 e: vector(3) - punto unidad de la referencia (debe pertenecer a la cóncia) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: factorizacion()</h3>
+<p>
+Factoriza esta cónica degenerada en dos rectas. Devuelve una tupla conteniendo las dos rectas como subespacios, que serán la misma en caso de que la cónica sea una recta doble. <br>
+Implementación <br>
+Si es una recta doble (rango 1) se interseca con dos rectas cualesquiera y se unen los puntos. Si son dos rectas (rango 2) se toma el punto de intersección y la intersección con otra recta que no pase por ese punto. <br>
 </p>
 </div>
 <div class='function'>

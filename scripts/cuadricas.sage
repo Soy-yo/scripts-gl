@@ -287,6 +287,7 @@ class conica:
     #\m
     # Devuelve una tupla conteniendo los dos puntos de la cónica dadas dos de sus coordenadas. No se deben dar ni más ni menos.
     # Devolverá dos veces el mismo punto si sólo hay un punto que cumpla esas condiciones.
+    # Devolverá una tupla con dos vectores vacíos en caso de no encontrar ninguno.
     #
     # Uso: (P, Q) = c.puntos(x0 = x, y0 = y) (donde c es una cónica, x, y son números); similarmente:
     # P = c.puntos(x0 = x, z0 = z), P = c.puntos(y0 = y, z0 = z)
@@ -303,13 +304,13 @@ class conica:
         assert len(filter(lambda t: t is None, [x0, y0, z0])) == 1, "Se debe especificar el valor de dos variables exactamente"
         if x0 is None:
             sol = map(lambda s: s.rhs(), solve(self.ecuacion().substitute(self._vars[1] == y0, self._vars[2] == z0), self._vars[0]))
-            return (vector([sol[0], y0, z0]), vector([sol[-1], y0, z0]))
+            return (vector([sol[0], y0, z0]), vector([sol[-1], y0, z0])) if len(sol) > 0 else (vector([]), vector([]))
         if y0 is None:
             sol = map(lambda s: s.rhs(), solve(self.ecuacion().substitute(self._vars[0] == x0, self._vars[2] == z0), self._vars[1]))
-            return (vector([x0, sol[0], z0]), vector([x0, sol[-1], z0]))
+            return (vector([x0, sol[0], z0]), vector([x0, sol[-1], z0])) if len(sol) > 0 else (vector([]), vector([]))
         if z0 is None:
             sol = map(lambda s: s.rhs(), solve(self.ecuacion().substitute(self._vars[0] == x0, self._vars[1] == y0), self._vars[2]))
-            return (vector([x0, y0, sol[0]]), vector([x0, y0, sol[-1]]))
+            return (vector([x0, y0, sol[0]]), vector([x0, y0, sol[-1]])) if len(sol) > 0 else (vector([]), vector([]))
 
     #\m
     # Determina si la recta dada es tangente a esta cónica.
@@ -600,6 +601,72 @@ class conica:
         m = matriz_asociada(matrix([p, q, r, e]).T)
         return parametrizacion_conica(identity_matrix(3), m)
 
+    #\m
+    # Factoriza esta cónica degenerada en dos rectas. Devuelve una tupla conteniendo las dos rectas como subespacios, que serán la misma
+    # en caso de que la cónica sea una recta doble.
+    #
+    # Implementación \\
+    # Si es una recta doble (rango 1) se interseca con dos rectas cualesquiera y se unen los puntos.
+    # Si son dos rectas (rango 2) se toma el punto de intersección y la intersección con otra recta que no pase por ese punto.
+    #
+    def factorizacion(self):
+        assert self.es_degenerada(), "Para factorizar una conica esta debe ser degenerada"
+        i = 0
+        x = self.__punto_aleatorio(-10, 10)
+        # Buscamos uno que no esté en la cónica
+        while x in self and i < 100:
+            x = self.__punto_aleatorio(-10, 10)
+            i = i + 1
+        assert x not in self, "Algo ha ido mal al intentar factorizar =("
+        if self.es_recta_doble():
+            _no_pasos()
+            i = 0
+            y = self.__punto_aleatorio(-10, 10)
+            # Buscamos uno distinto
+            while matrix([x, y]).rank() == 1 and i < 100:
+                y = self.__punto_aleatorio(-10, 10)
+                i = i + 1
+            b = matrix([x, y]).rank() == 2
+            _no_pasos(False)
+            assert b, "Algo ha ido mal al intentar factorizar =("
+            _no_pasos()
+            r = recta_proyectiva(x, y)
+            i = 0
+            z = self.__punto_aleatorio(-10, 10)
+            # Ahora un tercero que no esté en la recta
+            while z in r and i < 100:
+                z = self.__punto_aleatorio(-10, 10)
+                i = i + 1
+            b = z not in r
+            _no_pasos(False)
+            assert b, "Algo ha ido mal al intentar factorizar =("
+            _no_pasos()
+            s = recta_proyectiva(x, z)
+            p = self.interseccion_recta(r)[0]
+            q = self.interseccion_recta(s)[0]
+            res = subespacio(p, q)
+            _no_pasos(False)
+            return (res, res)
+        else:
+            _no_pasos()
+            c = self.interseccion().punto()
+            i = 0
+            y = self.__punto_aleatorio(-10, 10)
+            # Buscamos uno distinto y de la intersección
+            while (matrix([x, y]).rank() == 1 or matrix([c, y]).rank() == 1) and i < 100:
+                y = self.__punto_aleatorio(-10, 10)
+                i = i + 1
+            b = matrix([x, y]).rank() == 2 and matrix([c, y]).rank() == 2
+            _no_pasos(False)
+            assert b, "Algo ha ido mal al intentar factorizar =("
+            _no_pasos()
+            r = recta_proyectiva(x, y)
+            (p, q) = self.interseccion_recta(r)
+            res1 = subespacio(c, p)
+            res2 = subespacio(c, q)
+            _no_pasos(False)
+            return (res1, res2)
+
     # ELIMINADO DE MOMENTO PORQUE PARECE NO FUNCIONAR BIEN
     '''
     #
@@ -683,6 +750,9 @@ class conica:
         return self(punto) == 0
 
     # Métodos auxiliares
+
+    def __punto_aleatorio(self, a, b):
+        return vector([randint(a, b) for i in range(3)])
 
     def __calcular_uxv(self, m):
         # Simplifica por si acaso

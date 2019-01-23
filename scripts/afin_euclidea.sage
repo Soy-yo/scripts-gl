@@ -467,11 +467,8 @@ class espacio_afin:
         paso("La interseccion es: ", a, ", ", b)
         # Los puntos son distintos (con que uno sea real los dos deberían serlo pero se comprueba de todos modos)
         if matrix([a, b]).rank() == 2:
-            return 0 if self.__es_real(a) and self.__es_real(b) else 1
+            return 0 if es_real(a) and es_real(b) else 1
         return 2
-
-    def __es_real(self, p):
-        return p == conjugate(p)
 
     def __repr__(self):
         return "<Espacio afin de dimension " + str(self._dim) + " con hiperplano del infinito de ecuacion " + str(self._infinito.implicitas()[0]) + ">"
@@ -608,6 +605,118 @@ class espacio_euclideo:
         paso("La razon doble es: ", r)
         return 1/(2*I) * log(r)
 
+    #\m
+    # Determina si la cónica C dada es una circunferencia, esto es, si contiene los puntos conjugados del infinito.
+    #
+    # Parámetros \\
+    # c: conica/parametrizacion_conica - conica a comprobar si es una circunferencia
+    #
+    def es_circunferencia(self, c):
+        return self._i in c and self._j in c
+
+    #\m
+    # Devuelve una lista contieniendo los focos de la cónica dada.
+    #
+    # NOTA. Puede ser un poco lento. Paciencia. También puede ser que dé resultados horribles según sea la cónica.
+    #
+    # Implementación \\
+    # Se obtienen las cónicas degeneradas tangentes a c desde I y J y se obtienen los puntos de corte F, F', G y G', donde G, G'
+    # son los focos imaginarios. En caso de ser una circunferencia, únicamente devuelve su centro.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que calcular los focos
+    #
+    def focos(self, c):
+        if S.es_circunferencia(c):
+            paso("I = ", self._i, ", J = ", self._j, " pertenecen a la conica, luego es una circunferencia: el unico foco es el centro")
+            return [S._afin.centro_conica(c)]
+        paso("Calculamos las tangentes desde I = ", self._i, ", y J = ", self._j)
+        tangi = c.tangentes(self._i)
+        _no_pasos()
+        tangj = c.tangentes(self._j)
+        _no_pasos(False)
+        paso("Las de J deberian ser las conjugadas; desde I: ", tangi.ecuacion(factor = True), "; desde J: ", tangj.ecuacion(factor = True))
+        (ri, si) = tangi.factorizacion()
+        (rj, sj) = tangj.factorizacion()
+        # Es parábola
+        if ri == self.recta_infinito() or si == self.recta_infinito():
+            r = ri if ri != self.recta_infinito() else si
+            s = rj if rj != self.recta_infinito() else sj
+            paso("Es una parabola: el foco sera la interseccion entre las rectas que no coinciden:")
+            paso(r.implicitas()[0], ", ", s.implicitas()[0])
+            _no_pasos()
+            f = r.interseccion(s).punto().simplify_full()
+            _no_pasos(False)
+            return [f]
+        else:
+            _no_pasos()
+            # Simplificamos por intentar quitar alguna i que sobre
+            f1 = ri.interseccion(rj).punto().simplify_full()
+            f2 = ri.interseccion(sj).punto().simplify_full()
+            f3 = si.interseccion(rj).punto().simplify_full()
+            f4 = si.interseccion(sj).punto().simplify_full()
+            _no_pasos(False)
+            paso("Intersecamos las cuatro rectas entre si:")
+            paso(ri.implicitas()[0], " con: ", rj.implicitas()[0], ", ", sj.implicitas()[0], ": ", f1, ", ", f2)
+            paso(si.implicitas()[0], ", con las mismas: ", f3, ", ", f4)
+            # Devolvemos los focos reales primero
+            return sorted([f1, f2, f3, f4], key = lambda f: not es_real(f))
+
+    #\m
+    # Devuelve una tupla con los ejes de la cónica dada. Para una cónica con cuatro focos, simplemente une los focos reales entre sí (y lo
+    # mismo para los imaginarios). Para las cónicas con un solo foco, lo une con el "centro" infinito en el caso de la parábola y con el x
+    # dado por parámetro en el caso de la circunferencia, pues el foco coincide con el centro (el otro eje es su perpendicular).
+    #
+    # IMPORTANTE. En el caso de la parábola el segundo eje que se devuelve no es un eje real, sino la recta del infinito.
+    #
+    # NOTA. No se muestra el procedimiento de calcular los focos.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que obtener sus ejes \\
+    # x: vector(3) - dirección (punto de la recta del infinito) desde la que calcular el prumer eje en el caso de la circunferencia
+    # (por defecto ninguno, pues en general no es necesario)
+    #
+    def ejes(self, c, x = None):
+        _no_pasos()
+        focos = self.focos(c)
+        _no_pasos(False)
+        paso("Los focos son: ", focos)
+        if len(focos) == 4:
+            paso("Los unimos:")
+            # Deberían estar ordenados, primero los reales
+            e1 = subespacio(focos[0], focos[1])
+            e2 = subespacio(focos[2], focos[3])
+            return (e1, e2)
+        elif not self.es_circunferencia(c):
+            _no_pasos()
+            centro = self._afin.puntos_infinitos_conica(c)[0]
+            _no_pasos(False)
+            paso("Lo unimos con el punto de tangencia en el infinito: ", centro)
+            e1 = subespacio(focos[0], centro)
+            paso("El otro sera la recta del infinito")
+            return (e1, self.recta_infinito())
+        else:
+            assert x is not None and x in self.recta_infinito(), \
+                "Para las circunferencias hay que dar un punto del infinito desde el que empezar"
+            paso("Uno de los ejes es el que une: ", x, " con: ", focos[0], " (que es el centro)")
+            e1 = subespacio(x, focos[0])
+            paso("El otro eje es su perpendicular que pasa por: ", focos[0])
+            e2 = self.perpendicular(self._afin.direccion(e1), focos[0])
+            return (e1, e2)
+        assert False, "Algo fue mal calculando los ejes =("
+
     def __repr__(self):
         return "<Espacio euclideo de dimension 2 con recta del infinito de ecuacion " + str(self.recta_infinito().implicitas()[0]) + \
             " y puntos ciclicos conjugados del infinito I = " + str(self._i) + ", J = " + str(self._j) + ">"
+
+#\f
+# Determina si un punto es real.
+#
+# Implementación \\
+# Comrueba que coincida con su conjugado.
+#
+# Parámetros \\
+# p: vector(n) - punto a comprobar
+#
+def es_real(p):
+    return bool(p == conjugate(p))

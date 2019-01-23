@@ -333,7 +333,47 @@ u: vector(3) - uno de los puntos del infinito de los que se quiere saber si son 
 v: vector(3) - el otro <br>
 </p>
 </div>
+<div class='function'>
+<h3>Función: es_circunferencia(c)</h3>
+<p>
+Determina si la cónica C dada es una circunferencia, esto es, si contiene los puntos conjugados del infinito. <br>
+Parámetros <br>
+c: conica/parametrizacion_conica - conica a comprobar si es una circunferencia <br>
+</p>
 </div>
+<div class='function'>
+<h3>Función: focos(c)</h3>
+<p>
+Devuelve una lista contieniendo los focos de la cónica dada. <br>
+NOTA. Puede ser un poco lento. Paciencia. También puede ser que dé resultados horribles según sea la cónica. <br>
+Implementación <br>
+Se obtienen las cónicas degeneradas tangentes a c desde I y J y se obtienen los puntos de corte F, F', G y G', donde G, G' son los focos imaginarios. En caso de ser una circunferencia, únicamente devuelve su centro. <br>
+Parámetros <br>
+c: conica - cónica de la que calcular los focos <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: ejes(c, x = None)</h3>
+<p>
+Devuelve una tupla con los ejes de la cónica dada. Para una cónica con cuatro focos, simplemente une los focos reales entre sí (y lo mismo para los imaginarios). Para las cónicas con un solo foco, lo une con el "centro" infinito en el caso de la parábola y con el x dado por parámetro en el caso de la circunferencia, pues el foco coincide con el centro (el otro eje es su perpendicular). <br>
+IMPORTANTE. En el caso de la parábola el segundo eje que se devuelve no es un eje real, sino la recta del infinito. <br>
+NOTA. No se muestra el procedimiento de calcular los focos. <br>
+Parámetros <br>
+c: conica - cónica de la que obtener sus ejes <br>
+x: vector(3) - dirección (punto de la recta del infinito) desde la que calcular el prumer eje en el caso de la circunferencia (por defecto ninguno, pues en general no es necesario) <br>
+</p>
+</div>
+</div>
+</div>
+<div class='function'>
+<h3>Función: es_real(p)</h3>
+<p>
+Determina si un punto es real. <br>
+Implementación <br>
+Comrueba que coincida con su conjugado. <br>
+Parámetros <br>
+p: vector(n) - punto a comprobar <br>
+</p>
 </div>
 </body>
 </html>

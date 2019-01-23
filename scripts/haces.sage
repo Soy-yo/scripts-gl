@@ -203,7 +203,7 @@ class haz_conicas:
     # Después sustituye los resultados obtenidos para obtener las cónicas.
     #
     def degeneradas(self):
-        ec = self._matriz.det()
+        ec = self._matriz.det().expand()
         paso("Resolvemos det", self._matriz, " = ", ec, " = 0")
         sol = [] if ec.degree(self._param) == 3 else [self._param == Infinity]
         sol = sol + solve(ec, self._param)
