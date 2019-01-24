@@ -605,6 +605,9 @@ class conica:
     # Factoriza esta cónica degenerada en dos rectas. Devuelve una tupla conteniendo las dos rectas como subespacios, que serán la misma
     # en caso de que la cónica sea una recta doble.
     #
+    # IMPORTANTE. No es un método muy fiable, pues depende de cierta aleatoriedad, con lo que las rectas obtenidas pueden no estar simplificadas.
+    # Es más recomendable pedir la ecuación factorizada (c.ecuacion(True)) y crear las rectas a mano a partir de los coeficientes de la ecuación.
+    #
     # Implementación \\
     # Si es una recta doble (rango 1) se interseca con dos rectas cualesquiera y se unen los puntos.
     # Si son dos rectas (rango 2) se toma el punto de intersección y la intersección con otra recta que no pase por ese punto.
@@ -612,19 +615,20 @@ class conica:
     def factorizacion(self):
         assert self.es_degenerada(), "Para factorizar una conica esta debe ser degenerada"
         i = 0
-        x = self.__punto_aleatorio(-10, 10)
+        # Buscamos primero los más pequeños posibles
+        x = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
         # Buscamos uno que no esté en la cónica
         while x in self and i < 100:
-            x = self.__punto_aleatorio(-10, 10)
+            x = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
             i = i + 1
         assert x not in self, "Algo ha ido mal al intentar factorizar =("
         if self.es_recta_doble():
             _no_pasos()
             i = 0
-            y = self.__punto_aleatorio(-10, 10)
+            y = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
             # Buscamos uno distinto
             while matrix([x, y]).rank() == 1 and i < 100:
-                y = self.__punto_aleatorio(-10, 10)
+                y = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
                 i = i + 1
             b = matrix([x, y]).rank() == 2
             _no_pasos(False)
@@ -632,10 +636,10 @@ class conica:
             _no_pasos()
             r = recta_proyectiva(x, y)
             i = 0
-            z = self.__punto_aleatorio(-10, 10)
+            z = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
             # Ahora un tercero que no esté en la recta
             while z in r and i < 100:
-                z = self.__punto_aleatorio(-10, 10)
+                z = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
                 i = i + 1
             b = z not in r
             _no_pasos(False)
@@ -651,10 +655,10 @@ class conica:
             _no_pasos()
             c = self.interseccion().punto()
             i = 0
-            y = self.__punto_aleatorio(-10, 10)
+            y = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
             # Buscamos uno distinto y de la intersección
             while (matrix([x, y]).rank() == 1 or matrix([c, y]).rank() == 1) and i < 100:
-                y = self.__punto_aleatorio(-10, 10)
+                y = self.__punto_aleatorio(int(-i / 10) - 2, int(i / 10) + 2)
                 i = i + 1
             b = matrix([x, y]).rank() == 2 and matrix([c, y]).rank() == 2
             _no_pasos(False)
@@ -752,7 +756,8 @@ class conica:
     # Métodos auxiliares
 
     def __punto_aleatorio(self, a, b):
-        return vector([randint(a, b) for i in range(3)])
+        p = vector([randint(a, b) for i in range(3)])
+        return p if p != 0 else vector([0, 0, 1])
 
     def __calcular_uxv(self, m):
         # Simplifica por si acaso

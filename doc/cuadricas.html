@@ -298,6 +298,7 @@ e: vector(3) - punto unidad de la referencia (debe pertenecer a la cóncia) <br>
 <h3>Función: factorizacion()</h3>
 <p>
 Factoriza esta cónica degenerada en dos rectas. Devuelve una tupla conteniendo las dos rectas como subespacios, que serán la misma en caso de que la cónica sea una recta doble. <br>
+IMPORTANTE. No es un método muy fiable, pues depende de cierta aleatoriedad, con lo que las rectas obtenidas pueden no estar simplificadas. Es más recomendable pedir la ecuación factorizada (c.ecuacion(True)) y crear las rectas a mano a partir de los coeficientes de la ecuación. <br>
 Implementación <br>
 Si es una recta doble (rango 1) se interseca con dos rectas cualesquiera y se unen los puntos. Si son dos rectas (rango 2) se toma el punto de intersección y la intersección con otra recta que no pase por ese punto. <br>
 </p>

@@ -539,10 +539,9 @@ class espacio_euclideo:
     # matriz_cambio: matriz(3,3) - matriz del cambio de referencia a R'
     #
     def cambiar_referencia(self, matriz_cambio):
-        afin = self._afin.cambiar_referencia(matriz_cambio)
         i2 = matriz_cambio * self._i
-        paso("Calculamos las nuevas coordenadas de I: ", matriz_cambio, self._i, " = ", i2)
-        return espacio_euclideo(afin.hiperplano_infinito(), i2)
+        paso("Calculamos las nuevas coordenadas de I: ", matriz_cambio, matrix([self._i]).T, " = ", i2)
+        return espacio_euclideo(i2)
 
     #\m
     # Determina si las direcciones son ortogonales.
@@ -617,7 +616,10 @@ class espacio_euclideo:
     #\m
     # Devuelve una lista contieniendo los focos de la cónica dada.
     #
-    # NOTA. Puede ser un poco lento. Paciencia. También puede ser que dé resultados horribles según sea la cónica.
+    # NOTA. Puede ser un poco lento. Paciencia. \\
+    # IMPORTANTE. No es fiable 100% cuando depende de la factorización de cónicas degeneradas, pues no es un método fiable 100%.
+    # Si se obtienen resultados muy raros o errores es recomendable ejecutar varias veces. Si eso no lo arregla, tocará hacerlo a mano
+    # (seguir la implementación que se da más abajo, pero hallando las rectas tangentes a mano).
     #
     # Implementación \\
     # Se obtienen las cónicas degeneradas tangentes a c desde I y J y se obtienen los puntos de corte F, F', G y G', donde G, G'
@@ -667,8 +669,9 @@ class espacio_euclideo:
     # mismo para los imaginarios). Para las cónicas con un solo foco, lo une con el "centro" infinito en el caso de la parábola y con el x
     # dado por parámetro en el caso de la circunferencia, pues el foco coincide con el centro (el otro eje es su perpendicular).
     #
-    # IMPORTANTE. En el caso de la parábola el segundo eje que se devuelve no es un eje real, sino la recta del infinito.
-    #
+    # IMPORTANTE. En el caso de la parábola el segundo eje que se devuelve no es un eje real, sino la recta del infinito. \\
+    # IMPORTANTE 2. No es fiable 100% cuando depende de la factorización de cónicas degeneradas, pues no es un método fiable 100%.
+    # Si se obtienen resultados muy raros o errores es recomendable ejecutar varias veces. Si eso no lo arregla, tocará calcular los focos a mano. \\
     # NOTA. No se muestra el procedimiento de calcular los focos.
     #
     # Parámetros \\
@@ -704,6 +707,27 @@ class espacio_euclideo:
             e2 = self.perpendicular(self._afin.direccion(e1), focos[0])
             return (e1, e2)
         assert False, "Algo fue mal calculando los ejes =("
+
+    #\m
+    # Devuelve una lista con las directrices de la cónica indicada, esto es, las polares de los focos. Deberían ser rectas reales
+    # o, en caso de ser imaginarias, simplificables. En el caso de que la cónica sea una circunferencia, su directriz será la propia
+    # recta del infinito, luego no una recta del plano. Igualmente se devuelve el resultado.
+    #
+    # IMPORTANTE. No es fiable 100% cuando depende de la factorización de cónicas degeneradas, pues no es un método fiable 100%.
+    # Si se obtienen resultados muy raros o errores es recomendable ejecutar varias veces. Si eso no lo arregla, tocará calcular los
+    # focos a mano.
+    #
+    # Parámetros \\
+    # c: conica - cónica de la que calcular sus directrices
+    #
+    def directrices(self, c):
+        _no_pasos()
+        if self.es_circunferencia(c):
+            paso("Es una circunferencia, el resultado sera la recta del infinito, con lo que no es una directriz 'verdadera'")
+        focos = self.focos(c)
+        _no_pasos(False)
+        paso("Los focos son: ", focos, "; calculamos sus polares")
+        return map(lambda f: c.polar(f), focos)
 
     def __repr__(self):
         return "<Espacio euclideo de dimension 2 con recta del infinito de ecuacion " + str(self.recta_infinito().implicitas()[0]) + \
