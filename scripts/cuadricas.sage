@@ -64,6 +64,61 @@ def conica_cinco_puntos(a, b, c, d, e):
     return res
 
 #\f
+# Crea una cónica a partir de una homografía entre haces de rectas, dada como homografia_dos_rectas (cada una de las rectas representa el punto base
+# de cada haz y se entiende que cada punto de cada recta es una recta del haz). La cónica es el resultado de intersecar r y h(r), donde r es una
+# recta del primer haz y h(r) su imagen. Si la homografía es realmente entre dos rectas, el resultado obtenido será una parametrización de una cónica
+# dual.
+#
+# NOTA. No se puede usar para perspectividades. El resultado simplemente sería el vértice como punto o como recta según la homografía fuera de una
+# recta en otra o de un haz de rectas en otro, respectivamente.
+#
+# Implementación \\
+# En una referencia adecuada una cónica puede parametrizarse como (1 : theta : theta^2). Esta referencia está dada por dos puntos de la cónica y el
+# polo de la recta que los une. Se toman los puntos base de cada haz, que pertenecerán a la cónica, pues r intersecado con h(r), donde r es la recta
+# que une los puntos base debe ser necesariamente el punto base del segundo haz, pues ambas pasan por él. Lo mismo sucede para h^-1(r) y r. Sólo falta
+# obtener el polo de la recta r, que será el punto de intersección de las tangentes a la cónica desde los puntos base de cada haz. Estas tangentes
+# tienen que ser, por tanto, h(r) y h^-1(r). Finalmente, se toma como referencia {P, Polo(PQ), Q; E}, con un punto unidad arbitrario de la cónica,
+# calculado como la intersección de un punto cualquiera y su imagen, y se parametriza la cónica como (1 : theta : theta^2).
+#
+# Parámetros \\
+# h: homografia_dos_rectas - homografía (entendida entre haces de rectas) que va a generar la cónica \\
+# e: complejo/Infinity - coordenada del punto extra que se va a utilizar, que no debe coincidir con r ni h^-1(r) (por defecto 0, 1 o Infinity)
+#
+def conica_por_homografia(h, e = 0):
+    _no_pasos()
+    persp = h.es_perspectividad()
+    _no_pasos(False)
+    assert not persp, "No se puede crear una conica a partir de una perspectividad"
+    _no_pasos()
+    r = h.recta_origen().subespacio().interseccion(h.recta_destino().subespacio()).punto()
+    _no_pasos(False)
+    paso("El punto de interseccion de las rectas de la homografia es: ", r, "; dualmente, la union de las bases es la recta con esos coeficientes")
+    g = h^-1
+    _no_pasos()
+    s = h(r)
+    t = g(r)
+    _no_pasos(False)
+    paso("h", r, " = ", s, "; h^-1", r, " = ", t, "; dualmente, las rectas con esos coeficientes")
+    paso("Obtengamos ahora los puntos necesarios:")
+    _no_pasos()
+    p = h.recta_origen().subespacio().dual().punto()
+    q = h.recta_destino().subespacio().dual().punto()
+    polo = s.cross_product(t)
+    _no_pasos(False)
+    paso("Los puntos base de los haces son: ", p, ", ", q, " y el polo de estos: ", polo, " (su producto vectorial); falta el punto unidad")
+    # Mientras coincida, busca otro
+    while matrix([r, h.recta_origen()[e]]).rank() == 1 or matrix([t, h.recta_origen()[e]]).rank() == 1:
+        e = Infinity if e == 0 else 1 if es_infinito(e) else 0
+    u = h(h.recta_origen()[e])
+    _no_pasos()
+    unidad = h.recta_origen()[e].cross_product(u)
+    _no_pasos(False)
+    paso("El punto unidad es la interseccion de las rectas de coeficientes: ", h.recta_origen()[e], ", ", u)
+    paso("R = {", p, ", ", polo, ", ", q, "; ", unidad, "}")
+    matriz = matriz_asociada(matrix([p, polo, q, unidad]).T)
+    return parametrizacion_conica(identity_matrix(3), matriz)
+
+#\f
 # Calcula la razón doble de 4 puntos sobre una cónica, dado un punto base también perteneciente a la misma. \\
 # Como una cónica queda definida por 5 puntos no es necesario especificar explícitamente la cónica. \\
 # Nótese que la razón doble debería ser la misma sea cual sea el punto base, siempre que se encuentre en la misma cónica

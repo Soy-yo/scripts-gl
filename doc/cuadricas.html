@@ -35,6 +35,18 @@ e: vector(3) - quinto punto de la cónica <br>
 </p>
 </div>
 <div class='function'>
+<h3>Función: conica_por_homografia(h, e = 0)</h3>
+<p>
+Crea una cónica a partir de una homografía entre haces de rectas, dada como homografia_dos_rectas (cada una de las rectas representa el punto base de cada haz y se entiende que cada punto de cada recta es una recta del haz). La cónica es el resultado de intersecar r y h(r), donde r es una recta del primer haz y h(r) su imagen. Si la homografía es realmente entre dos rectas, el resultado obtenido será una parametrización de una cónica dual. <br>
+NOTA. No se puede usar para perspectividades. El resultado simplemente sería el vértice como punto o como recta según la homografía fuera de una recta en otra o de un haz de rectas en otro, respectivamente. <br>
+Implementación <br>
+En una referencia adecuada una cónica puede parametrizarse como (1 : theta : theta^2). Esta referencia está dada por dos puntos de la cónica y el polo de la recta que los une. Se toman los puntos base de cada haz, que pertenecerán a la cónica, pues r intersecado con h(r), donde r es la recta que une los puntos base debe ser necesariamente el punto base del segundo haz, pues ambas pasan por él. Lo mismo sucede para h^-1(r) y r. Sólo falta obtener el polo de la recta r, que será el punto de intersección de las tangentes a la cónica desde los puntos base de cada haz. Estas tangentes tienen que ser, por tanto, h(r) y h^-1(r). Finalmente, se toma como referencia {P, Polo(PQ), Q; E}, con un punto unidad arbitrario de la cónica, calculado como la intersección de un punto cualquiera y su imagen, y se parametriza la cónica como (1 : theta : theta^2). <br>
+Parámetros <br>
+h: homografia_dos_rectas - homografía (entendida entre haces de rectas) que va a generar la cónica <br>
+e: complejo/Infinity - coordenada del punto extra que se va a utilizar, que no debe coincidir con r ni h^-1(r) (por defecto 0, 1 o Infinity) <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: razon_doble_conica(base, p0, p1, p2, p3)</h3>
 <p>
 Calcula la razón doble de 4 puntos sobre una cónica, dado un punto base también perteneciente a la misma. <br>

@@ -1011,7 +1011,7 @@ class homografia_dos_rectas:
     def es_perspectividad(self):
         _no_pasos()
         imagen = self(self._interseccion)
-        _no_pasos()
+        _no_pasos(False)
         paso("Calculamos h", self._interseccion, " = ", imagen, ", y comprobamos que sea un punto fijo")
         return matrix([self._interseccion, imagen]).rank() == 1
 

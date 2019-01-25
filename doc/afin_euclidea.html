@@ -244,6 +244,7 @@ d2: subespacio(dim=1,dim_amb=2) - segundo diámetro <br>
 <p>
 Clase que representa un espacio euclídeo de dimensión 2. Sirve para diversos cálculos relacionados con subespacios, cónicas, etc. No utiliza la cuádrica del absoluto, pero sí los puntos conjugados del infinito. <br>
 IMPORTANTE. Cuidado de no llamar a ninguna variable I por ningún lugar o probablemente esto deje de funcionar. <br>
+IMPORTTANTE 2. A pesar de que esta clase contiene métodos para cálculo de elementos de cónicas, utilizan un método "directo", desde la definición, por lo tanto, los resultados obtenidos pueden no ser correctos. En caso de querer calcular focos, ejes, etc., se recomienda mucho más usar la clase calculadora_conica (calculadora_conica.sage), que realiza los cálculos simplificando la cónica primero, con lo cual sí deberían estar bien en cualquier caso. <br>
 NOTA. Esta clase está basada en espacio_afin, pero no me he molestado en aprender herencia en Python, así que, si se quieren usar métodos de espacio_afin, se deberá acceder al que esta clase proporciona mediante el método espacio_afin(). <br>
 </p>
 <div class='methods'>

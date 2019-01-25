@@ -39,9 +39,19 @@ Devuelve la cónica que recibió la calculadora inicialmente. </p>
 Devuelve el espacio euclídeo que recibió la calculadora inicialmente, </p>
 </div>
 <div class='function'>
+<h3>Función: matriz_cambio_inicial()</h3>
+<p>
+Devuelve la primera matriz del cambio necesaria para que I = (1:i:0). En caso de no haber sido necesario tal cambio devolverá la matriz identidad. </p>
+</div>
+<div class='function'>
 <h3>Función: conica_intermedia()</h3>
 <p>
 Devuelve la cónica que usa la calculadora para los primeros cálculos. Si I = (1:i:0) inicialmente coincidirá con la cónica inicial. </p>
+</div>
+<div class='function'>
+<h3>Función: conica_final()</h3>
+<p>
+Devuelve la cónica obtenida por el método ecuacion_canonica. </p>
 </div>
 <div class='function'>
 <h3>Función: espacio_final()</h3>
@@ -49,9 +59,14 @@ Devuelve la cónica que usa la calculadora para los primeros cálculos. Si I = (
 Devuelve el espacio euclídeo que usa la calculadora para los cálculos. Si I = (1:i:0) inicialmente coincidirá con el espacio inicial. </p>
 </div>
 <div class='function'>
-<h3>Función: conica_final()</h3>
+<h3>Función: matriz_cambio_final()</h3>
 <p>
-Devuelve la cónica obtenida por el método ecuacion_reducida. </p>
+Devuelve la segunda matriz del cambio necesaria para que la cónica tuviera ecuación canónica. </p>
+</div>
+<div class='function'>
+<h3>Función: clasificacion()</h3>
+<p>
+Devuelve una cadena de texto representando el tipo de la cónica que usa la calculadora. En caso de no haber sido calculado aún devolverá "desconocido". En caso de haber algún error devolverá "!!!". </p>
 </div>
 <div class='function'>
 <h3>Función: centro()</h3>
@@ -65,20 +80,54 @@ Como aseguramos que en la referencia actual la recta del infinito es z=0, simple
 <h3>Función: ejes()</h3>
 <p>
 Calcula los ejes de la cónica y los devuelve como una tupla. Debe haber sido calculado el centro previamente. <br>
-IMPORTANTE. Para parábolas no está implementado todavía. <br>
 Implementación <br>
 Hay dos casos posibles. · La cónica tiene centro. Las direcciones de los ejes son los autovectores de la submatriz de la cónica (00, 01; 10, 11). Los ejes serán los que pasen por el centro y por ambas direcciones. <br>
-· La cónica no tiene centro. El propio centro infinito es la dirección del eje y la dirección perpendicular es cualquier fila no nula de la submatriz anterior. <br>
+· La cónica no tiene centro. El propio centro infinito es la dirección del eje y la dirección perpendicular es cualquier fila no nula de la submatriz anterior. Se devuelve el esta otra recta como el otro eje. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: vertice()</h3>
+<p>
+Devuelve el vértice de la cónica si lo tiene y si ha sido ya calculado. En caso de no encontrarlo dará error. <br>
 </p>
 </div>
 <div class='function'>
 <h3>Función: ecuacion_canonica()</h3>
 <p>
 Hace un nuevo cambio de referencia euclídeo para devolver la cónica en ecuación canónica alfa*x^2 + beta*y^2 + ganma*z^2 = 0. <br>
-IMPORTANTE. Para parábolas no está implementado todavía. <br>
 Implementación <br>
-Hay dos casos posibles. · La cónica tiene centro. Usa las direcciones de los ejes calculadas previamente, junto con el centro como triángulo autopolar de referencia y como punto unidad la suma de los anteriores, con las direcciones normalizadas (u, v) y el centro con tercera coordenada 1 (c). Así, alfa = u^tAu, beta = v^tAv y ganma = c^tAc. <br>
-· <br>
+Hay dos casos posibles. · La cónica tiene centro. Usa las direcciones de los ejes calculadas previamente, junto con el centro como triángulo autopolar de referencia y como punto unidad la suma de los anteriores, con las direcciones normalizadas (u, v) y el centro con tercera coordenada 1 (c). Así, alfa = u^tAu, beta = v^tAv y ganma = c^tAc y sólo queda simplificar y reordenar. <br>
+· La cónica no tiene centro. Usa las direcciones de los ejes calculados previamente, junto con el vértice como triángulo autopolar de referencia y como punto unidad la suma de los anteriores, con las direcciones normalizadas (u, v) y el vértice con tercera coordenada 1 (w). Así, alfa = v^tAv y beta = w^tAu y sólo queda simplificar y reordenar. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: asintotas()</h3>
+<p>
+Calcula las asintotas de la cónica en caso de que sea una hipérbola, partiendo de su ecuación canónica. Devuelve una tupla. Si se quiere una forma más directa se recomienda usar la clase espacio_afin, que no necesita de ecuaciones reducidas. <br>
+Implementación <br>
+Estando la hipérbola en su ecuación reducida, simplemente unimos su centro con la intersección de la cónica con la recta del infinito, que se puede parametrizar como (theta : 1 : 0). <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: focos()</h3>
+<p>
+Calcula los focos de la cónica una vez está ya en su ecuación canónica. Devuelve una lista con los focos reales, dos en caso de elipse e hipérbola, uno en caso de parábola. <br>
+Implementación <br>
+Hay tres casos posibles. · Elipse. Son los puntos de coordenadas (+/-sqrt(a^2 - b^2), 0), si la ecuación es (X/a)^2 + (Y/b)^2 = 1. · Hipérbola. Son los puntos de coordenadas (+/-sqrt(a^2 + b^2), 0), si la ecuación es (X/a)^2 - (Y/b)^2 = 1. · Parábola. Es el punto (a, 0), si la ecuación es Y^2 = 4aX. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: excentricidad()</h3>
+<p>
+Calcula la excentricidad de la cónica, esto es, sqrt(1 - b^2/a^2) para elipses, sqrt(1 + b^2/a^2) para hipérbolas y 1 para parábolas. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: directrices()</h3>
+<p>
+Calcula las directrices de la cónica, esto es, las polares de los focos, una vez está ya en su ecuación canónica. Devuelve una lista con las directrices reales, dos en caso de elipse e hipérbola, una en caso de parábola. <br>
+Implementación <br>
+Hay tres casos posibles. · Cónica con centro. Son las rectas X = a/e, X = -a/e, donde e es la excentricidad y la ecuación de la cónica es (X/a)^2 + (Y/b)^2 = 1. · Cónica sin centro. Es la recta X = -a, donde Y^2 = 4aX es la ecuación de la parábola. <br>
 </p>
 </div>
 </div>
