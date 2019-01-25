@@ -253,7 +253,7 @@ class proyeccion:
     # Se debe asegurar que dim Z + dim Y = dim X - 1.
     #
     # Parámetros \\
-    # centro: subespacio - centro de la proyección
+    # centro: subespacio - centro de la proyección \\
     # imagen: subespacio - espacio de llegada de la aplicación
     #
     def __init__(self, centro, imagen):

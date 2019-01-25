@@ -133,12 +133,14 @@ fun parseFile(file: File, parent: String, destinationDir: String): String {
                 }
                 INIT_DOC_TYPE -> {
                     if (line.startsWith("def")) {
+                        val params = line.dropWhile { it != '(' }
+                                .takeWhile { it != ':' }
+                                .replace("self,?\\s?".toRegex(), "")
                         bw.write("<div class='function'>\n")
-                        bw.write("<h3>Constructor</h3>\n")
+                        bw.write("<h3>Constructor $params</h3>\n")
                         bw.write(sb.toString())
                         bw.write("</div>\n")
                     }
-
                 }
                 CLASS_DOC_TYPE -> {
                     if (line.startsWith("class")) {

@@ -10,6 +10,69 @@
 Archivo que contiene clases relativas a haces de hiperplanos y cónicas dados dos elementos del haz. Para usar haces de hiperplanos dada su base mejor usar subespacios duales. <br>
 Autor: Pablo Sanz Sanz <br>
 </p>
+<div class='function'>
+<h3>Función: haz_generico(a, b, c, d)</h3>
+<p>
+Crea un haz genérico de cónicas, dados los cuatro puntos de contacto. <br>
+Implementación <br>
+Crea un haz con las cónicas degeneradas AB·CD y AC·BC. <br>
+Parámetros <br>
+a: vector(3) - primer punto de contacto <br>
+b: vector(3) - segundo punto de contacto <br>
+c: vector(3) - tercer punto de contacto <br>
+d: vector(3) - cuarto punto de contacto <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: haz_contacto_simple(conica, a, b, t)</h3>
+<p>
+Crea un haz con contacto simple, dados una cónica, dos puntos por donde pasa y el punto de contacto doble. <br>
+Implementación <br>
+Si A y B pertenecen a la cónica obtiene las rectas AT y BT, que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz. SI no, se obtendrá también la tangente t a la cónica desde T de forma que t·AB es la otra cónica degenerada del haz. <br>
+Parámetros <br>
+conica: conica - cónica no degenerada que al menos contenga el punto T <br>
+a: vector(3) - primer punto de contacto simple <br>
+b: vector(3) - segundo punto de contacto simple <br>
+t: vector(3) - punto de contacto doble <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: haz_contacto_triple(conica, a, t)</h3>
+<p>
+Crea un haz con contacto triple, dados una cónica, un punto de por el que pasa y el punto de contacto triple. <br>
+NOTA. He visto que en algunos ejercicios se pide calcular el haz de contacto triple dado el punto A que no pertenece a la cónica. Como de momento no sé hacer eso, aquí no está permitido. <br>
+Implementación <br>
+Obtiene las rectas AT y t (tangente a la cónica desde T), que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz. <br>
+Parámetros <br>
+conica: conica - una cónica del haz <br>
+a: vector(3) - punto de contacto simple <br>
+t: vector(3) - punto de contacto triple <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: haz_contacto_cuadruple(conica, t)</h3>
+<p>
+Crea un haz con contacto cuádruple, dados la cónica y el punto de contacto cuádruple. <br>
+Implementación <br>
+Obtiene la recta doble tangente a la cónica desde T, que formará una cónica degenerada del haz. Con esta y la dada se construye el haz. <br>
+Parámetros <br>
+conica: conica - una cónica no degenerada del haz <br>
+t: vector(3) - punto de contacto cuádruple <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: haz_dos_contactos_dobles(conica1, s, t, conica2 = None)</h3>
+<p>
+Crea un haz con dos contactos dobles, dados una o dos cónicas y los puntos de contacto doble. <br>
+Implementación <br>
+Si una cónica contiene los dos puntos S y T obtiene la recta doble ST, que formará una cónica degenerada del haz y se construye con esta y la dada. Si no se deben dar dos cónicas, una conteniendo S y la otra T, por lo que no pertenecerán al haz. Entonces se tomarán además las tangentes desde los puntos respectivos como segunda cónica degenerada del haz. <br>
+Parámetros <br>
+conica1: conica - una cónica del haz que contenga al menos a S o a T <br>
+s: vector(3) - primer punto de contacto doble <br>
+t: vector(3) - segundo punto de contacto doble <br>
+conica2: conica - otra cónica del haz que contenga el punto de S y T que no contenga la primera, en caso de necesitarse (por defecto ninguna) <br>
+</p>
+</div>
 <div class='class'>
 <h2>Clase: haz_hiperplanos</h2>
 <p>
@@ -17,7 +80,7 @@ Clase que representa un haz de hiperplanos (puntutales o duales). <br>
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (h1, h2)</h3>
 <p>
 Crea un haz de hiperplanos dados dos hiperplanos representantes del haz. Será h1 + lambda * h2. <br>
 Parámetros <br>
@@ -76,7 +139,7 @@ NOTA. No se implementa el método para obtener la base porque requeriría que un
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (c1, c2)</h3>
 <p>
 Crea un haz de cónicas dadas dos cónicas representantes del haz. Será c1 + lambda * c2. <br>
 Parámetros <br>

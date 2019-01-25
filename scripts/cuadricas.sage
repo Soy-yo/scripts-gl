@@ -46,17 +46,7 @@ def conica_degenerada(r1, r2 = None):
 #
 def conica_cinco_puntos(a, b, c, d, e):
     assert len(a) == 3 and len(b) == 3 and len(c) == 3 and len(d) == 3 and len(e) == 3, "Los puntos deben pertenecer al plano"
-    _no_pasos()
-    ab = subespacio(a, b)
-    cd = subespacio(c, d)
-    abcd = conica_degenerada(ab, cd)
-    ac = subespacio(a, c)
-    bd = subespacio(b, d)
-    acbd = conica_degenerada(ac, bd)
-    _no_pasos(False)
-    haz = haz_conicas(abcd, acbd)
-    paso("Creamos las conicas degeneradas AB*CD y AC*BD y generamos el haz:")
-    paso("(", ab.implicitas()[0].lhs(), ")(", cd.implicitas()[0].lhs(), ") + lambda * (", ac.implicitas()[0].lhs(), ")(", bd.implicitas()[0].lhs(), ") = 0")
+    haz = haz_generico(a, b, c, d)
     paso("Por ultimo, forzamos que pase por E =", e, ", y despejamos lambda")
     _no_pasos()
     res = haz.forzar_punto(e)

@@ -5,6 +5,161 @@
 # Autor: Pablo Sanz Sanz
 #
 
+# Funciones globales
+
+#\f
+# Crea un haz genérico de cónicas, dados los cuatro puntos de contacto.
+#
+# Implementación \\
+# Crea un haz con las cónicas degeneradas AB·CD y AC·BC.
+#
+# Parámetros \\
+# a: vector(3) - primer punto de contacto \\
+# b: vector(3) - segundo punto de contacto \\
+# c: vector(3) - tercer punto de contacto \\
+# d: vector(3) - cuarto punto de contacto
+#
+def haz_generico(a, b, c, d):
+    assert len(a) == 3 and len(b) == 3 and len(c) == 3 and len(d) == 3, "Los puntos deben pertenecer al plano"
+    _no_pasos()
+    ab = subespacio(a, b)
+    cd = subespacio(c, d)
+    abcd = conica_degenerada(ab, cd)
+    ac = subespacio(a, c)
+    bd = subespacio(b, d)
+    acbd = conica_degenerada(ac, bd)
+    _no_pasos(False)
+    paso("Creamos las conicas degeneradas AB*CD y AC*BD y generamos el haz:")
+    paso("(", ab.implicitas()[0].lhs(), ")(", cd.implicitas()[0].lhs(), ") + lambda * (", ac.implicitas()[0].lhs(), ")(", bd.implicitas()[0].lhs(), ") = 0")
+    return haz_conicas(abcd, acbd)
+
+#\f
+# Crea un haz con contacto simple, dados una cónica, dos puntos por donde pasa y el punto de contacto doble.
+#
+# Implementación \\
+# Si A y B pertenecen a la cónica obtiene las rectas AT y BT, que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz.
+# SI no, se obtendrá también la tangente t a la cónica desde T de forma que t·AB es la otra cónica degenerada del haz.
+#
+# Parámetros \\
+# conica: conica - cónica no degenerada que al menos contenga el punto T \\
+# a: vector(3) - primer punto de contacto simple \\
+# b: vector(3) - segundo punto de contacto simple \\
+# t: vector(3) - punto de contacto doble
+#
+def haz_contacto_simple(conica, a, b, t):
+    assert len(a) == 3 and len(b) == 3 and len(t) == 3, "Los puntos deben pertenecer al plano"
+    assert t in conica, "El punto doble debe pertenecer a la conica"
+    _no_pasos()
+    at = subespacio(a, t)
+    bt = subespacio(b, t)
+    atbt = conica_degenerada(at, bt)
+    _no_pasos(False)
+    # Necesitamos también la tangente
+    if a not in conica or b not in conica:
+        paso("Calculamos la tangente desde T = ", t, " usando la polar")
+        tang = conica.polar(t)
+        _no_pasos()
+        ab = subespacio(a, b)
+        abt = conica_degenerada(tang, ab)
+        _no_pasos(False)
+        paso("Creamos las conicas degeneradas AT*BT y t*AB y generamos el haz:")
+        paso("(", at.implicitas()[0].lhs(), ")(", bt.implicitas()[0].lhs(), ") + lambda * (", \
+             tang.implicitas()[0].lhs(), ")(", ab.implicitas()[0].lhs(), ") = 0")
+        return haz_conicas(atbt, abt)
+    else:
+        paso("Creamos la conica degenerada AT*BT y generamos el haz (xi es x, y, z respectivamente):")
+        paso("(", conica.ecuacion().lhs(), ") + lambda * (", at.implicitas()[0].lhs(), ")(", bt.implicitas()[0].lhs(), ") = 0")
+        return haz_conicas(conica, atbt)
+
+#\f
+# Crea un haz con contacto triple, dados una cónica, un punto de por el que pasa y el punto de contacto triple.
+#
+# NOTA. He visto que en algunos ejercicios se pide calcular el haz de contacto triple dado el punto A que no pertenece a la cónica.
+# Como de momento no sé hacer eso, aquí no está permitido.
+#
+# Implementación \\
+# Obtiene las rectas AT y t (tangente a la cónica desde T), que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz.
+#
+# Parámetros \\
+# conica: conica - una cónica del haz \\
+# a: vector(3) - punto de contacto simple \\
+# t: vector(3) - punto de contacto triple
+#
+def haz_contacto_triple(conica, a, t):
+    assert len(a) == 3 and len(t) == 3, "Los puntos deben pertenecer al plano"
+    assert a in conica and t in conica, "Los puntos deben pertenecer a la conica"
+    paso("Calculamos la tangente desde T = ", t, " usando la polar")
+    tang = conica.polar(t)
+    _no_pasos()
+    at = subespacio(a, t)
+    att = conica_degenerada(at, tang)
+    _no_pasos(False)
+    paso("Creamos la conica degenerada AT*t y generamos el haz (xi es x, y, z respectivamente):")
+    paso("(", conica.ecuacion().lhs(), ") + lambda * (", at.implicitas()[0].lhs(), ")(", tang.implicitas()[0].lhs(), ") = 0")
+    return haz_conicas(conica, att)
+
+#\f
+# Crea un haz con contacto cuádruple, dados la cónica y el punto de contacto cuádruple.
+#
+# Implementación \\
+# Obtiene la recta doble tangente a la cónica desde T, que formará una cónica degenerada del haz. Con esta y la dada se construye el haz.
+#
+# Parámetros \\
+# conica: conica - una cónica no degenerada del haz \\
+# t: vector(3) - punto de contacto cuádruple
+#
+def haz_contacto_cuadruple(conica, t):
+    assert len(t) == 3, "El punto debe pertenecer al plano"
+    assert t in conica, "El punto debe pertenecer a la conica"
+    paso("Calculamos la tangente desde T = ", t, " usando la polar")
+    tang = conica.polar(t)
+    tt = conica_degenerada(tang)
+    paso("Creamos la conica degenerada t^2 y generamos el haz (xi es x, y, z respectivamente):")
+    paso("(", conica.ecuacion().lhs(), ") + lambda * (", tang.implicitas()[0].lhs(), ")^2 = 0")
+    return haz_conicas(conica, tt)
+
+#\f
+# Crea un haz con dos contactos dobles, dados una o dos cónicas y los puntos de contacto doble.
+#
+# Implementación \\
+# Si una cónica contiene los dos puntos S y T obtiene la recta doble ST, que formará una cónica degenerada del haz y
+# se construye con esta y la dada. Si no se deben dar dos cónicas, una conteniendo S y la otra T, por lo que no
+# pertenecerán al haz. Entonces se tomarán además las tangentes desde los puntos respectivos como segunda cónica
+# degenerada del haz.
+#
+# Parámetros \\
+# conica1: conica - una cónica del haz que contenga al menos a S o a T \\
+# s: vector(3) - primer punto de contacto doble \\
+# t: vector(3) - segundo punto de contacto doble \\
+# conica2: conica - otra cónica del haz que contenga el punto de S y T que no contenga la primera, en caso de necesitarse
+# (por defecto ninguna)
+#
+def haz_dos_contactos_dobles(conica1, s, t, conica2 = None):
+    assert len(s) == 3 and len(t) == 3, "Los puntos deben pertenecer al plano"
+    assert t in conica1 or s in conica1, "Alguno de los puntos debe pertenecer a la primera conica"
+    assert t in conica1 and s in conica1 or conica2 is not None, "Los dos puntos deben estar en alguna conica del haz"
+    _no_pasos()
+    st = subespacio(s, t)
+    sstt = conica_degenerada(st)
+    _no_pasos(False)
+    # Necesitamos también las tangentes
+    if s not in conica1 or t not in conica1:
+        assert s in conica2 or t in conica2, "Alguno de los puntos debe pertenecer a la segunda conica"
+        # S será el punto de tangencia de la primera
+        if s not in conica1:
+            (s, t) = (t, s)
+        paso("Calculamos la tangente desde S = ", s, " y T = ", t, " usando las polares")
+        tang1 = conica1.polar(s)
+        tang2 = conica2.polar(t)
+        conica_tang = conica_degenerada(tang1, tang2)
+        paso("Creamos las conicas degeneradas ST^2 y Tang(T)Tang(S) y generamos el haz:")
+        paso("(", st.implicitas()[0].lhs(), ")^2 + lambda * (", tang1.implicitas()[0].lhs(), ")(", tang2.implicitas()[0].lhs(), ") = 0")
+        return haz_conicas(sstt, conica_tang)
+    else:
+        paso("Creamos la conica degenerada ST^2 y generamos el haz (xi es x, y, z respectivamente):")
+        paso("(", conica1.ecuacion().lhs(), ") + lambda * (", st.implicitas()[0].lhs(), ")^2 = 0")
+        return haz_conicas(conica1, sstt)
+
 # Clases
 
 #\c

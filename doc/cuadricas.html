@@ -119,7 +119,7 @@ Clase que representa una cónica tanto puntual como dual dada su matriz. <br>
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (matriz)</h3>
 <p>
 Construye una cónica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de posiciones la mitad del coeficiente según las variables). Se puede usar también ecuacion.hessian() pero puede dar problemas si se tiene algún parámetro o si no aparecen las tres variables. <br>
 Parámetros <br>
@@ -346,7 +346,7 @@ Clase que representa una parametrización de una cónica no degenerada de la for
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (matriz, matriz_cambio = identity_matrix(3))</h3>
 <p>
 Construye una parametrización de una cónica dadas la matriz M que determina las coordenadas de cada punto, que se obtienen como M * (1, theta, theta^2). M será la matriz que hace que la cónica se exprese como y^2=xz. <br>
 También se puede indicar una matriz de cambio de referencia extra para casos del tipo (por ejemplo) parametrizar una cónica como (1, theta, theta^2). <br>
@@ -468,7 +468,7 @@ Se representa mediante una falsa homografía de una recta en sí misma, que para
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (homografia, param)</h3>
 <p>
 Construye una homografía de una cónica dada una homografía de una falsa recta en sí misma y la parametrización de la cónica. <br>
 En general, no se usará este constructor directamente, sino que se creará a partir de funciones creadoras externas. <br>
@@ -605,7 +605,7 @@ Clase que define una involución sobre una cónica, conocido alguno de sus eleme
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (conica, vertice = None, fijos = None, eje = None)</h3>
 <p>
 Construye una involución sabiendo la cónica al menos unos de sus elementos: vértice, puntos fijos o eje. <br>
 Nótese que si se da una cónica y el eje, este debe ser del tipo recta_proyectiva y si se da una parametrización de la cónica el eje debe ser un subespacio. <br>

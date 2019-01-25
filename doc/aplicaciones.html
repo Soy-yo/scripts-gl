@@ -32,7 +32,7 @@ Clase que representa una aplicación proyectiva de un subespacio arbitario en ot
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (matriz)</h3>
 <p>
 Construye una aplicacion poryectiva dadas su matriz asociada. <br>
 En general, no está pensado para usarse directamente, sino para ser creada por otras funciones. <br>
@@ -157,11 +157,12 @@ Clase que representa una proyección dados un subespacio centro y un subespacio 
 </p>
 <div class='methods'>
 <div class='function'>
-<h3>Constructor</h3>
+<h3>Constructor (centro, imagen)</h3>
 <p>
 Construye una proyección dados su centro (Z) e imagen (Y) de un mismo espacio Z. Se debe asegurar que dim Z + dim Y = dim X - 1. <br>
 Parámetros <br>
-centro: subespacio - centro de la proyección imagen: subespacio - espacio de llegada de la aplicación <br>
+centro: subespacio - centro de la proyección <br>
+imagen: subespacio - espacio de llegada de la aplicación <br>
 </p>
 </div>
 <div class='function'>
