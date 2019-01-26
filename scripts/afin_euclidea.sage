@@ -618,6 +618,8 @@ class espacio_euclideo:
         return self._i in c and self._j in c
 
     #\m
+    # --- NO USAR ---
+    #
     # Devuelve una lista contieniendo los focos de la cónica dada.
     #
     # NOTA. Puede ser un poco lento. Paciencia. \\
@@ -669,6 +671,8 @@ class espacio_euclideo:
             return sorted([f1, f2, f3, f4], key = lambda f: not es_real(f))
 
     #\m
+    # --- NO USAR ---
+    #
     # Devuelve una tupla con los ejes de la cónica dada. Para una cónica con cuatro focos, simplemente une los focos reales entre sí (y lo
     # mismo para los imaginarios). Para las cónicas con un solo foco, lo une con el "centro" infinito en el caso de la parábola y con el x
     # dado por parámetro en el caso de la circunferencia, pues el foco coincide con el centro (el otro eje es su perpendicular).
@@ -713,6 +717,8 @@ class espacio_euclideo:
         assert False, "Algo fue mal calculando los ejes =("
 
     #\m
+    # --- NO USAR ---
+    #
     # Devuelve una lista con las directrices de la cónica indicada, esto es, las polares de los focos. Deberían ser rectas reales
     # o, en caso de ser imaginarias, simplificables. En el caso de que la cónica sea una circunferencia, su directriz será la propia
     # recta del infinito, luego no una recta del plano. Igualmente se devuelve el resultado.

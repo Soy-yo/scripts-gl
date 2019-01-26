@@ -349,7 +349,7 @@ def crear_homografia_dos_rectas(a, ap, b, bp, c, cp, r_origen, r_destino):
     theta1p = r_destino.coordenada(bp)
     theta2 = r_origen.coordenada(c)
     theta2p = r_destino.coordenada(cp)
-    paso("Creamos una homografia sobre una falsa recta que convierta: ", \
+    paso("Creamos una homografia sobre una recta que convierta: ", \
          theta0, " -> ", theta0p, ",", theta1, " -> ", theta1p, ",", theta2, " -> ", theta2p)
     h = crear_homografia_recta_theta(theta0, theta0p, theta1, theta1p, theta2, theta2p)
     return homografia_dos_rectas(h, r_origen, r_destino)

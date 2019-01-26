@@ -345,6 +345,7 @@ c: conica/parametrizacion_conica - conica a comprobar si es una circunferencia <
 <div class='function'>
 <h3>Función: focos(c)</h3>
 <p>
+--- NO USAR --- <br>
 Devuelve una lista contieniendo los focos de la cónica dada. <br>
 NOTA. Puede ser un poco lento. Paciencia. <br>
 IMPORTANTE. No es fiable 100% cuando depende de la factorización de cónicas degeneradas, pues no es un método fiable 100%. Si se obtienen resultados muy raros o errores es recomendable ejecutar varias veces. Si eso no lo arregla, tocará hacerlo a mano (seguir la implementación que se da más abajo, pero hallando las rectas tangentes a mano). <br>
@@ -357,6 +358,7 @@ c: conica - cónica de la que calcular los focos <br>
 <div class='function'>
 <h3>Función: ejes(c, x = None)</h3>
 <p>
+--- NO USAR --- <br>
 Devuelve una tupla con los ejes de la cónica dada. Para una cónica con cuatro focos, simplemente une los focos reales entre sí (y lo mismo para los imaginarios). Para las cónicas con un solo foco, lo une con el "centro" infinito en el caso de la parábola y con el x dado por parámetro en el caso de la circunferencia, pues el foco coincide con el centro (el otro eje es su perpendicular). <br>
 IMPORTANTE. En el caso de la parábola el segundo eje que se devuelve no es un eje real, sino la recta del infinito. <br>
 IMPORTANTE 2. No es fiable 100% cuando depende de la factorización de cónicas degeneradas, pues no es un método fiable 100%. Si se obtienen resultados muy raros o errores es recomendable ejecutar varias veces. Si eso no lo arregla, tocará calcular los focos a mano. <br>
@@ -369,6 +371,7 @@ x: vector(3) - dirección (punto de la recta del infinito) desde la que calcular
 <div class='function'>
 <h3>Función: directrices(c)</h3>
 <p>
+--- NO USAR --- <br>
 Devuelve una lista con las directrices de la cónica indicada, esto es, las polares de los focos. Deberían ser rectas reales o, en caso de ser imaginarias, simplificables. En el caso de que la cónica sea una circunferencia, su directriz será la propia recta del infinito, luego no una recta del plano. Igualmente se devuelve el resultado. <br>
 IMPORTANTE. No es fiable 100% cuando depende de la factorización de cónicas degeneradas, pues no es un método fiable 100%. Si se obtienen resultados muy raros o errores es recomendable ejecutar varias veces. Si eso no lo arregla, tocará calcular los focos a mano. <br>
 Parámetros <br>

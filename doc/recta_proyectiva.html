@@ -410,6 +410,18 @@ a: complejo/Infinity/vector(n) - punto del primer par b: complejo/Infinity/vecto
 </p>
 </div>
 <div class='function'>
+<h3>Función: descomponer(centro, r_aux)</h3>
+<p>
+Descompone esta homografía en dos perspectividades, dado el centro de la primera y una recta auxiliar que pase por uno de los puntos fijos de la homografía. Devuelve una tupla conteniendo las dos homografia_dos_rectas (h1, h2), de forma que h = h2*h1, es decir, se aplica primero h1. <br>
+NOTA. El resultado es una homografia_dos_rectas para permitir dimensión n. Con una proyección como tal sería más complicado. Por tanto, se obtendrá una expresión con ecuación como resultado, sin mostrarse su procedimiento. Si se desea obtener objetos de tipo proyeccion como tal, simplemente úsese el centro de cada una como centro y el subespacio asociado a cada recta como imagen. <br>
+Implementación <br>
+Se elige el centro dado como centro de la primera perspectividad. Con esto, se calcula la imagen por la perspectividad de dos puntos (pues el punto fijo por el que pasa la recta sigue fijo), de entre Infinity, 0, 1. Uniendo los puntos obtenidos en la recta auxiliar con las verdaderas imágenes de cada punto se obtiene un punto de corte que será el centro de la segunda. <br>
+Parámetros <br>
+centro: vector(n) - punto del centro de la primera proyección <br>
+r_aux: recta_proyectiva(dim_amb=n-1) - recta auxiliar que corta a la recta de esta homografía en un punto fijo <br>
+</p>
+</div>
+<div class='function'>
 <h3>Función: __mul__(otra)</h3>
 <p>
 Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))). <br>

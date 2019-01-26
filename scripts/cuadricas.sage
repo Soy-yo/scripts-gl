@@ -646,7 +646,59 @@ class conica:
         m = matriz_asociada(matrix([p, q, r, e]).T)
         return parametrizacion_conica(identity_matrix(3), m)
 
+    #
+    # Devuelve la homografía generada por esta cónica en un par de rectas que se suponen tangentes a la cónica.
+    # La homografía se genera por los cortes de rectas tangentes a la cónica con las dos rectas.
+    #
+    # NOTA. No parece muy eficiente hacer esto cuando luego te piden únicamente calcular la imagen de un punto. Se recomendaría
+    # seguir la idea pero hacerlo a mano.
+    #
+    # Implementación \\
+    # El punto de tangencia con la primera recta va a la intersección de las rectas. La intersección va al punto de tangencia con la segunda.
+    # Así, sólo queda elegir un último punto de entre 0, Infinity, 1 de la primera recta para obtener su imagen trazando la tangente a la cónica
+    # que no coincida con la primera recta.
+    #
+    # Parámetros \\
+    # r1: recta_proyectiva(dim_amb=2) - recta de partida de la homografía \\
+    # r2: recta_proyectiva(dim_amb=2) - recta de llegada de la homografía
+    #
+    def homografia_generada(self, r1, r2):
+        assert r1.dimension_ambiente() == 2 and r2.dimension_ambiente() == 2, "Las rectas deben pertenecer al plano"
+        _no_pasos()
+        tang = self.es_tangente(r1.subespacio()) and self.es_tangente(r2.subespacio())
+        _no_pasos(False)
+        assert tang, "Las rectas deben ser tangentes a la conica"
+        _no_pasos()
+        interseccion = r1.subespacio().interseccion(r2.subespacio()).punto()
+        _no_pasos(False)
+        paso("Obtenemos la interseccion de las dos rectas: ", interseccion)
+        paso("Ahora con la conica")
+        m = self.interseccion_recta(r1)[0]
+        n = self.interseccion_recta(r2)[0]
+        paso("Las dos intersecciones han sido: ", m, ", ", n)
+        paso("Ahora elegimos otro punto de la primera retca del que hallar su tangente para obtener su imagen en la otra recta")
+        coord1 = r1.coordenada(interseccion)
+        coord2 = r1.coordenada(m)
+        theta = Infinity if not es_infinito(coord1) and not es_infinito(coord2) else \
+                0 if (es_infinito(coord1) or coord1 != 0) and (es_infinito(coord2) or coord2 != 0) else \
+                1
+        p = r1[theta]
+        paso("Para calcular la tangente de ", p, " intersecamos su polar con la conica y unimos con el punto (no se muestra procedimiento)")
+        _no_pasos()
+        polar = self.polar(p)
+        # Reutilizamos nombre
+        polar = recta_proyectiva(polar.representantes()[0], polar.representantes()[1])
+        (t1, t2) = self.interseccion_recta(polar)
+        t = t1 if matrix([m, t1]).rank() == 2 else t2
+        recta_tang = subespacio(p, t)
+        q = r2.subespacio().interseccion(recta_tang).punto()
+        _no_pasos(False)
+        paso("El punto de tangencia con la conica es: ", t, "; la tangente: ", recta_tang.implicitas()[0], "; y corta la otra recta en: ", q)
+        return crear_homografia_dos_rectas(m, interseccion, interseccion, n, p, q, r1, r2)
+
     #\m
+    # --- NO RECOMENDABLE USAR ---
+    #
     # Factoriza esta cónica degenerada en dos rectas. Devuelve una tupla conteniendo las dos rectas como subespacios, que serán la misma
     # en caso de que la cónica sea una recta doble.
     #
