@@ -1,15 +1,15 @@
+### Importante
+Todos estos scripts han sido programados y probados por mí mismo en apenas unos meses. He intentado probar que todo funcione correctamente y he ido arreglando todos los errores que he ido encontrando. Parece que todo funciona correctamente. Pero eso no significa que todo funcione correctamente. Así que <b>no me hago responsable de posibles errores que puedan suceder a la hora de usar los scripts en un examen</b>. Se recomienda comprobar que las soluciones tienen sentido o incluso dibujarlas con GeoGebra.
+
+### Fecha de salida
+Salvo arreglos de última hora, que serán avisados, se asegura que a partir del <b>lunes 28 de enero a las 10:00</b> ya no habrá más modificaciones de código.
+
 # scripts-gl
 Scripts que pueden resultar útiles para resolver ejercicios de Geometría Lineal usando Sage.
 
 Están pensados únicamente para su uso en resolución de ejercicios y exámenes de la asignatura GL de la Facultad de Matemáticas de la Universidad Complutense de Madrid. Por ello, no se pretende que los algoritmos sean óptimos ni 100% fiables, aunque sí es recomendable que tengan una fiabilidad alta.
 
 Cualquier error que se detecte debería ser comunicado lo antes posible.
-
-# Importante
-Todos estos scripts han sido programados y probados por mí mismo en apenas unos meses. He intentado probar que todo funcione correctamente y he ido arreglando todos los errores que he ido encontrando. Parece que todo funciona correctamente. Pero eso no significa que todo funcione correctamente. Así que <b>no me hago responsable de posibles errores que puedan suceder a la hora de usar los scripts en un examen</b>. Se recomienda comprobar que las soluciones tienen sentido o incluso dibujarlas con GeoGebra.
-
-# Fecha de salida
-Salvo arreglos de última hora, que serán avisados, se asegura que a partir del <b>lunes 28 de enero a las 10:00</b> ya no habrá más modificaciones de código.
 
 # Cómo usarlos
 Las carpetas importantes son scripts y doc. En scripts se encuentran todos los archivos con scripts disponibles. En doc se encuentra la documentación básica para ser capaz de usar dichos scripts, sin necesidad de mirar ningún tipo de código.
