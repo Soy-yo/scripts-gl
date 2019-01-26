@@ -714,14 +714,14 @@ class homografia_recta:
             # Cogemos dos de los puntos de la referencia que no sean el fijo para la nueva referencia
             i = 0 if ref[0] != fijos[0] else 2
             j = 1 if ref[1] != fijos[0] else 2
-            lamb = self._matriz[0][1] / -self._matriz[0][0]
+            lamb = self._matriz[0][1] / -self._matriz[0][0] if self._matriz[0][0] != 0 else Infinity
             paso("Usamos el punto fijo como primer punto de la nueva referencia y dejamos dos de los otros dos:")
             paso("Cambiamos de referencia theta' = lambda*theta, con lambda = ", \
                 self._matriz[0][1], "/", -self._matriz[0][0], "=", lamb)
-            # Calculamos la nueva referencia obteniendo
-            nueva0 = self._recta[lamb * self._recta.coordenada(fijos[0])]
-            nueva1 = self._recta[lamb * self._recta.coordenada(ref[i])]
-            nueva2 = self._recta[lamb * self._recta.coordenada(ref[j])]
+            # Calculamos la nueva referencia
+            nueva0 = self._recta[lamb * self._recta.coordenada(fijos[0])] if not es_infinito(lamb) else self._recta[self._recta.coordenada(fijos[0])]
+            nueva1 = self._recta[lamb * self._recta.coordenada(ref[i])] if not es_infinito(lamb) else self._recta[self._recta.coordenada(ref[i])]
+            nueva2 = self._recta[lamb * self._recta.coordenada(ref[j])] if not es_infinito(lamb) else self._recta[self._recta.coordenada(ref[j])]
             paso("R={", nueva0, ",", nueva1, ";", nueva2, "}")
             return homografia_recta(matrix([[1, 1], [0, 1]]), recta_proyectiva(nueva0, nueva1, nueva2))
         # Dos puntos fijos distintos, podría ser involución
@@ -756,7 +756,7 @@ class homografia_recta:
             1 if ref[1] != fijos[0] and ref[1] != fijos[1] else \
             2
         paso("Usamos un punto arbitrario y su imagen como primeros puntos de la referencia y uno de los fijos como unidad")
-        paso("R={", ref[i], ",", self(ref[i]), ",", fijos[0], "}")
+        paso("R={", ref[i], ",", self(ref[i]), ";", fijos[0], "}")
         return homografia_recta(matrix([[0, 1], [1, 0]]), recta_proyectiva(ref[i], self(ref[i]), fijos[0]))
 
     #\m
@@ -794,6 +794,53 @@ class homografia_recta:
         p2 = (b - theta) if not es_infinito(b) else 1
         p3 = (bp - theta) if not es_infinito(bp) else 1
         return p0 * p1 + mu * p2 * p3
+
+    #\m
+    # Descompone esta homografía en dos perspectividades, dado el centro de la primera y una recta auxiliar que pase por uno de los
+    # puntos fijos de la homografía. Devuelve una tupla conteniendo las dos homografia_dos_rectas (h1, h2), de forma que h = h2*h1, es
+    # decir, se aplica primero h1.
+    #
+    # NOTA. El resultado es una homografia_dos_rectas para permitir dimensión n. Con una proyección como tal sería más complicado.
+    # Por tanto, se obtendrá una expresión con ecuación como resultado, sin mostrarse su procedimiento. Si se desea obtener objetos
+    # de tipo proyeccion como tal, simplemente úsese el centro de cada una como centro y el subespacio asociado a cada recta como imagen.
+    #
+    # Implementación \\
+    # Se elige el centro dado como centro de la primera perspectividad. Con esto, se calcula la imagen por la perspectividad de dos puntos
+    # (pues el punto fijo por el que pasa la recta sigue fijo), de entre Infinity, 0, 1. Uniendo los puntos obtenidos en la recta
+    # auxiliar con las verdaderas imágenes de cada punto se obtiene un punto de corte que será el centro de la segunda.
+    #
+    # Parámetros \\
+    # centro: vector(n) - punto del centro de la primera proyección \\
+    # r_aux: recta_proyectiva(dim_amb=n-1) - recta auxiliar que corta a la recta de esta homografía en un punto fijo
+    #
+    def descomponer(self, centro, r_aux):
+        assert self._recta.dimension_ambiente() == r_aux.dimension_ambiente(), "La recta auxiliar debe pertenecer al mismo espacio"
+        assert len(centro) == self._recta.dimension_ambiente() + 1, "El centro de la perspectividad debe pertenecer al mismo espacio"
+        _no_pasos()
+        fijos = self.puntos_fijos_theta()
+        inters = self._recta.subespacio().interseccion(r_aux.subespacio())
+        _no_pasos(False)
+        assert inters.es_punto() and self._recta.coordenada(inters.punto()) in fijos, "La recta auxiliar debe cortar a esta en un punto fijo"
+        m = self._recta.coordenada(inters.punto())
+        a = 0 if es_infinito(m) else Infinity
+        b = 1 if es_infinito(m) or m != 1 else 0
+        ha = self(a)
+        hb = self(b)
+        _no_pasos()
+        imagen1 = subespacio(centro, self._recta[a]).interseccion(r_aux.subespacio()).punto()
+        imagen2 = subespacio(centro, self._recta[b]).interseccion(r_aux.subespacio()).punto()
+        h1 = crear_homografia_dos_rectas(self._recta[m], self._recta[m], self._recta[a], imagen1, self._recta[b], imagen2, self._recta, r_aux)
+        _no_pasos(False)
+        paso("La primera perspectividad transforma: ", self._recta[a], " -> ", imagen1, ", ", self._recta[b], " -> ", imagen2)
+        paso("Ahora unimos estos puntos imagen con la imagen original de cada uno para obtener el otro centro")
+        paso("Estos son h", self._recta[a], " = ", self._recta[ha], " y h", self._recta[b], " = ", self._recta[hb])
+        _no_pasos()
+        # Calculamos el centro por la info, no porque sea necesario
+        centro2 = subespacio(imagen1, self._recta[ha]).interseccion(subespacio(imagen2, self._recta[hb])).punto()
+        h2 = crear_homografia_dos_rectas(self._recta[m], self._recta[m], imagen1, self._recta[ha], imagen2, self._recta[hb], r_aux, self._recta)
+        _no_pasos(False)
+        paso("El centro segundo obtenido ha sido: ", centro2)
+        return (h1, h2)
 
     #\m
     # Operador *. Devuelve la composición de las homografías ((self o otra)(theta) = self(otra(theta))).
@@ -1039,9 +1086,9 @@ class homografia_dos_rectas:
         paso(0, "->", b)
         paso(1, "->", c)
         paso("Que forman las siguientes rectas y se cortaran en el centro")
-        paso(r1)
-        paso(r2)
-        paso(r3)
+        paso(r1.implicitas()[0])
+        paso(r2.implicitas()[0])
+        paso(r3.implicitas()[0])
         _no_pasos()
         res = r1.interseccion(r2) if not r1.es_punto() and not r2.es_punto() else \
                 r1.interseccion(r3) if not r1.es_punto() and not r3.es_punto() else \
