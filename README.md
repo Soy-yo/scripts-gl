@@ -5,6 +5,12 @@ Están pensados únicamente para su uso en resolución de ejercicios y exámenes
 
 Cualquier error que se detecte debería ser comunicado lo antes posible.
 
+# Importante
+Todos estos scripts han sido programados y probados por mí mismo en apenas unos meses. He intentado probar que todo funcione correctamente y he ido arreglando todos los errores que he ido encontrando. Parece que todo funciona correctamente. Pero eso no significa que todo funcione correctamente. Así que <b>no me hago responsable de posibles errores que puedan suceder a la hora de usar los scripts en un examen</b>. Se recomienda comprobar que las soluciones tienen sentido o incluso dibujarlas con GeoGebra.
+
+# Fecha de salida
+Salvo arreglos de última hora, que serán avisados, se asegura que a partir del <b>lunes 28 de enero a las 10:00</b> ya no habrá más modificaciones de código.
+
 # Cómo usarlos
 Las carpetas importantes son scripts y doc. En scripts se encuentran todos los archivos con scripts disponibles. En doc se encuentra la documentación básica para ser capaz de usar dichos scripts, sin necesidad de mirar ningún tipo de código.
 
@@ -25,6 +31,9 @@ Las carpetas importantes son scripts y doc. En scripts se encuentran todos los a
         Ya no están pensados para la versión antigua porque algunos archivos se enlazan mutuamente. Igualmente, se pueden unir todos los archivos en un mismo archivo para luego copiar y pegar en nuestro cuaderno. Esto debería funcionar, pero probablemente ralentice el ordenador.
       </li>
     </ul>
+  </li>
+  <li>
+    Para ver los resultados con tipografía de Latex se recomienda ejecutar la línea <code>pretty_print_default(True)</code>.
   </li>
   <li>
     Abrimos <b>doc/index.html</b> en el navegador para tener toda la documentación necesaria.
