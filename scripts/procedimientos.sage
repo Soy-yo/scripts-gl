@@ -28,7 +28,7 @@ def paso(*objetos):
         for obj in objetos:
             s = s + str(latex(obj))
         show(LatexExpr(s))
-        
+
 #\f
 # Activa o desactiva que se muestren los pasos que ejecutan las funciones.
 #
@@ -53,6 +53,8 @@ def mostrar_procedimiento(b = True):
 #
 # Parámetros \\
 # b: booleano - True para desactivarlos, False para recuperarlos de nuevo (por defecto True)
+#
+
 def _no_pasos(b = True):
     global _mostrar_procedimiento
     if b:

@@ -56,7 +56,7 @@ def haz_contacto_simple(conica, a, b, t):
     _no_pasos(False)
     # Necesitamos también la tangente
     if a not in conica or b not in conica:
-        paso("Calculamos la tangente desde T = ", t, " usando la polar")
+        paso("Alguno de los puntos dados no esta en la conica; calculamos la tangente t desde T = ", t, " usando la polar")
         tang = conica.polar(t)
         _no_pasos()
         ab = subespacio(a, b)
@@ -72,13 +72,13 @@ def haz_contacto_simple(conica, a, b, t):
         return haz_conicas(conica, atbt)
 
 #\f
-# Crea un haz con contacto triple, dados una cónica, un punto de por el que pasa y el punto de contacto triple.
-#
-# NOTA. He visto que en algunos ejercicios se pide calcular el haz de contacto triple dado el punto A que no pertenece a la cónica.
-# Como de momento no sé hacer eso, aquí no está permitido.
+# Crea un haz con contacto triple, dados una cónica, un punto de por el que pasa y el punto de contacto triple con la cónica.
 #
 # Implementación \\
-# Obtiene las rectas AT y t (tangente a la cónica desde T), que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz.
+# Si A pertenece a la cóncia obtiene las rectas AT y t (tangente a la cónica desde T), que formarán una cónica degenerada del haz.
+# Con esta y la dada se construye el haz. Si no, calcula un haz auxiliar con la cónica dada y la cónica degenerada que forman la
+# recta t anterior y la polar de A. Finalmente, se elige la cónica de este haz que pasa por el punto A que, junto con AT·t formará
+# el haz buscado.
 #
 # Parámetros \\
 # conica: conica - una cónica del haz \\
@@ -87,15 +87,29 @@ def haz_contacto_simple(conica, a, b, t):
 #
 def haz_contacto_triple(conica, a, t):
     assert len(a) == 3 and len(t) == 3, "Los puntos deben pertenecer al plano"
-    assert a in conica and t in conica, "Los puntos deben pertenecer a la conica"
-    paso("Calculamos la tangente desde T = ", t, " usando la polar")
+    assert t in conica, "El punto triple debe pertenecer a la conica"
+    paso("Calculamos la tangente t desde T = ", t, " usando la polar")
     tang = conica.polar(t)
     _no_pasos()
     at = subespacio(a, t)
     att = conica_degenerada(at, tang)
     _no_pasos(False)
-    paso("Creamos la conica degenerada AT*t y generamos el haz (xi es x, y, z respectivamente):")
-    paso("(", conica.ecuacion().lhs(), ") + lambda * (", at.implicitas()[0].lhs(), ")(", tang.implicitas()[0].lhs(), ") = 0")
+    if a not in conica:
+        paso("El punto A = ", a, " no pertenece a la conica dada: calculamos su polar")
+        polar = conica.polar(a)
+        pt = conica_degenerada(tang, polar)
+        paso("Creamos la conica degenerada Polar(A)*t y generamos un haz auxiliar (xi es x, y, z respectivamente):")
+        paso("(", conica.ecuacion().lhs(), ") + lambda * (", polar.implicitas()[0].lhs(), ")(", tang.implicitas()[0].lhs(), ") = 0")
+        haz_aux = haz_conicas(conica, pt)
+        paso("Obtenemos la conica de este haz que pasa por el punto A, sustituyendolo; con esta y AT*t tenemos el haz:")
+        _no_pasos()
+        conica_aux = haz_aux.forzar_punto(a)
+        _no_pasos(False)
+        paso("(", conica_aux.ecuacion().lhs(), ") + lambda * (", at.implicitas()[0].lhs(), ")(", tang.implicitas()[0].lhs(), ") = 0")
+        return haz_conicas(conica_aux, att)
+    else:
+        paso("Creamos la conica degenerada AT*t y generamos el haz (xi es x, y, z respectivamente):")
+        paso("(", conica.ecuacion().lhs(), ") + lambda * (", at.implicitas()[0].lhs(), ")(", tang.implicitas()[0].lhs(), ") = 0")
     return haz_conicas(conica, att)
 
 #\f
@@ -111,7 +125,7 @@ def haz_contacto_triple(conica, a, t):
 def haz_contacto_cuadruple(conica, t):
     assert len(t) == 3, "El punto debe pertenecer al plano"
     assert t in conica, "El punto debe pertenecer a la conica"
-    paso("Calculamos la tangente desde T = ", t, " usando la polar")
+    paso("Calculamos la tangente t desde T = ", t, " usando la polar")
     tang = conica.polar(t)
     tt = conica_degenerada(tang)
     paso("Creamos la conica degenerada t^2 y generamos el haz (xi es x, y, z respectivamente):")
@@ -148,7 +162,7 @@ def haz_dos_contactos_dobles(conica1, s, t, conica2 = None):
         # S será el punto de tangencia de la primera
         if s not in conica1:
             (s, t) = (t, s)
-        paso("Calculamos la tangente desde S = ", s, " y T = ", t, " usando las polares")
+        paso("Cada punto esta en cada conica; calculamos la tangente desde S = ", s, " y T = ", t, " usando las polares")
         tang1 = conica1.polar(s)
         tang2 = conica2.polar(t)
         conica_tang = conica_degenerada(tang1, tang2)

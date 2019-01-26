@@ -39,10 +39,9 @@ t: vector(3) - punto de contacto doble <br>
 <div class='function'>
 <h3>Función: haz_contacto_triple(conica, a, t)</h3>
 <p>
-Crea un haz con contacto triple, dados una cónica, un punto de por el que pasa y el punto de contacto triple. <br>
-NOTA. He visto que en algunos ejercicios se pide calcular el haz de contacto triple dado el punto A que no pertenece a la cónica. Como de momento no sé hacer eso, aquí no está permitido. <br>
+Crea un haz con contacto triple, dados una cónica, un punto de por el que pasa y el punto de contacto triple con la cónica. <br>
 Implementación <br>
-Obtiene las rectas AT y t (tangente a la cónica desde T), que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz. <br>
+Si A pertenece a la cóncia obtiene las rectas AT y t (tangente a la cónica desde T), que formarán una cónica degenerada del haz. Con esta y la dada se construye el haz. Si no, calcula un haz auxiliar con la cónica dada y la cónica degenerada que forman la recta t anterior y la polar de A. Finalmente, se elige la cónica de este haz que pasa por el punto A que, junto con AT·t formará el haz buscado. <br>
 Parámetros <br>
 conica: conica - una cónica del haz <br>
 a: vector(3) - punto de contacto simple <br>
