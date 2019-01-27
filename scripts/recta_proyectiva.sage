@@ -699,8 +699,8 @@ class homografia_recta:
     # Implementación \\
     # En función de los puntos fijos devuelve: \\
     # infinitos -> ella misma (identidad) \\
-    # 1         -> matriz (1, 1; 0, 1) con referencia el punto fijo y dos arbitrarios, multiplicada por lambda = delta/beta \\
-    # 2         -> matriz (-beta/gamma, 0; 0, 1) con referencia los puntos fijos y uno arbitrario
+    # 1         -> matriz (1, 1; 0, 1) con referencia el punto fijo, un punto arbitario y su imagen \\
+    # 2         -> matriz (cociente de autovalores, 0; 0, 1) con referencia los puntos fijos y uno arbitrario
     #
     def simplificar(self):
         paso("Calculamos los puntos fijos")
@@ -711,17 +711,13 @@ class homografia_recta:
         ref = self._recta.referencia()
         # Elación: matriz de Jordan fija y referencia el punto fijo y dos arbitrarios
         if len(fijos) == 1:
-            # Cogemos dos de los puntos de la referencia que no sean el fijo para la nueva referencia
-            i = 0 if ref[0] != fijos[0] else 2
-            j = 1 if ref[1] != fijos[0] else 2
-            lamb = self._matriz[0][1] / -self._matriz[0][0] if self._matriz[0][0] != 0 else Infinity
-            paso("Usamos el punto fijo como primer punto de la nueva referencia y dejamos dos de los otros dos:")
-            paso("Cambiamos de referencia theta' = lambda*theta, con lambda = ", \
-                self._matriz[0][1], "/", -self._matriz[0][0], "=", lamb)
-            # Calculamos la nueva referencia
-            nueva0 = self._recta[lamb * self._recta.coordenada(fijos[0])] if not es_infinito(lamb) else self._recta[self._recta.coordenada(fijos[0])]
-            nueva1 = self._recta[lamb * self._recta.coordenada(ref[i])] if not es_infinito(lamb) else self._recta[self._recta.coordenada(ref[i])]
-            nueva2 = self._recta[lamb * self._recta.coordenada(ref[j])] if not es_infinito(lamb) else self._recta[self._recta.coordenada(ref[j])]
+            # Cogemos un punto de la referencia que no sea el fijo para la nueva referencia
+            i = 0 if ref[0] != fijos[0] else 1
+            paso("Usamos el punto fijo como primer punto de la nueva referencia, y usamos otro punto y su imagen como 0 y 1;", \
+                " asi transforma: ", Infinity, " -> ", Infinity, ", 0 -> 1 ")
+            nueva0 = self._recta[self._recta.coordenada(fijos[0])]
+            nueva1 = self._recta[self._recta.coordenada(ref[i])]
+            nueva2 = self._recta[self(self._recta.coordenada(ref[i]))]
             paso("R={", nueva0, ",", nueva1, ";", nueva2, "}")
             return homografia_recta(matrix([[1, 1], [0, 1]]), recta_proyectiva(nueva0, nueva1, nueva2))
         # Dos puntos fijos distintos, podría ser involución
