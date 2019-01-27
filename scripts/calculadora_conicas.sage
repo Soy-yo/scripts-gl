@@ -11,6 +11,8 @@
 # A pesar de los cambios de referencia que haga intermedios, los resultados serán devueltos en la
 # referencia inicial que se supone canónica.
 #
+# NOTA. 
+#
 class calculadora_conica:
 
     #\i
@@ -304,8 +306,8 @@ class calculadora_conica:
             exc = self.excentricidad()
             paso("a = ", a, ", e = ", exc, "; las directrices son X = +/-", a, "/", exc)
             _no_pasos()
-            d1 = subespacio(vector([1, -a / exc, 0])).dual()
-            d2 = subespacio(vector([1, a / exc, 0])).dual()
+            d1 = subespacio(vector([1, 0, -a / exc])).dual()
+            d2 = subespacio(vector([1, 0, a / exc])).dual()
             _no_pasos(False)
             self._directrices = [d1, d2]
         return map(lambda d: self.__r(d, 1), self._directrices)
@@ -313,7 +315,7 @@ class calculadora_conica:
     # Métodos auxiliares
 
     def __ejes(self):
-        subm = self._conica1.matriz_asociada()[0:2,0:2]
+        subm = self._conica1.matriz_asociada()[0 : 2, 0 : 2]
         paso("Obtenemos las direcciones de los ejes como los autovectores de la submatriz: ", subm)
         # Uso aplicaciones porque ya está hecho allí
         (x, y) = aplicacion_proyectiva(subm).puntos_fijos()
@@ -327,7 +329,7 @@ class calculadora_conica:
         return (self.__r(e1, 0), self.__r(e2, 0))
 
     def __ejes_p(self):
-        subm = self._conica1.matriz_asociada()[0:2,0:2]
+        subm = self._conica1.matriz_asociada()[0 : 2, 0 : 2]
         paso("Obtenemos la direccion de la tangente en el vertice como cualquiera de las filas no nulas de la submatriz: ", subm)
         u = self._centro
         v = vector((subm[0].list() if subm[0] != 0 else subm[1].list()) + [0])
@@ -348,14 +350,14 @@ class calculadora_conica:
         return (self.__r(e1, 0), self.__r(e2, 0))
 
     def __canonica(self):
-        (u, v) = map(lambda x: x[0].normalized(), self._ejes)
+        (u, v) = map(lambda x: x[0].normalized().simplify_full(), self._ejes)
         # La tercera coordenada es no nula
         c = self._centro / self._centro[2]
-        unidad = u + v + c
+        unidad = (u + v + c).simplify_full()
         paso("Usamos como referencia euclidea R={", u, ", ", v, ", ", c, "; ", unidad, "}")
         m = matrix([u, v, c]).T.simplify_full()
         paso("Obtenemos los nuevos coeficientes de la ecuacion de la conica con: ", m)
-        mc = self._conica1.cambiar_referencia(m^-1).matriz_asociada()
+        mc = self._conica1.cambiar_referencia((m^-1).simplify_full()).matriz_asociada()
         paso(mc)
         (alfa, beta, ganma) = mc.diagonal()
         paso("Los ajustamos un poco si es necesario para que quede todo ordenado")
@@ -393,14 +395,14 @@ class calculadora_conica:
         return self._conica2
 
     def __canonica_p(self):
-        (u, v) = map(lambda x: x[0].normalized(), self._ejes)
+        (u, v) = map(lambda x: x[0].normalized().simplify_full(), self._ejes)
         # La tercera coordenada es no nula
         w = self._vertice / self._vertice[2]
-        unidad = u + v + w
+        unidad = (u + v + w).simplify_full()
         paso("Usamos como referencia euclidea R={", u, ", ", v, ", ", w, "; ", unidad, "}")
         m = matrix([u, v, w]).T.simplify_full()
         paso("Obtenemos los nuevos coeficientes de la ecuacion de la conica con: ", m)
-        mc = self._conica1.cambiar_referencia(m^-1).matriz_asociada()
+        mc = self._conica1.cambiar_referencia((m^-1).simplify_full()).matriz_asociada()
         paso(mc)
         (alfa, beta) = (mc[1][1], mc[0][2])
         p = beta / alfa
@@ -408,6 +410,7 @@ class calculadora_conica:
         if p > 0:
             paso("Cambiamos la orientacion de: ", u, " en la referencia para tener la parabola hacia la derecha")
             m = matrix([-u, v, w]).T.simplify_full()
+            paso("Entonces la matriz del cambio hubiera sido: ", m)
             p = -p
         self._conica2 = conica(matrix([[0, 0, p], [0, 1, 0], [p, 0, 0]]))
         self._cambio2 = m
@@ -437,7 +440,7 @@ class calculadora_conica:
         _no_pasos(False)
         paso("La recta en la referencia actual tiene coeficientes: ", d)
         if abs(n) > 0 and self._cambio2 is not None:
-            paso("Cambiamos a la referencia con la que estabamos trabajando con la matriz del cambio menos traspuesta: ", self._cambio2.T^-1)
+            paso("Cambiamos a la referencia con la que estabamos trabajando con la matriz del cambio a la menos traspuesta: ", self._cambio2.T^-1)
             d = self._cambio2.T^-1 * d
             paso(d)
         if self._cambio1 is None or n < 0:

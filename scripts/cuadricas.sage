@@ -393,8 +393,9 @@ class conica:
     def cambiar_referencia(self, matriz_cambio):
         assert matriz_cambio.nrows() == 3, "La matriz del cambio de referencia de una cónica es 3x3"
         assert matriz_cambio.det() != 0, "Una matriz de cambio de referencia debe ser invertible"
-        paso("La matriz de la conica en la nueva referencia se calcula:", (matriz_cambio.T)^-1, self._matriz, matriz_cambio^-1)
-        return conica((matriz_cambio.T)^-1 * self._matriz * matriz_cambio^-1)
+        m = (matriz_cambio^-1).simplify_full()
+        paso("La matriz de la conica en la nueva referencia se calcula:", m.T, self._matriz, m)
+        return conica(m.T * self._matriz * m)
 
     #\m
     # Devuelve la cónica dual (de rectas tangentes) a esta cónica.
