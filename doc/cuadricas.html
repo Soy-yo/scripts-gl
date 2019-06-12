@@ -7,7 +7,8 @@
 <body>
 <a href='index.html'>Página principal</a><h1>cuadricas</h1>
 <p>
-Este archivo contiene clases para manejar cónicas y cuádricas y algunas otras funciones útiles. De momento no se ha implementado nada sobre cuádricas en general porque la mayoría de ejercicios son de cónicas, pero ciertos métodos serían exactamente iguales, sólo que en dimensión mayor. Se puede mirar el procedimiento y hacer a mano. <br>
+Este archivo contiene clases para manejar cónicas y cuádricas y algunas otras funciones útiles. <br>
+Visto que ahora mete cuádricas en los exámenes se ha añadido la clase cuadrica, con las mismas operaciones básicas que tenía conica (básicamente es un copia-pega de la otra clase). <br>
 Autor: Pablo Sanz Sanz <br>
 </p>
 <div class='function'>
@@ -113,6 +114,146 @@ extra: complejo/Infinity/vector(3) - punto extra de la cónica que se utilizará
 </p>
 </div>
 <div class='class'>
+<h2>Clase: cuadrica</h2>
+<p>
+Clase que representa una cuádrica tanto puntual como dual dada su matriz, con las operaciones básicas. <br>
+Usar la clase conica en vez de esta en caso de necesitar una cónica, pues es más especializada. <br>
+</p>
+<div class='methods'>
+<div class='function'>
+<h3>Constructor (matriz)</h3>
+<p>
+Construye una cuádrica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de posiciones la mitad del coeficiente según las variables). Si no, se puede usar también ecuacion.hessian(), donde ecuacion es la parte izquierda de la ecuación (sin el == 0) pero puede dar problemas si se tiene algún parámetro o si no aparecen las tres variables. <br>
+Parámetros <br>
+matriz: matriz(n, n) - matriz de la cuádrica <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: matriz_asociada()</h3>
+<p>
+Devuelve la matriz asociada a esta cuádrica. </p>
+</div>
+<div class='function'>
+<h3>Función: ecuacion(factor = False)</h3>
+<p>
+Devuelve la ecuación de esta cuádrica. <br>
+Parámetros <br>
+factor: booleano - indica si se quiere la ecuación factorizada (aunque no siempre se consigue) o no (False por defecto) <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: es_degenerada()</h3>
+<p>
+Determina si esta cuádrica es degenerada, esto es, si el rango de su matriz asociada no es máximo. </p>
+</div>
+<div class='function'>
+<h3>Función: dimension()</h3>
+<p>
+Devuelve la dimensión en la que se encuentra la cuádrica (p.e.: 2 para cónica). </p>
+</div>
+<div class='function'>
+<h3>Función: es_tangente(s)</h3>
+<p>
+Determina si el hiperplano o la recta dada es tangente a esta cuádrica. Si esta cuádrica es una cónica es mejor utilizar una recta del tipo subespacio (o usar la clase conica en vez de cuadrica directamente). <br>
+Implementación <br>
+Comprueba que el punto dual del hiperplano pertenezca a la cuádrica dual. <br>
+En el caso de que sea una recta proyectiva halla el corte con la cuádrica y devolverá True si es un punto doble. <br>
+Parámetros <br>
+s: subespacio/recta_proyectiva - hiperplano (tipo subespacio) o recta (tipo recta_proyectiva) a comprobar si es tangente o no <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: cambiar_referencia(matriz_cambio)</h3>
+<p>
+Devuelve una nueva cuádrica expresada en la nueva referencia R', dada la matriz del cambio de referencia de R a R'. <br>
+La matriz del cambio de referencia debería proceder de cambiar_referencia (espacios.sage). <br>
+Implementación <br>
+Si A es la matriz asociada a esta cuádrica y M la matriz del cambio de referencia entre dos referencias (que esta cuádrica desconoce), se crea una nueva cuádrica cuya matriz asociada sea M^-t * A * M^-1. <br>
+Parámetros <br>
+matriz_cambio: matriz(n, n) - matriz que representa el cambio de referencia: x' = Ax <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: dual()</h3>
+<p>
+Devuelve la cuádrica dual (de hiperplanos tangentes) a esta cuádrica. <br>
+Implementación <br>
+Se crea una nueva cuádrica cuya matriz asociada sea la adjunta de la de esta. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: polar(p)</h3>
+<p>
+Devuelve el hiperplano polar del punto P respecto de esta cuádrica. <br>
+Implementación <br>
+Si A es la matriz asociada a esta cuádrica, el hiperplano polar es el de ecuación x^t * A * p = 0. <br>
+Parámetros <br>
+p: vector(n) - punto del que se quiere calcular su polar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: polo(h)</h3>
+<p>
+Devuelve el polo del hiperplano h respecto de esta cuádrica. <br>
+Implementación <br>
+Se calcula el hiperplano polar del punto dual del hiperplano h* (el vector de sus coeficientes) respecto a la cuádrica dual C*. Por tanto, el dual del hiperplano polar calculado será el punto buscado. <br>
+Parámetros <br>
+h: subespacio - hiperplano del que calcular el polo <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: tangentes(p)</h3>
+<p>
+Devuelve la cuádrica degenerada tangente a esta cuádrica que pasa por P. <br>
+Implementación <br>
+Devuelve la cuádrica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cuádrica. <br>
+Parámetros <br>
+p: vector(n) - punto del que obtener las tangentes <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: interseccion()</h3>
+<p>
+Devuelve el núcleo de esta cuádrica degenerada. El resultado se devuelve siempre de tipo subespacio. Si la cuádrica no es degenerada devuelve un subespacio vacío. Serviría, por ejemplo, para calcular el punto de intersección de los dos conos que pueden formar una cuádrica degenerada en dimensión 3. <br>
+Implementación <br>
+Calcula el núcleo de la matriz asociada, que será la intersección de las rectas. <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: interseccion_recta(r)</h3>
+<p>
+Devuelve una tupla conteniendo los dos puntos de intersección de una recta (expresada como recta_proyectiva) con esta cuádrica. Si la recta fuera tangente (esto es, corta en un punto doble) devolverá dos veces el mismo punto. <br>
+Implementación <br>
+Tomado un punto genérico de la recta, P(theta), resuelve P^t(theta) * A * P(theta) = 0, siendo A la matriz que representa esta cuádrica. <br>
+Parámetros <br>
+r: recta_proyectiva(dim=n) - recta con la que intersecar <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __call__(p)</h3>
+<p>
+Calcula la imagen de un punto mediante la forma bilineal que define esta cuádrica. Realmente esta no es una operación de cuádricas, pero se incluye aquí porque puede ser útil. <br>
+Uso: c(p) (donde c es una cuadrica y p un punto). <br>
+Implementación <br>
+Calcula p^t * A * p, donde A es la matriz asociada a esta cuádrica. <br>
+Parámetros <br>
+p: vector(n) - punto del que se quiere calcular su imagen <br>
+</p>
+</div>
+<div class='function'>
+<h3>Función: __contains__(punto)</h3>
+<p>
+Operador in. Determina si un punto está contenido en esta cuádrica o no. <br>
+Uso: P in c (P es un punto y c una cuadrica). <br>
+Implementación <br>
+Comprueba p^t * A * p = 0 para A la matriz asociada de la cuádrica. <br>
+Parámetros <br>
+punto: vector(n) - punto que comprobar si pertenece a la cuádrica <br>
+</p>
+</div>
+</div>
+</div>
+<div class='class'>
 <h2>Clase: conica</h2>
 <p>
 Clase que representa una cónica tanto puntual como dual dada su matriz. <br>
@@ -121,7 +262,7 @@ Clase que representa una cónica tanto puntual como dual dada su matriz. <br>
 <div class='function'>
 <h3>Constructor (matriz)</h3>
 <p>
-Construye una cónica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de posiciones la mitad del coeficiente según las variables). Se puede usar también ecuacion.hessian() pero puede dar problemas si se tiene algún parámetro o si no aparecen las tres variables. <br>
+Construye una cónica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de posiciones la mitad del coeficiente según las variables). Si no, se puede usar también ecuacion.hessian(), donde ecuacion es la parte izquierda de la ecuación (sin el == 0), pero puede dar problemas si se tiene algún parámetro o si no aparecen las tres variables. <br>
 Parámetros <br>
 matriz: matriz(3, 3) - matriz de la cónica <br>
 </p>
@@ -229,7 +370,7 @@ p: vector(3) - punto del que obtener las tangentes <br>
 <div class='function'>
 <h3>Función: interseccion()</h3>
 <p>
-Devuelve la intersección de las rectas de esta cónica degenerada. Devuelve un subespacio, si sólo se quiere un punto, en caso de ser dos rectas distintas, se puede usar .representantes()[0] para obtenerlo como vector. Si la cónica no es degenerada devuelve un subespacio vacío. <br>
+Devuelve la intersección de las rectas de esta cónica degenerada. El resultado se devuelve siempre de tipo subespacio. Si sólo se quiere un punto, en caso de ser dos rectas distintas, se puede usar .representantes()[0] para obtenerlo como vector. Si la cónica no es degenerada devuelve un subespacio vacío. <br>
 Implementación <br>
 Calcula el núcleo de la matriz asociada, que será la intersección de las rectas. <br>
 </p>

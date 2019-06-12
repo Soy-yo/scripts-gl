@@ -1,8 +1,7 @@
 #\s
-# Este archivo contiene clases para manejar cónicas y cuádricas y algunas otras funciones útiles.
-# De momento no se ha implementado nada sobre cuádricas en general porque la mayoría de ejercicios son de cónicas,
-# pero ciertos métodos serían exactamente iguales, sólo que en dimensión mayor. Se puede mirar el procedimiento
-# y hacer a mano.
+# Este archivo contiene clases para manejar cónicas y cuádricas y algunas otras funciones útiles. \\
+# Visto que ahora mete cuádricas en los exámenes se ha añadido la clase cuadrica, con las mismas operaciones básicas que tenía
+# conica (básicamente es un copia-pega de la otra clase).
 #
 # Autor: Pablo Sanz Sanz
 #
@@ -274,6 +273,249 @@ def crear_homografia_conica_fijos(a, ap, param, m, n = None, extra = 0):
 # Clases
 
 #\c
+# Clase que representa una cuádrica tanto puntual como dual dada su matriz, con las operaciones básicas. \\
+# Usar la clase conica en vez de esta en caso de necesitar una cónica, pues es más especializada.
+#
+class cuadrica:
+
+    #\i
+    # Construye una cuádrica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo
+    # a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de
+    # posiciones la mitad del coeficiente según las variables). Si no, se puede usar también ecuacion.hessian(), donde
+    # ecuacion es la parte izquierda de la ecuación (sin el == 0) pero puede dar problemas si se tiene algún parámetro o
+    # si no aparecen las tres variables.
+    #
+    # Parámetros \\
+    # matriz: matriz(n, n) - matriz de la cuádrica
+    #
+    def __init__(self, matriz):
+        assert matriz.is_symmetric(), "La matriz de una cuadrica debe ser simetrica"
+        self._vars = vector([var('x_var' + str(i), latex_name = 'x_' + str(i)) for i in range(matriz.nrows())])
+        self._matriz = matriz
+        self._ecuacion = (self._vars * matriz * self._vars).factor()
+
+    # Métodos accedentes
+
+    #\m
+    # Devuelve la matriz asociada a esta cuádrica.
+    def matriz_asociada(self):
+        return self._matriz
+
+    #\m
+    # Devuelve la ecuación de esta cuádrica.
+    #
+    # Parámetros \\
+    # factor: booleano - indica si se quiere la ecuación factorizada (aunque no siempre se consigue) o no (False por defecto)
+    #
+    def ecuacion(self, factor = False):
+        # Intenta factorizar de nuevo por si acaso
+        return self._ecuacion.factor() == 0 if factor else self._ecuacion.expand() == 0
+
+    #\m
+    # Determina si esta cuádrica es degenerada, esto es, si el rango de su matriz asociada no es máximo.
+    def es_degenerada(self):
+        return not self._matriz.is_invertible()
+
+    #\m
+    # Devuelve la dimensión en la que se encuentra la cuádrica (p.e.: 2 para cónica).
+    def dimension(self):
+        return self._matriz.nrows() - 1
+
+    # Otros métodos
+
+    #\m
+    # Determina si el hiperplano o la recta dada es tangente a esta cuádrica. Si esta cuádrica es una cónica es mejor utilizar
+    # una recta del tipo subespacio (o usar la clase conica en vez de cuadrica directamente).
+    #
+    # Implementación \\
+    # Comprueba que el punto dual del hiperplano pertenezca a la cuádrica dual. \\
+    # En el caso de que sea una recta proyectiva halla el corte con la cuádrica y devolverá True si es un punto doble.
+    #
+    # Parámetros \\
+    # s: subespacio/recta_proyectiva - hiperplano (tipo subespacio) o recta (tipo recta_proyectiva) a comprobar si es tangente o no
+    #
+    def es_tangente(self, s):
+        assert s.dimension_ambiente() == self.dimension(), "El subespacio debe pertenecer al mismo espacio que la cuadrica"
+        # Para recta_proyectiva
+        if not hasattr(s, 'dim'):
+            (p, q) = self.interseccion_recta(s)
+            paso("La recta interseca con la cuadrica en: ", p, ", ", q, "; comprobamos si son el mismo punto")
+            return matrix([p, q]).rank() == 1
+        assert s.dim() == self.dimension() - 1, "El subespacio a comprobar si es tangente debe ser un hiperplano o una recta"
+        paso("Obtenemos la cuadrica dual, formada por los hiperplanos tangentes a la puntual, y el dual del hiperplano")
+        d = self.dual()
+        _no_pasos()
+        p = s.dual().representantes()[0]
+        _no_pasos(False)
+        paso("El dual del hiperplano es:", p, "; comprobamos si pertenece a la cuadrica dual")
+        return p in d
+
+    #\m
+    # Devuelve una nueva cuádrica expresada en la nueva referencia R', dada la matriz del cambio
+    # de referencia de R a R'.
+    #
+    # La matriz del cambio de referencia debería proceder de cambiar_referencia (espacios.sage).
+    #
+    # Implementación \\
+    # Si A es la matriz asociada a esta cuádrica y M la matriz del cambio de referencia entre dos referencias
+    # (que esta cuádrica desconoce), se crea una nueva cuádrica cuya matriz asociada sea M^-t * A * M^-1.
+    #
+    # Parámetros \\
+    # matriz_cambio: matriz(n, n) - matriz que representa el cambio de referencia: x' = Ax
+    #
+    def cambiar_referencia(self, matriz_cambio):
+        assert matriz_cambio.nrows() == self._matriz.nrows(), \
+            "La matriz del cambio de referencia debe ser de las mismas dimensiones que la cuadrica"
+        assert matriz_cambio.is_invertible(), "Una matriz de cambio de referencia debe ser invertible"
+        m = matriz_cambio^-1
+        paso("La matriz de la cuadrica en la nueva referencia se calcula:", m.T, self._matriz, m)
+        return cuadrica(m.T * self._matriz * m)
+
+    #\m
+    # Devuelve la cuádrica dual (de hiperplanos tangentes) a esta cuádrica.
+    #
+    # Implementación \\
+    # Se crea una nueva cuádrica cuya matriz asociada sea la adjunta de la de esta.
+    #
+    def dual(self):
+        paso("La cuadrica dual se obtiene mediante la matriz adjunta:", self._matriz.adjoint())
+        return cuadrica(self._matriz.adjoint())
+
+    #\m
+    # Devuelve el hiperplano polar del punto P respecto de esta cuádrica.
+    #
+    # Implementación \\
+    # Si A es la matriz asociada a esta cuádrica, el hiperplano polar es el de ecuación x^t * A * p = 0.
+    #
+    # Parámetros \\
+    # p: vector(n) - punto del que se quiere calcular su polar
+    #
+    def polar(self, p):
+        assert len(p) == self.dimension() + 1, "El punto debe pertenecer al espacio ambiente"
+        paso("La ecuacion del hiperplano polar a p es:", matrix([self._vars]), self._matriz, matrix([p]).T, " = 0")
+        v = self._matriz * p
+        paso(self._vars * v, " = 0")
+        # Aquí lo tenemos que hacer con dual
+        _no_pasos()
+        res = subespacio(v).dual()
+        _no_pasos(False)
+        return res
+
+    #\m
+    # Devuelve el polo del hiperplano h respecto de esta cuádrica.
+    #
+    # Implementación \\
+    # Se calcula el hiperplano polar del punto dual del hiperplano h* (el vector de sus coeficientes) respecto a la cuádrica dual C*.
+    # Por tanto, el dual del hiperplano polar calculado será el punto buscado.
+    #
+    # Parámetros \\
+    # h: subespacio - hiperplano del que calcular el polo
+    #
+    def polo(self, h):
+        assert h.dimension_ambiente() == self.dimension(), "EL hiperplano del que calcular el polo debe ser del mismo espacio"
+        assert h.dim() == self.dimension() - 1, "El subespacio del que calcular el polo debe ser un hiperplano"
+        _no_pasos()
+        p = h.dual().representantes()[0]
+        d = self.dual()
+        _no_pasos(False)
+        paso("Obtenemos los duales del hiperplano y la cuadrica y calculamos la polar de h* (o p):")
+        paso("h* = ", p, "; C*: ", d._matriz)
+        polar = d.polar(p)
+        _no_pasos()
+        res = polar.dual().representantes()[0]
+        _no_pasos(False)
+        paso("Finalmente, calculamos el dual de la polar hallada")
+        return res
+
+    #\m
+    # Devuelve la cuádrica degenerada tangente a esta cuádrica que pasa por P.
+    #
+    # Implementación \\
+    # Devuelve la cuádrica de matriz A * p * p^t * A - (p^t * A * p) * A, donde A es la matriz asociada a esta cuádrica.
+    #
+    # Parámetros \\
+    # p: vector(n) - punto del que obtener las tangentes
+    #
+    def tangentes(self, p):
+        assert len(p) == self._matriz.nrows(), "El punto debe pertencer al espacio ambiente"
+        x = matrix([p]).T
+        paso("La cuadrica degenerada tangente a esta que pasa por el punto es la de matriz")
+        paso(self._matriz, x, x.T, self._matriz, " - (", x.T, self._matriz, x, ")", self._matriz)
+        return cuadrica(self._matriz * x * x.T * self._matriz - (x.T * self._matriz * x)[0][0] * self._matriz)
+
+    #\m
+    # Devuelve el núcleo de esta cuádrica degenerada. El resultado se devuelve siempre de tipo subespacio.
+    # Si la cuádrica no es degenerada devuelve un subespacio vacío.
+    # Serviría, por ejemplo, para calcular el punto de intersección de los dos conos que pueden formar una cuádrica
+    # degenerada en dimensión 3.
+    #
+    # Implementación \\
+    # Calcula el núcleo de la matriz asociada, que será la intersección de las rectas.
+    #
+    def interseccion(self):
+        paso("La interseccion es el nucleo de la matriz asociada")
+        paso("Usaremos el centro de una aplicacion_proyectiva por simplicidad para el codigo")
+        # Aprovechamos aplicacion_proyectiva
+        return aplicacion_proyectiva(self._matriz).centro()
+
+    #\m
+    # Devuelve una tupla conteniendo los dos puntos de intersección de una recta (expresada como recta_proyectiva)
+    # con esta cuádrica. Si la recta fuera tangente (esto es, corta en un punto doble) devolverá dos veces el mismo punto.
+    #
+    # Implementación \\
+    # Tomado un punto genérico de la recta, P(theta), resuelve P^t(theta) * A * P(theta) = 0, siendo A la matriz que
+    # representa esta cuádrica.
+    #
+    # Parámetros \\
+    # r: recta_proyectiva(dim=n) - recta con la que intersecar
+    #
+    def interseccion_recta(self, r):
+        assert r.dimension_ambiente() == self.dimension(), "La recta debe pertenecer al espacio ambiente"
+        var('theta_var', latex_name = '\\theta')
+        p = r[theta_var]
+        ec = (p * self._matriz * p).expand()
+        assert ec != 0, "La recta con la que se intenta intersecar esta contenida en la cuadrica"
+        # Si queda una ecuación de primer grado o grado cero es que una solución era infinito
+        sol = [] if ec.degree(theta_var) == 2 else [theta_var == Infinity]
+        paso("Resolvemos: ", matrix([p]), self._matriz, matrix([p]).T, " = ", ec, " = 0")
+        sol = sol + solve(ec, theta_var)
+        paso(sol)
+        paso("Sustituimos en la recta para obtener los dos puntos")
+        return (r[sol[0].rhs()], r[sol[-1].rhs()])
+
+    #\m
+    # Calcula la imagen de un punto mediante la forma bilineal que define esta cuádrica. Realmente esta no es una operación de
+    # cuádricas, pero se incluye aquí porque puede ser útil.
+    #
+    # Uso: c(p) (donde c es una cuadrica y p un punto).
+    #
+    # Implementación \\
+    # Calcula p^t * A * p, donde A es la matriz asociada a esta cuádrica.
+    #
+    # Parámetros \\
+    # p: vector(n) - punto del que se quiere calcular su imagen
+    #
+    def __call__(self, p):
+        return p * self._matriz * p
+
+    #\m
+    # Operador in. Determina si un punto está contenido en esta cuádrica o no.
+    #
+    # Uso: P in c (P es un punto y c una cuadrica).
+    #
+    # Implementación \\
+    # Comprueba p^t * A * p = 0 para A la matriz asociada de la cuádrica.
+    #
+    # Parámetros \\
+    # punto: vector(n) - punto que comprobar si pertenece a la cuádrica
+    #
+    def __contains__(self, punto):
+        return self(punto) == 0
+
+    def __repr__(self):
+        return "<Cuadrica de ecuacion " + str(self.ecuacion()) + ">"
+
+#\c
 # Clase que representa una cónica tanto puntual como dual dada su matriz.
 #
 class conica:
@@ -281,8 +523,9 @@ class conica:
     #\i
     # Construye una cónica dada su matriz. Si se quiere crear mediante una ecuación es recomendable hacerlo
     # a mano (matriz simétrica con coeficientes de variables al cuadrado en la diagonal y en el resto de
-    # posiciones la mitad del coeficiente según las variables). Se puede usar también ecuacion.hessian() pero
-    # puede dar problemas si se tiene algún parámetro o si no aparecen las tres variables.
+    # posiciones la mitad del coeficiente según las variables). Si no, se puede usar también ecuacion.hessian(), donde
+    # ecuacion es la parte izquierda de la ecuación (sin el == 0), pero puede dar problemas si se tiene algún parámetro o
+    # si no aparecen las tres variables.
     #
     # Parámetros \\
     # matriz: matriz(3, 3) - matriz de la cónica
@@ -391,9 +634,9 @@ class conica:
     # matriz_cambio: matriz(3, 3) - matriz que representa el cambio de referencia: x' = Ax
     #
     def cambiar_referencia(self, matriz_cambio):
-        assert matriz_cambio.nrows() == 3, "La matriz del cambio de referencia de una cónica es 3x3"
+        assert matriz_cambio.nrows() == 3, "La matriz del cambio de referencia de una conica es 3x3"
         assert matriz_cambio.det() != 0, "Una matriz de cambio de referencia debe ser invertible"
-        m = (matriz_cambio^-1).simplify_full()
+        m = matriz_cambio^-1
         paso("La matriz de la conica en la nueva referencia se calcula:", m.T, self._matriz, m)
         return conica(m.T * self._matriz * m)
 
@@ -463,14 +706,15 @@ class conica:
     # p: vector(3) - punto del que obtener las tangentes
     #
     def tangentes(self, p):
+        assert len(p) == 3, "El punto debe pertencer al plano"
         x = matrix([p]).T
         paso("La conica degenerada tangente a esta que pasa por el punto es la de matriz")
         paso(self._matriz, x, x.T, self._matriz, " - (", x.T, self._matriz, x, ")", self._matriz)
         return conica(self._matriz * x * x.T * self._matriz - (x.T * self._matriz * x)[0][0] * self._matriz)
 
     #\m
-    # Devuelve la intersección de las rectas de esta cónica degenerada. Devuelve un subespacio, si sólo
-    # se quiere un punto, en caso de ser dos rectas distintas, se puede usar .representantes()[0] para
+    # Devuelve la intersección de las rectas de esta cónica degenerada. El resultado se devuelve siempre de tipo subespacio.
+    # Si sólo se quiere un punto, en caso de ser dos rectas distintas, se puede usar .representantes()[0] para
     # obtenerlo como vector. Si la cónica no es degenerada devuelve un subespacio vacío.
     #
     # Implementación \\
@@ -495,14 +739,14 @@ class conica:
     #
     def interseccion_recta(self, r):
         assert r.dimension_ambiente() == 2, "La recta debe ser del plano"
-        var('theta', latex_name = '\\theta')
-        p = r[theta]
+        var('theta_var', latex_name = '\\theta')
+        p = r[theta_var]
         ec = (p * self._matriz * p).expand()
         assert ec != 0, "La recta con la que se intenta intersecar esta contenida en la conica"
         # Si queda una ecuación de primer grado o grado cero es que una solución era infinito
-        sol = [] if ec.degree(theta) == 2 else [theta == Infinity]
+        sol = [] if ec.degree(theta_var) == 2 else [theta_var == Infinity]
         paso("Resolvemos: ", matrix([p]), self._matriz, matrix([p]).T, " = ", ec, " = 0")
-        sol = sol + solve(ec, theta)
+        sol = sol + solve(ec, theta_var)
         paso(sol)
         paso("Sustituimos en la recta para obtener los dos puntos")
         return (r[sol[0].rhs()], r[sol[-1].rhs()])
@@ -769,59 +1013,6 @@ class conica:
             _no_pasos(False)
             return (res1, res2)
 
-    # ELIMINADO DE MOMENTO PORQUE PARECE NO FUNCIONAR BIEN
-    '''
-    #
-    # Devuelve una tupla conteniendo las dos rectas (como subespacios) en que se descompone esta cónica degenerada.
-    # Si la cónica es una recta doble ambas rectas serán la misma.
-    #
-    # NOTA. Aquí se utiliza el procedimiento que se describe a continuación porque es más sencillo de programar, pero hay otros métodos, como el de resolver
-    # la ecuación en alguna de las variables, o hallar el punto de intersección de las rectas y luego cortar la cónica con rectas sencillas, como x=0, y=0 o z=0
-    # para hallar los otros dos puntos y luego unirlos con el primero. Además, simplemente accediendo a la ecuación de la cónica con factor = True (ver ecuacion())
-    # se puede ver la cónica factorizada, pero sin ningún tipo de procedimiento especial. Esto está por si fuera necesario.
-    #
-    # Implementación \\
-    # Utiliza los ejercicios 3 y 4 de la hoja 6 (han podido cambiar de numeración). Llamaremos u y v a los vectores de coeficientes de las rectas.
-    # Los ejercicios nos dicen que (uv^t + vu^t)* = (uxv)(uxv)^t; uv^t - vu^t es una matriz antisimétrica con sus componentes fuera de la diagonal son, por
-    # orden, (uxv)3, -(uxv)2, (uxv)1 (donde el número denota la componente del vector); y 2uv^t = (uv^t + vu^t) + (uv^t - vu^t). \\
-    # Entonces, el primero de esa suma se obtiene de la propia matriz de la cónica. Para el segundo hay que obtener uxv. Eso se hace sabiendo que (uxv)(uxv)^t
-    # es la matriz de la cónica dual. Calculando, la diagonal de esta matriz son los cuadrados de las componentes de uxv. Lo único que queda es calcular el signo.
-    #
-    def factorizacion(self):
-        assert self.es_degenerada(), "La factorizacion se hace sobre una conica degenerada"
-        assert self._matriz != 0, "No tiene sentido factorizar la conica de matriz 0"
-        paso("Vamos a factorizar mediante un metodo visto en un ejercicio")
-        m = -self._matriz.adjoint()
-        paso("Primero calculamos (uxv)(uxv)^t = -A* = -", m)
-        uxv = vector(self.__calcular_uxv(m))
-        paso("Su daigonal principal son los cuadrados de cada componente del vector uxv => uxv = ", uxv)
-        resta = matrix([[0, uxv[2], -uxv[1]], [-uxv[2], 0, uxv[0]], [uxv[1], -uxv[0], 0]])
-        paso("Sabemos que uv^t-vu^t se expresa como matriz antisimetrica formada por las componentes de uxv:", resta)
-        uv2 = resta + self._matriz
-        paso("Y 2uv^t = ", resta, " + ", self._matriz, " = ", uv2, "; de aqui tomamos una fila y una columna y ya tenemos los coeficientes de las rectas buscadas")
-        i = 1
-        u = uv2.rows()[0]
-        # Por si acaso
-        while u == 0:
-            u = uv2.rows()[i]
-            i = i + 1
-        i = 1
-        v = uv2.columns()[0]
-        # Buscamos uno linealmente independiente
-        while matrix([u.list(), v.list()]).rank() == 1 and i < 3:
-            v = uv2.columns()[i]
-            i = i + 1
-        # Era una recta doble
-        if matrix([u.list(), v.list()]).rank() == 1:
-            paso("Tenemos una recta doble con coeficientes: ", u)
-        else:
-            paso("Tenemos dos rectas de coeficientes: ", u, ", ", v)
-        _no_pasos()
-        res = (subespacio(u).dual(), subespacio(v).dual())
-        _no_pasos(False)
-        return res
-    '''
-
     #\m
     # Calcula la imagen de un punto mediante la forma bilineal que define esta cónica. Realmente esta no es una operación de
     # cónicas, pero se incluye aquí porque puede ser útil.
@@ -856,23 +1047,6 @@ class conica:
     def __punto_aleatorio(self, a, b):
         p = vector([randint(a, b) for i in range(3)])
         return p if p != 0 else vector([0, 0, 1])
-
-    def __calcular_uxv(self, m):
-        # Simplifica por si acaso
-        uxv1 = sqrt(m[0][0]).simplify_full()
-        uxv2 = sqrt(m[1][1]).simplify_full()
-        uxv3 = sqrt(m[2][2]).simplify_full()
-        paso(m)
-        paso(uxv1)
-        paso(uxv2)
-        paso(uxv3)
-        m01 = (uxv1 * uxv2).simplify_full()
-        m02 = (uxv1 * uxv3).simplify_full()
-        m12 = (uxv2 * uxv3).simplify_full()
-        s1 = 1 if m01 == m[0][1] else -1
-        s2 = 1 if m02 == m[0][2] else -1
-        s3 = 1 if m12 == m[1][2] else -1
-        return (s1 * s2 * uxv1, s1 * s3 * uxv2, s2 * s3 * uxv3)
 
     def _tipo(self):
         return 0
