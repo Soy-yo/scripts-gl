@@ -1233,7 +1233,7 @@ class parametrizacion_conica:
             return r
         return True
 
-    #\f
+    #\m
     # Calcula la razón doble {A, B; C, D}. Es válido tanto para puntos como para parámetros inhomogéneos
     # de la cónica.
     #
@@ -1260,7 +1260,7 @@ class parametrizacion_conica:
              ", respectivamente (no se muestra procedimiento)")
         return razon_doble_theta(theta0, theta1, theta2, theta3)
 
-    #\f
+    #\m
     # Determina si los puntos dados forman una cuaterna armónica, esto es, {A, B; C, D} = -1. Es válido tanto
     # para puntos como para parámetros inhomogéneos de una cónica.
     #
@@ -1273,7 +1273,7 @@ class parametrizacion_conica:
     def es_cuaterna_armonica(self, a, b, c, d):
         return bool(self.razon_doble(a, b, c, d) == -1)
 
-    #\f
+    #\m
     # Devuelve el conjugado armónico de c respecto de a y b. Es válido tanto para puntos como para parámetros inhomogéneos
     # de una cónica.
     #
