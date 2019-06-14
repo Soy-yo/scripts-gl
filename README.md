@@ -1,8 +1,8 @@
 ### Importante
 Todos estos scripts han sido programados y probados por mí mismo en apenas unos meses. He intentado probar que todo funcione correctamente y he ido arreglando todos los errores que he ido encontrando. Parece que todo funciona correctamente. Pero eso no significa que todo funcione correctamente. Así que <b>no me hago responsable de posibles errores que puedan suceder a la hora de usar los scripts en un examen</b>. Se recomienda comprobar que las soluciones tienen sentido o incluso dibujarlas con GeoGebra.
 
-### Fecha de salida
-Salvo arreglos de última hora, que serán avisados, se asegura que a partir del <b>lunes 28 de enero a las 10:00</b> ya no habrá más modificaciones de código.
+### Última versión estable 12/06/19
+La última versión con todas las funcionalidades implementadas y que (parece) funciona correctamente es del <b>12/6/19</b> (el cambio con la versión anterior ha sido la implementación de las cuádricas para dimensión genérica, ya que cayeron en el examen de enero).
 
 # scripts-gl
 Scripts que pueden resultar útiles para resolver ejercicios de Geometría Lineal usando Sage.
